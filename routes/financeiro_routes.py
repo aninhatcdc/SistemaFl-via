@@ -32,6 +32,7 @@ from models import db
 from models.financeiro import LancamentoFinanceiro
 from services.financeiro_importador import ler_planilha_financeira
 from utils.permissoes import financeiro_required
+from utils.storage import storage_path
 
 
 financeiro_bp = Blueprint(
@@ -75,8 +76,7 @@ def extensao_permitida(nome_arquivo):
 
 
 def pasta_importacoes():
-    pasta = os.path.join(
-        current_app.instance_path,
+    pasta = storage_path(
         "importacoes_financeiro"
     )
 

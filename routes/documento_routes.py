@@ -16,11 +16,11 @@ from werkzeug.utils import secure_filename
 from models import db
 from models.cliente import Cliente
 from models.documento import Documento
+from utils.storage import storage_path, caminho_storage_relativo
 
 
 documento_bp = Blueprint("documentos", __name__)
 
-UPLOAD_FOLDER = "uploads"
 
 
 # =====================================
@@ -77,23 +77,21 @@ def novo_documento(cliente_id):
             flash("O nome do arquivo é inválido.", "danger")
             return redirect(request.url)
 
-        pasta_cliente = os.path.join(
-            UPLOAD_FOLDER,
-            f"cliente_{cliente.id}"
-        )
-
-        os.makedirs(pasta_cliente, exist_ok=True)
-
-        caminho = os.path.join(
-            pasta_cliente,
+        caminho = storage_path(
+            "uploads",
+            "documentos",
+            f"cliente_{cliente.id}",
             nome_seguro
         )
 
-        arquivo.save(caminho)
+        arquivo.save(str(caminho))
 
         documento = Documento(
             nome_arquivo=nome_seguro,
-            caminho_arquivo=caminho,
+            caminho_arquivo=os.path.relpath(
+                caminho,
+                storage_path()
+            ).replace("\\", "/"),
             tipo=None,
             descricao=request.form.get("descricao", ""),
             cliente_id=cliente.id
@@ -139,7 +137,7 @@ def detalhes_documento(id):
 def visualizar_documento(id):
     documento = Documento.query.get_or_404(id)
 
-    if not os.path.exists(documento.caminho_arquivo):
+    if not caminho_storage_relativo(documento.caminho_arquivo).is_file():
         flash("Arquivo não encontrado no servidor.", "danger")
 
         return redirect(
@@ -147,7 +145,11 @@ def visualizar_documento(id):
         )
 
     return send_file(
-        documento.caminho_arquivo
+        str(
+            caminho_storage_relativo(
+                documento.caminho_arquivo
+            )
+        )
     )
 
 
@@ -159,7 +161,7 @@ def visualizar_documento(id):
 def download_documento(id):
     documento = Documento.query.get_or_404(id)
 
-    if not os.path.exists(documento.caminho_arquivo):
+    if not caminho_storage_relativo(documento.caminho_arquivo).is_file():
         flash("Arquivo não encontrado no servidor.", "danger")
 
         return redirect(
@@ -167,7 +169,11 @@ def download_documento(id):
         )
 
     return send_file(
-        documento.caminho_arquivo,
+        str(
+            caminho_storage_relativo(
+                documento.caminho_arquivo
+            )
+        ),
         as_attachment=True,
         download_name=documento.nome_arquivo
     )
@@ -185,8 +191,8 @@ def excluir_documento(id):
     documento = Documento.query.get_or_404(id)
     cliente_id = documento.cliente_id
 
-    if os.path.exists(documento.caminho_arquivo):
-        os.remove(documento.caminho_arquivo)
+    if caminho_storage_relativo(documento.caminho_arquivo).is_file():
+        caminho_storage_relativo(documento.caminho_arquivo).unlink()
 
     db.session.delete(documento)
     db.session.commit()

@@ -26,6 +26,8 @@ from models.documento_gerado import DocumentoGerado
 from models.documento_modelo import DocumentoModelo
 from models.processo import Processo
 
+from utils.storage import storage_path, caminho_storage_relativo
+
 from services.gerador_documentos_service import (
     gerar_documento_docx,
     montar_contexto_documento,
@@ -59,6 +61,11 @@ def caminho_absoluto(caminho):
 
     if os.path.isabs(caminho):
         return caminho
+
+    if str(caminho).replace("\\", "/").lstrip("/").startswith("uploads/"):
+        return str(
+            caminho_storage_relativo(caminho)
+        )
 
     return os.path.join(
         current_app.root_path,

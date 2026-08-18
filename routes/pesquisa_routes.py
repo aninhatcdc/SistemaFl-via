@@ -67,11 +67,22 @@ def contem_sem_acentos(
     maiúsculas e minúsculas.
     """
 
-    return db.func.sem_acentos(
-        db.func.coalesce(
-            campo,
-            ""
+    dialeto = db.session.bind.dialect.name
+
+    expressao = db.func.coalesce(
+        campo,
+        ""
+    )
+
+    if dialeto == "postgresql":
+        return db.func.unaccent(
+            db.func.lower(expressao)
+        ).like(
+            termo_like
         )
+
+    return db.func.sem_acentos(
+        expressao
     ).like(
         termo_like
     )

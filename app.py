@@ -349,16 +349,30 @@ def criar_administrador_inicial():
 # INICIALIZAÇÃO DO BANCO
 # =====================================
 with app.app_context():
-    if not event.contains(
-        db.engine,
-        "connect",
-        registrar_funcoes_sqlite
-    ):
-        event.listen(
+    # A função sem_acentos é necessária apenas no SQLite local.
+    # No PostgreSQL, a pesquisa usa a extensão unaccent.
+    if db.engine.dialect.name == "sqlite":
+        if not event.contains(
             db.engine,
             "connect",
             registrar_funcoes_sqlite
-        )
+        ):
+            event.listen(
+                db.engine,
+                "connect",
+                registrar_funcoes_sqlite
+            )
+    else:
+        try:
+            with db.engine.begin() as conexao:
+                conexao.exec_driver_sql(
+                    "CREATE EXTENSION IF NOT EXISTS unaccent"
+                )
+        except Exception as erro:
+            print(
+                "Aviso: não foi possível habilitar a extensão "
+                f"unaccent no PostgreSQL: {erro}"
+            )
 
     db.create_all()
 

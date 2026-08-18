@@ -354,10 +354,7 @@
                       and configuracao_global.logo %}
 
                     <img
-                        src="{{ url_for(
-                            'static',
-                            filename=configuracao_global.logo
-                        ) }}"
+                        src="{{ url_for('configuracoes.visualizar_logo') }}"
                         alt="Logo do escritório"
                         class="marca-logo-topo">
 
@@ -683,10 +680,7 @@
                               and configuracao_global.logo %}
 
                             <img
-                                src="{{ url_for(
-                                    'static',
-                                    filename=configuracao_global.logo
-                                ) }}"
+                                src="{{ url_for('configuracoes.visualizar_logo') }}"
                                 alt="Logo do escritório"
                                 class="marca-logo-sidebar">
 

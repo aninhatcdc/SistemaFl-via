@@ -25,6 +25,7 @@ from werkzeug.utils import secure_filename
 from models import db
 from models.configuracao import ConfiguracaoEscritorio
 from utils.permissoes import admin_required
+from utils.storage import storage_path
 
 
 configuracao_bp = Blueprint(
@@ -56,8 +57,7 @@ def extensao_logo_permitida(nome_arquivo):
 
 
 def pasta_logos():
-    pasta = os.path.join(
-        current_app.static_folder,
+    pasta = storage_path(
         "uploads",
         "logos"
     )
@@ -122,6 +122,15 @@ def obter_caminho_banco():
 
 
 def obter_informacoes_banco():
+    if db.engine.dialect.name != "sqlite":
+        return {
+            "existe": True,
+            "caminho": "PostgreSQL",
+            "tamanho": 0,
+            "tamanho_formatado": "Banco gerenciado pelo PostgreSQL/Render",
+            "modificado_em": None
+        }
+
     caminho_banco = obter_caminho_banco()
 
     if not caminho_banco.is_file():
@@ -379,8 +388,7 @@ def dados_escritorio():
             )
 
             if configuracao.logo:
-                caminho_antigo = os.path.join(
-                    current_app.static_folder,
+                caminho_antigo = storage_path(
                     configuracao.logo
                 )
 
@@ -437,6 +445,26 @@ def dados_escritorio():
 
 
 # =====================================
+# VISUALIZAR LOGO
+# =====================================
+@configuracao_bp.route("/logo")
+def visualizar_logo():
+    configuracao = obter_configuracao()
+
+    if not configuracao.logo:
+        return ("", 404)
+
+    caminho = storage_path(
+        configuracao.logo
+    )
+
+    if not caminho.is_file():
+        return ("", 404)
+
+    return send_file(str(caminho))
+
+
+# =====================================
 # REMOVER LOGO
 # =====================================
 @configuracao_bp.route(
@@ -450,8 +478,7 @@ def remover_logo():
     configuracao = obter_configuracao()
 
     if configuracao.logo:
-        caminho_logo = os.path.join(
-            current_app.static_folder,
+        caminho_logo = storage_path(
             configuracao.logo
         )
 
@@ -529,6 +556,16 @@ def pagina_backup():
 )
 @admin_required
 def baixar_backup():
+    if db.engine.dialect.name != "sqlite":
+        flash(
+            "O sistema está usando PostgreSQL. "
+            "Faça os backups pelo painel do Render/PostgreSQL.",
+            "info"
+        )
+        return redirect(
+            url_for("configuracoes.pagina_backup")
+        )
+
     try:
         caminho_backup = criar_backup_temporario()
 

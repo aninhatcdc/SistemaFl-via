@@ -1,12 +1,23 @@
-__pycache__/
-*.py[cod]
-*.db
-instance/
-logs/
-backups_automaticos/
-uploads/
+# Ambiente virtual
 venv/
-.env
+env/
 .venv/
-.idea/
-.vscode/
+
+# Python
+__pycache__/
+*.pyc
+
+# Banco de dados local e uploads (dados sensíveis de clientes!)
+instance/
+uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# Variáveis de ambiente / segredos
+.env
+.env.*
+
+# Sistema
+.DS_Store
+Thumbs.db

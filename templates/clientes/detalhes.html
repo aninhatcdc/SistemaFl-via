@@ -1289,7 +1289,7 @@
 
                                 </td>
 
-                                <td class="text-end">
+                                <td class="text-end text-nowrap">
 
                                     {% if atendimento.area
                                           == atendimento.AREA_TRABALHISTA %}
@@ -1308,13 +1308,36 @@
 
                                     {% else %}
 
-                                        <span class="text-muted small">
+                                        <span class="text-muted small me-2">
 
                                             Ficha indisponível
 
                                         </span>
 
                                     {% endif %}
+
+                                    <form
+                                        action="{{ url_for(
+                                            'atendimentos.excluir_atendimento',
+                                            atendimento_id=atendimento.id
+                                        ) }}"
+                                        method="POST"
+                                        class="d-inline"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm(
+                                                'Tem certeza que deseja excluir esta ficha?\n\nTodos os dados deste atendimento serão excluídos e esta ação não poderá ser desfeita.'
+                                            )"
+                                        >
+
+                                            🗑 Excluir
+
+                                        </button>
+
+                                    </form>
 
                                 </td>
 

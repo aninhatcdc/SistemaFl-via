@@ -5129,6 +5129,8 @@ def etapa_segurado_previdenciario(atendimento_id):
             url_for("clientes.listar_clientes")
         )
 
+    cliente = atendimento.cliente
+
     ficha = obter_ou_criar_ficha_previdenciaria(atendimento)
 
     if ficha is None:
@@ -6762,6 +6764,8 @@ def etapa_cliente(atendimento_id):
                 "clientes.listar_clientes",
             )
         )
+
+    cliente = atendimento.cliente
 
     ficha = obter_ou_criar_ficha(
         atendimento,
@@ -9399,3 +9403,118 @@ def gerar_pdf_familia(atendimento_id):
                 atendimento_id=atendimento.id,
             )
         )
+
+# ============================================================
+# EXCLUIR ATENDIMENTO
+# ============================================================
+
+@atendimento_bp.route(
+    "/atendimentos/<int:atendimento_id>/excluir",
+    methods=["POST"],
+)
+@login_required
+def excluir_atendimento(atendimento_id):
+
+    atendimento = Atendimento.query.get_or_404(
+        atendimento_id
+    )
+
+    try:
+
+        # ----------------------------------------------------
+        # EXCLUIR A FICHA RELACIONADA
+        # ----------------------------------------------------
+
+        if atendimento.area == Atendimento.AREA_TRABALHISTA:
+
+            ficha = atendimento.ficha_trabalhista
+
+            if ficha is not None:
+
+                db.session.delete(
+                    ficha
+                )
+
+
+        elif atendimento.area == Atendimento.AREA_PREVIDENCIARIA:
+
+            ficha = atendimento.ficha_previdenciaria
+
+            if ficha is not None:
+
+                db.session.delete(
+                    ficha
+                )
+
+
+        elif atendimento.area == Atendimento.AREA_CIVEL:
+
+            ficha = atendimento.ficha_civel
+
+            if ficha is not None:
+
+                db.session.delete(
+                    ficha
+                )
+
+
+        elif atendimento.area == Atendimento.AREA_FAMILIA:
+
+            ficha = atendimento.ficha_familia
+
+            if ficha is not None:
+
+                db.session.delete(
+                    ficha
+                )
+
+
+        elif atendimento.area == Atendimento.AREA_CONSUMIDOR:
+
+            ficha = atendimento.ficha_consumidor
+
+            if ficha is not None:
+
+                db.session.delete(
+                    ficha
+                )
+
+
+        # ----------------------------------------------------
+        # EXCLUIR O ATENDIMENTO
+        # ----------------------------------------------------
+
+        db.session.delete(
+            atendimento
+        )
+
+        db.session.commit()
+
+
+        flash(
+            "Atendimento excluído com sucesso.",
+            "success"
+        )
+
+
+    except Exception as erro:
+
+        db.session.rollback()
+
+        print(
+            "ERRO AO EXCLUIR ATENDIMENTO:",
+            erro
+        )
+
+        flash(
+            "Não foi possível excluir o atendimento.",
+            "danger"
+        )
+
+
+    return redirect(
+        request.referrer
+        or url_for(
+            "dashboard.dashboard"
+        )
+    )

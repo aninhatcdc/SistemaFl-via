@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% from "components/file_icon.html" import file_icon %}
+{% from "components/page_header.html" import page_header %}
+{% from "components/dashboard_card.html" import dashboard_card %}
+
+{% block titulo %}
+Arquivos
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "📂 Arquivos",
+    "Todos os arquivos vinculados aos clientes."
+) }}
+
+<!-- Indicadores -->
+<div class="row mb-4">
+
+    {{ dashboard_card(
+        "📂 Total",
+        total,
+        "Arquivos cadastrados"
+    ) }}
+
+</div>
+
+<!-- Pesquisa -->
+<form method="GET"
+      action="{{ url_for('documentos.listar_documentos') }}"
+      class="mb-4">
+
+    <div class="input-group">
+
+        <input type="text"
+               name="q"
+               class="form-control"
+               placeholder="Pesquisar por nome do arquivo ou descrição..."
+               value="{{ termo }}">
+
+        <button type="submit"
+                class="btn btn-dark">
+            🔍 Pesquisar
+        </button>
+
+        <a href="{{ url_for('documentos.listar_documentos') }}"
+           class="btn btn-secondary">
+            Limpar
+        </a>
+
+    </div>
+
+</form>
+
+<!-- Lista de arquivos -->
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        {% if documentos %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Arquivo</th>
+                            <th>Cliente</th>
+                            <th>Descrição</th>
+                            <th>Data de envio</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for documento in documentos %}
+
+                            <tr>
+
+                                <td>
+                                    <a href="{{ url_for('documentos.detalhes_documento', id=documento.id) }}"
+                                       class="fw-bold text-decoration-none">
+
+                                        {{ file_icon(documento.nome_arquivo) }}
+                                        {{ documento.nome_arquivo }}
+
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <a href="{{ url_for('clientes.detalhes_cliente', id=documento.cliente.id) }}"
+                                       class="fw-bold text-decoration-none">
+                                        {{ documento.cliente.nome }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ documento.descricao or "-" }}
+                                </td>
+
+                                <td>
+                                    {% if documento.criado_em %}
+                                        {{ documento.criado_em.strftime("%d/%m/%Y às %H:%M") }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a href="{{ url_for('documentos.visualizar_documento', id=documento.id) }}"
+                                       class="btn btn-info btn-sm"
+                                       target="_blank">
+                                        👁 Ver
+                                    </a>
+
+                                    <a href="{{ url_for('documentos.download_documento', id=documento.id) }}"
+                                       class="btn btn-success btn-sm">
+                                        ⬇ Baixar
+                                    </a>
+
+                                    <form action="{{ url_for('documentos.excluir_documento', id=documento.id) }}"
+                                          method="POST"
+                                          style="display:inline;">
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Tem certeza que deseja excluir este arquivo?')">
+                                            🗑 Excluir
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <h5 class="text-muted">
+                    📂 Nenhum arquivo encontrado
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Envie arquivos pela ficha de um cliente.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,969 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+{% block titulo %}
+Local de Trabalho | Ficha Trabalhista
+{% endblock %}
+
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_local_trabalho",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+
+{% block etapa_titulo %}
+Local de Trabalho
+{% endblock %}
+
+
+{% block etapa_descricao %}
+Informe onde e em quais condições o trabalho era realizado.
+{% endblock %}
+
+
+{% block etapa_identificacao %}
+Etapa 6 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+<div class="trabalhista-info-box">
+
+    <i class="bi bi-info-circle"></i>
+
+    <div>
+        Registre os locais em que o cliente trabalhava, as viagens,
+        os gastos com deslocamento e o uso de recursos particulares.
+        Os campos complementares aparecerão conforme as respostas.
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+<!-- ============================================================
+     LOCAL OU LOCAIS DE TRABALHO
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-geo-alt"></i>
+        </span>
+
+        <div>
+            <h3>Local ou locais de trabalho</h3>
+
+            <p>
+                Identifique se o serviço era prestado em endereço fixo,
+                em diferentes locais ou em obras.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="trabalhava_mesmo_local"
+                class="form-label"
+            >
+                Trabalhava sempre no mesmo local?
+            </label>
+
+            <select
+                name="trabalhava_mesmo_local"
+                id="trabalhava_mesmo_local"
+                class="form-select"
+                data-controla="grupo-locais-trabalho"
+                data-exibir-quando="NAO"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.trabalhava_mesmo_local == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-locais-trabalho"
+            class="col-12 campo-condicional"
+        >
+
+            <label
+                for="locais_trabalho"
+                class="form-label"
+            >
+                Quais locais?
+            </label>
+
+            <textarea
+                name="locais_trabalho"
+                id="locais_trabalho"
+                class="form-control"
+                rows="4"
+                placeholder="Informe endereços, cidades, unidades, filiais ou outros locais em que trabalhou."
+            >{{ ficha.locais_trabalho or "" }}</textarea>
+
+        </div>
+
+
+        <div class="col-lg-6">
+
+            <label
+                for="trabalhava_em_obras"
+                class="form-label"
+            >
+                Trabalhava em obras?
+            </label>
+
+            <select
+                name="trabalhava_em_obras"
+                id="trabalhava_em_obras"
+                class="form-select"
+                data-controla="grupo-obras"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.trabalhava_em_obras == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-obras"
+            class="col-12 campo-condicional"
+        >
+
+            <label
+                for="obras_locais"
+                class="form-label"
+            >
+                Em quais obras ou locais?
+            </label>
+
+            <textarea
+                name="obras_locais"
+                id="obras_locais"
+                class="form-control"
+                rows="4"
+                placeholder="Descreva as obras, empresas contratantes, cidades e períodos aproximados."
+            >{{ ficha.obras_locais or "" }}</textarea>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     VIAGENS E PERNOITES
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-luggage"></i>
+        </span>
+
+        <div>
+            <h3>Viagens e permanência fora de casa</h3>
+
+            <p>
+                Informe viagens a serviço, pernoites, diárias,
+                hospedagem e alimentação.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="trabalhava_viajando"
+                class="form-label"
+            >
+                Viajava a trabalho?
+            </label>
+
+            <select
+                name="trabalhava_viajando"
+                id="trabalhava_viajando"
+                class="form-select"
+                data-controla="grupo-viagens"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.trabalhava_viajando == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-viagens"
+            class="col-12 campo-condicional"
+        >
+
+            <div class="row g-3">
+
+                <div class="col-12">
+
+                    <label
+                        for="locais_viagens"
+                        class="form-label"
+                    >
+                        Para quais locais viajava?
+                    </label>
+
+                    <textarea
+                        name="locais_viagens"
+                        id="locais_viagens"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Informe cidades, estados, frequência e duração aproximada das viagens."
+                    >{{ ficha.locais_viagens or "" }}</textarea>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label
+                        for="dormia_fora_casa"
+                        class="form-label"
+                    >
+                        Dormia fora de casa?
+                    </label>
+
+                    <select
+                        name="dormia_fora_casa"
+                        id="dormia_fora_casa"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.dormia_fora_casa == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label
+                        for="recebia_diarias"
+                        class="form-label"
+                    >
+                        Recebia diárias?
+                    </label>
+
+                    <select
+                        name="recebia_diarias"
+                        id="recebia_diarias"
+                        class="form-select"
+                        data-controla="grupo-valor-diarias"
+                        data-exibir-quando="SIM"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.recebia_diarias == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="grupo-valor-diarias"
+                    class="col-md-6 campo-condicional"
+                >
+
+                    <label
+                        for="valor_diarias"
+                        class="form-label"
+                    >
+                        Valor das diárias
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            R$
+                        </span>
+
+                        <input
+                            type="text"
+                            name="valor_diarias"
+                            id="valor_diarias"
+                            class="form-control campo-monetario"
+                            value="{% if ficha.valor_diarias is not none %}{{ ficha.valor_diarias }}{% endif %}"
+                            inputmode="decimal"
+                            placeholder="0,00"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label
+                        for="recebia_hospedagem"
+                        class="form-label"
+                    >
+                        A empresa fornecia ou pagava hospedagem?
+                    </label>
+
+                    <select
+                        name="recebia_hospedagem"
+                        id="recebia_hospedagem"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.recebia_hospedagem == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label
+                        for="recebia_alimentacao"
+                        class="form-label"
+                    >
+                        A empresa fornecia ou pagava alimentação?
+                    </label>
+
+                    <select
+                        name="recebia_alimentacao"
+                        id="recebia_alimentacao"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.recebia_alimentacao == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     VEÍCULO PRÓPRIO
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-car-front"></i>
+        </span>
+
+        <div>
+            <h3>Veículo próprio</h3>
+
+            <p>
+                Registre o uso de veículo particular e eventual
+                reembolso feito pela empresa.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="usava_veiculo_proprio"
+                class="form-label"
+            >
+                Utilizava veículo próprio para o trabalho?
+            </label>
+
+            <select
+                name="usava_veiculo_proprio"
+                id="usava_veiculo_proprio"
+                class="form-select"
+                data-controla="grupo-veiculo-proprio"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.usava_veiculo_proprio == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-veiculo-proprio"
+            class="col-12 campo-condicional"
+        >
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="veiculo_proprio_descricao"
+                        class="form-label"
+                    >
+                        Qual veículo?
+                    </label>
+
+                    <input
+                        type="text"
+                        name="veiculo_proprio_descricao"
+                        id="veiculo_proprio_descricao"
+                        class="form-control"
+                        value="{{ ficha.veiculo_proprio_descricao or '' }}"
+                        placeholder="Ex.: motocicleta, carro, caminhonete."
+                    >
+
+                </div>
+
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="recebia_reembolso_veiculo"
+                        class="form-label"
+                    >
+                        Recebia reembolso pelo uso do veículo?
+                    </label>
+
+                    <select
+                        name="recebia_reembolso_veiculo"
+                        id="recebia_reembolso_veiculo"
+                        class="form-select"
+                        data-controla="grupo-reembolso-veiculo"
+                        data-exibir-quando="SIM"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.recebia_reembolso_veiculo == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="grupo-reembolso-veiculo"
+                    class="col-lg-6 campo-condicional"
+                >
+
+                    <label
+                        for="valor_reembolso_veiculo"
+                        class="form-label"
+                    >
+                        Valor do reembolso
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            R$
+                        </span>
+
+                        <input
+                            type="text"
+                            name="valor_reembolso_veiculo"
+                            id="valor_reembolso_veiculo"
+                            class="form-control campo-monetario"
+                            value="{% if ficha.valor_reembolso_veiculo is not none %}{{ ficha.valor_reembolso_veiculo }}{% endif %}"
+                            inputmode="decimal"
+                            placeholder="0,00"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     CELULAR, INTERNET E TELEFONE
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-phone"></i>
+        </span>
+
+        <div>
+            <h3>Celular, internet e telefone</h3>
+
+            <p>
+                Informe se recursos particulares eram utilizados
+                para executar o trabalho.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="utilizava_celular_particular"
+                class="form-label"
+            >
+                Utilizava celular particular para o trabalho?
+            </label>
+
+            <select
+                name="utilizava_celular_particular"
+                id="utilizava_celular_particular"
+                class="form-select"
+                data-controla="grupo-celular-particular"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.utilizava_celular_particular == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-celular-particular"
+            class="col-12 campo-condicional"
+        >
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="recebia_ajuda_internet_telefone"
+                        class="form-label"
+                    >
+                        Recebia ajuda para internet ou telefone?
+                    </label>
+
+                    <select
+                        name="recebia_ajuda_internet_telefone"
+                        id="recebia_ajuda_internet_telefone"
+                        class="form-select"
+                        data-controla="grupo-ajuda-internet"
+                        data-exibir-quando="SIM"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.recebia_ajuda_internet_telefone == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="grupo-ajuda-internet"
+                    class="col-lg-6 campo-condicional"
+                >
+
+                    <label
+                        for="valor_ajuda_internet_telefone"
+                        class="form-label"
+                    >
+                        Valor da ajuda
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            R$
+                        </span>
+
+                        <input
+                            type="text"
+                            name="valor_ajuda_internet_telefone"
+                            id="valor_ajuda_internet_telefone"
+                            class="form-control campo-monetario"
+                            value="{% if ficha.valor_ajuda_internet_telefone is not none %}{{ ficha.valor_ajuda_internet_telefone }}{% endif %}"
+                            inputmode="decimal"
+                            placeholder="0,00"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     OBSERVAÇÕES
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+
+        <div>
+            <h3>Observações sobre o local de trabalho</h3>
+
+            <p>
+                Registre detalhes adicionais que possam ser relevantes.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-12">
+
+            <label
+                for="observacoes_local_trabalho"
+                class="form-label"
+            >
+                Observações
+            </label>
+
+            <textarea
+                name="observacoes_local_trabalho"
+                id="observacoes_local_trabalho"
+                class="form-control"
+                rows="6"
+                placeholder="Ex.: condições dos locais, gastos não reembolsados, frequência das viagens, riscos, dificuldades de deslocamento ou outras informações."
+            >{{ ficha.observacoes_local_trabalho or "" }}</textarea>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ super() }}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        function atualizarCampoCondicional(controle) {
+            const destinoId = controle.dataset.controla;
+            const valorEsperado = controle.dataset.exibirQuando;
+            const destino = document.getElementById(destinoId);
+
+            if (!destino) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorEsperado;
+
+            destino.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            const campos = destino.querySelectorAll(
+                "input, select, textarea"
+            );
+
+            campos.forEach(function (campo) {
+                campo.disabled = !deveExibir;
+            });
+        }
+
+
+        const controles = document.querySelectorAll(
+            "[data-controla][data-exibir-quando]"
+        );
+
+        controles.forEach(function (controle) {
+
+            atualizarCampoCondicional(controle);
+
+            controle.addEventListener("change", function () {
+                atualizarCampoCondicional(controle);
+
+                const controlesInternos = document.querySelectorAll(
+                    "[data-controla][data-exibir-quando]"
+                );
+
+                controlesInternos.forEach(function (controleInterno) {
+                    atualizarCampoCondicional(controleInterno);
+                });
+            });
+
+        });
+
+
+        const camposMonetarios = document.querySelectorAll(
+            ".campo-monetario"
+        );
+
+        camposMonetarios.forEach(function (campo) {
+
+            campo.addEventListener("input", function () {
+                campo.value = campo.value.replace(
+                    /[^0-9.,]/g,
+                    ""
+                );
+            });
+
+            campo.addEventListener("blur", function () {
+                let valor = campo.value.trim();
+
+                if (!valor) {
+                    return;
+                }
+
+                if (valor.includes(",")) {
+                    valor = valor
+                        .replace(/\./g, "")
+                        .replace(",", ".");
+                }
+
+                const numero = Number(valor);
+
+                if (!Number.isNaN(numero)) {
+                    campo.value = numero.toLocaleString(
+                        "pt-BR",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    );
+                }
+            });
+
+        });
+
+    });
+</script>
+
+{% endblock %}

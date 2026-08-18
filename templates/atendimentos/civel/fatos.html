@@ -1,0 +1,437 @@
+{% extends "atendimentos/civel/layout.html" %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .civel-section .civel-section-title {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 0 16px 0 !important;
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        line-height: 1.25 !important;
+    }
+
+    .civel-section .civel-section-title i {
+        font-size: 22px !important;
+        line-height: 1 !important;
+    }
+
+    .campo-condicional {
+        display: none;
+    }
+</style>
+
+
+    <!-- ====================================================== -->
+    <!-- PERÍODO E LOCAL -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+            <i class="bi bi-calendar-event"></i>
+            Período e local dos fatos
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label for="data_inicio_fatos" class="form-label">
+                    Data de início
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_inicio_fatos"
+                    name="data_inicio_fatos"
+                    value="{{ ficha.data_inicio_fatos.strftime('%Y-%m-%d') if ficha.data_inicio_fatos else '' }}"
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label for="data_ultimo_fato" class="form-label">
+                    Data do último fato
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_ultimo_fato"
+                    name="data_ultimo_fato"
+                    value="{{ ficha.data_ultimo_fato.strftime('%Y-%m-%d') if ficha.data_ultimo_fato else '' }}"
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label for="fatos_continuam_ocorrendo" class="form-label">
+                    Os fatos continuam ocorrendo?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="fatos_continuam_ocorrendo"
+                    name="fatos_continuam_ocorrendo"
+                >
+                    <option value="">Selecione</option>
+
+                    {% for codigo, nome in ficha.RESPOSTAS.items() %}
+                    <option
+                        value="{{ codigo }}"
+                        {% if ficha.fatos_continuam_ocorrendo == codigo %}selected{% endif %}
+                    >
+                        {{ nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-12">
+                <label for="local_fatos" class="form-label">
+                    Local dos fatos
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="local_fatos"
+                    name="local_fatos"
+                    maxlength="255"
+                    placeholder="Informe o endereço, estabelecimento, cidade ou local onde os fatos ocorreram."
+                    value="{{ ficha.local_fatos or '' }}"
+                >
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- DESCRIÇÃO PRINCIPAL -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+            <i class="bi bi-journal-text"></i>
+            Descrição detalhada
+        </div>
+
+        <div>
+            <label for="descricao_detalhada_fatos" class="form-label">
+                Relato completo dos fatos
+                <span class="text-danger">*</span>
+            </label>
+
+            <textarea
+                class="form-control"
+                id="descricao_detalhada_fatos"
+                name="descricao_detalhada_fatos"
+                rows="10"
+                required
+                placeholder="Descreva os fatos em ordem cronológica, informando datas, pessoas envolvidas, acontecimentos, consequências e demais detalhes relevantes."
+            >{{ ficha.descricao_detalhada_fatos or '' }}</textarea>
+
+            <div class="form-text">
+                Organize o relato preferencialmente em ordem cronológica.
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- AMEAÇAS -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+            <i class="bi bi-exclamation-triangle"></i>
+            Ameaças ou intimidações
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label for="houve_ameaca" class="form-label">
+                    Houve ameaça ou intimidação?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="houve_ameaca"
+                    name="houve_ameaca"
+                    data-controla="grupo-ameaca"
+                >
+                    <option value="">Selecione</option>
+
+                    {% for codigo, nome in ficha.RESPOSTAS.items() %}
+                    <option
+                        value="{{ codigo }}"
+                        {% if ficha.houve_ameaca == codigo %}selected{% endif %}
+                    >
+                        {{ nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div
+                class="col-12 campo-condicional"
+                id="grupo-ameaca"
+            >
+                <label for="descricao_ameaca" class="form-label">
+                    Descrição da ameaça
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="descricao_ameaca"
+                    name="descricao_ameaca"
+                    rows="4"
+                    placeholder="Informe quem realizou a ameaça, quando ocorreu, como foi feita e quais foram as palavras ou atitudes utilizadas."
+                >{{ ficha.descricao_ameaca or '' }}</textarea>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- TESTEMUNHAS -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+            <i class="bi bi-people"></i>
+            Testemunhas
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label for="existem_testemunhas" class="form-label">
+                    Existem testemunhas?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="existem_testemunhas"
+                    name="existem_testemunhas"
+                    data-controla="grupo-testemunhas"
+                >
+                    <option value="">Selecione</option>
+
+                    {% for codigo, nome in ficha.RESPOSTAS.items() %}
+                    <option
+                        value="{{ codigo }}"
+                        {% if ficha.existem_testemunhas == codigo %}selected{% endif %}
+                    >
+                        {{ nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div
+                class="col-12 campo-condicional"
+                id="grupo-testemunhas"
+            >
+                <label for="testemunhas_dados" class="form-label">
+                    Identificação das testemunhas
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="testemunhas_dados"
+                    name="testemunhas_dados"
+                    rows="5"
+                    placeholder="Informe nome, telefone, relação com as partes e o que cada testemunha presenciou."
+                >{{ ficha.testemunhas_dados or '' }}</textarea>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- PROVAS -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+            <i class="bi bi-folder-check"></i>
+            Provas existentes
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label for="existem_provas" class="form-label">
+                    Existem provas?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="existem_provas"
+                    name="existem_provas"
+                    data-controla="grupo-provas"
+                >
+                    <option value="">Selecione</option>
+
+                    {% for codigo, nome in ficha.RESPOSTAS.items() %}
+                    <option
+                        value="{{ codigo }}"
+                        {% if ficha.existem_provas == codigo %}selected{% endif %}
+                    >
+                        {{ nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div
+                class="col-12 campo-condicional"
+                id="grupo-provas"
+            >
+                <label for="provas_existentes" class="form-label">
+                    Descrição das provas
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="provas_existentes"
+                    name="provas_existentes"
+                    rows="5"
+                    placeholder="Ex.: contratos, mensagens, áudios, vídeos, fotografias, recibos, notas fiscais, boletim de ocorrência ou documentos."
+                >{{ ficha.provas_existentes or '' }}</textarea>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- ENVOLVIDOS -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+            <i class="bi bi-person-lines-fill"></i>
+            Pessoas envolvidas
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-5">
+                <label for="cliente_participou_diretamente" class="form-label">
+                    O cliente participou diretamente dos fatos?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="cliente_participou_diretamente"
+                    name="cliente_participou_diretamente"
+                >
+                    <option value="">Selecione</option>
+
+                    {% for codigo, nome in ficha.RESPOSTAS.items() %}
+                    <option
+                        value="{{ codigo }}"
+                        {% if ficha.cliente_participou_diretamente == codigo %}selected{% endif %}
+                    >
+                        {{ nome }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-12">
+                <label for="terceiros_envolvidos" class="form-label">
+                    Terceiros envolvidos
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="terceiros_envolvidos"
+                    name="terceiros_envolvidos"
+                    rows="4"
+                    placeholder="Informe outras pessoas ou empresas envolvidas, seus vínculos e respectivas participações."
+                >{{ ficha.terceiros_envolvidos or '' }}</textarea>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ====================================================== -->
+    <!-- OBSERVAÇÕES -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+            <i class="bi bi-chat-left-text"></i>
+            Observações
+        </div>
+
+        <div>
+            <label for="observacoes_fatos" class="form-label">
+                Observações complementares
+            </label>
+
+            <textarea
+                class="form-control"
+                id="observacoes_fatos"
+                name="observacoes_fatos"
+                rows="5"
+                placeholder="Registre informações adicionais que possam ajudar na análise jurídica."
+            >{{ ficha.observacoes_fatos or '' }}</textarea>
+        </div>
+
+    </section>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function controlarCampo(select) {
+            const alvoId = select.dataset.controla;
+            const alvo = document.getElementById(alvoId);
+
+            if (!alvo) {
+                return;
+            }
+
+            const exibir = select.value === "SIM";
+
+            alvo.style.display = exibir ? "block" : "none";
+
+            const campos = alvo.querySelectorAll(
+                "input, select, textarea"
+            );
+
+            campos.forEach(function (campo) {
+                campo.disabled = !exibir;
+            });
+        }
+
+        const seletores = document.querySelectorAll(
+            "select[data-controla]"
+        );
+
+        seletores.forEach(function (select) {
+            controlarCampo(select);
+
+            select.addEventListener("change", function () {
+                controlarCampo(select);
+            });
+        });
+    });
+</script>
+
+{% endblock %}

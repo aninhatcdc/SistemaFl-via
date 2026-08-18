@@ -1,0 +1,17 @@
+{% macro page_header(titulo, descricao="") %}
+
+<div class="mb-4">
+
+    <h2 class="mb-1">
+        {{ titulo }}
+    </h2>
+
+    {% if descricao %}
+        <p class="text-muted mb-0">
+            {{ descricao }}
+        </p>
+    {% endif %}
+
+</div>
+
+{% endmacro %}

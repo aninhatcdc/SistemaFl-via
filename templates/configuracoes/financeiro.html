@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Configurações Financeiras
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "💰 Configurações Financeiras",
+    "Defina padrões, alertas e metas utilizadas pelo módulo financeiro."
+) }}
+
+<form
+    method="POST"
+    action="{{ url_for(
+        'configuracao_financeiro.configuracoes_financeiras'
+    ) }}">
+
+    <div class="row g-4">
+
+        <!-- =====================================
+             PADRÕES DOS LANÇAMENTOS
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-dark text-white py-3">
+
+                    <h5 class="mb-0">
+                        📋 Padrões dos lançamentos
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        <label
+                            for="categoria_padrao"
+                            class="form-label fw-semibold">
+
+                            Categoria padrão
+
+                        </label>
+
+                        <input
+                            type="text"
+                            id="categoria_padrao"
+                            name="categoria_padrao"
+                            class="form-control"
+                            value="{{ configuracao.categoria_padrao or '' }}"
+                            maxlength="100"
+                            required>
+
+                        <div class="form-text">
+
+                            Será usada quando nenhuma categoria for
+                            informada em um novo lançamento.
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label
+                            for="forma_pagamento_padrao"
+                            class="form-label fw-semibold">
+
+                            Forma de pagamento padrão
+
+                        </label>
+
+                        <input
+                            type="text"
+                            id="forma_pagamento_padrao"
+                            name="forma_pagamento_padrao"
+                            class="form-control"
+                            value="{{ configuracao.forma_pagamento_padrao or '' }}"
+                            maxlength="50"
+                            required>
+
+                    </div>
+
+                    <div>
+
+                        <label
+                            for="status_padrao"
+                            class="form-label fw-semibold">
+
+                            Status padrão
+
+                        </label>
+
+                        <select
+                            id="status_padrao"
+                            name="status_padrao"
+                            class="form-select">
+
+                            {% for status in ["Pago", "Pendente", "Previsto"] %}
+
+                                <option
+                                    value="{{ status }}"
+                                    {% if configuracao.status_padrao == status %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ status }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             ALERTAS
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-warning py-3">
+
+                    <h5 class="mb-0">
+                        🔔 Alertas financeiros
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-4">
+
+                        <label
+                            for="dias_alerta"
+                            class="form-label fw-semibold">
+
+                            Antecedência dos alertas
+
+                        </label>
+
+                        <select
+                            id="dias_alerta"
+                            name="dias_alerta"
+                            class="form-select">
+
+                            {% for quantidade in [1, 3, 5, 7, 10, 15, 30] %}
+
+                                <option
+                                    value="{{ quantidade }}"
+                                    {% if configuracao.dias_alerta == quantidade %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ quantidade }}
+
+                                    {% if quantidade == 1 %}
+                                        dia
+                                    {% else %}
+                                        dias
+                                    {% endif %}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-check form-switch mb-4">
+
+                        <input
+                            type="checkbox"
+                            id="avisar_vencimentos"
+                            name="avisar_vencimentos"
+                            class="form-check-input"
+                            {% if configuracao.avisar_vencimentos %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="avisar_vencimentos"
+                            class="form-check-label fw-semibold">
+
+                            Avisar lançamentos vencidos
+
+                        </label>
+
+                        <div class="form-text">
+
+                            Exibe pendências financeiras na Central de
+                            Notificações.
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-check form-switch">
+
+                        <input
+                            type="checkbox"
+                            id="destacar_recorrentes"
+                            name="destacar_recorrentes"
+                            class="form-check-input"
+                            {% if configuracao.destacar_recorrentes %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="destacar_recorrentes"
+                            class="form-check-label fw-semibold">
+
+                            Destacar lançamentos recorrentes
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             METAS
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-success text-white py-3">
+
+                    <h5 class="mb-0">
+                        🎯 Metas financeiras
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        <label
+                            for="meta_mensal"
+                            class="form-label fw-semibold">
+
+                            Meta mensal
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                R$
+                            </span>
+
+                            <input
+                                type="text"
+                                id="meta_mensal"
+                                name="meta_mensal"
+                                class="form-control"
+                                value="{{ '%.2f'|format(configuracao.meta_mensal or 0) }}"
+                                inputmode="decimal">
+
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <label
+                            for="meta_anual"
+                            class="form-label fw-semibold">
+
+                            Meta anual
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                R$
+                            </span>
+
+                            <input
+                                type="text"
+                                id="meta_anual"
+                                name="meta_anual"
+                                class="form-control"
+                                value="{{ '%.2f'|format(configuracao.meta_anual or 0) }}"
+                                inputmode="decimal">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             DASHBOARD FINANCEIRO
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-primary text-white py-3">
+
+                    <h5 class="mb-0">
+                        📊 Dashboard Financeiro
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="form-check form-switch mb-4">
+
+                        <input
+                            type="checkbox"
+                            id="mostrar_grafico_categorias"
+                            name="mostrar_grafico_categorias"
+                            class="form-check-input"
+                            {% if configuracao.mostrar_grafico_categorias %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="mostrar_grafico_categorias"
+                            class="form-check-label fw-semibold">
+
+                            Mostrar gráfico por categorias
+
+                        </label>
+
+                    </div>
+
+                    <div class="form-check form-switch">
+
+                        <input
+                            type="checkbox"
+                            id="mostrar_comparativo_anual"
+                            name="mostrar_comparativo_anual"
+                            class="form-check-input"
+                            {% if configuracao.mostrar_comparativo_anual %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="mostrar_comparativo_anual"
+                            class="form-check-label fw-semibold">
+
+                            Mostrar comparativo anual
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+
+        <a
+            href="{{ url_for(
+                'configuracoes.pagina_configuracoes'
+            ) }}"
+            class="btn btn-outline-secondary">
+
+            ← Voltar
+
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-success btn-lg">
+
+            💾 Salvar configurações
+
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

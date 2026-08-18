@@ -1,0 +1,471 @@
+{% extends "atendimentos/previdenciaria/layout.html" %}
+
+{% block title %}
+Documentação - Ficha Previdenciária
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_documentacao_previdenciario",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Documentação
+{% endblock %}
+
+{% block etapa_descricao %}
+Marque os documentos já apresentados e registre o que ainda está pendente.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 6 de 8
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="previdenciaria-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        Marque somente os documentos efetivamente apresentados ou conferidos.
+        Pendências podem ser registradas ao final da etapa.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .documento-card {
+        height: 100%;
+        border: 1px solid #e9ecef;
+        border-radius: 14px;
+        background: #ffffff;
+        padding: 16px;
+        transition: 0.2s ease;
+    }
+
+    .documento-card:hover {
+        border-color: #ced4da;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+    }
+
+    .documento-card .form-check {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        margin: 0;
+    }
+
+    .documento-card .form-check-input {
+        margin-top: 4px;
+        width: 1.15rem;
+        height: 1.15rem;
+        flex-shrink: 0;
+    }
+
+    .documento-card .form-check-label {
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .documento-card-titulo {
+        display: block;
+        font-weight: 700;
+        color: #212529;
+        margin-bottom: 4px;
+    }
+
+    .documento-card-descricao {
+        display: block;
+        font-size: 0.88rem;
+        color: #6c757d;
+        line-height: 1.4;
+    }
+
+    .documentos-contador {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #f1f3f5;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+</style>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-person-vcard"></i>
+        </span>
+        <div>
+            <h3>Documentos pessoais</h3>
+            <p>Documentos básicos de identificação e endereço.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos_pessoais = [
+            (
+                "documento_rg",
+                "RG",
+                "Documento de identidade do cliente."
+            ),
+            (
+                "documento_cpf",
+                "CPF",
+                "Cadastro de Pessoa Física."
+            ),
+            (
+                "documento_comprovante_residencia",
+                "Comprovante de residência",
+                "Preferencialmente recente e em nome do cliente."
+            ),
+            (
+                "documento_procuracao",
+                "Procuração",
+                "Procuração assinada para representação."
+            )
+        ] %}
+
+        {% for campo, titulo, descricao in documentos_pessoais %}
+        <div class="col-md-6 col-xl-3">
+            <div class="documento-card">
+                <div class="form-check">
+                    <input
+                        class="form-check-input documento-checkbox"
+                        type="checkbox"
+                        value="1"
+                        id="{{ campo }}"
+                        name="{{ campo }}"
+                        {% if ficha|attr(campo) %}checked{% endif %}
+                    >
+                    <label class="form-check-label" for="{{ campo }}">
+                        <span class="documento-card-titulo">
+                            {{ titulo }}
+                        </span>
+                        <span class="documento-card-descricao">
+                            {{ descricao }}
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-briefcase"></i>
+        </span>
+        <div>
+            <h3>Documentos contributivos e profissionais</h3>
+            <p>Documentos utilizados para comprovação de vínculos e contribuições.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos_contributivos = [
+            (
+                "documento_cnis",
+                "CNIS",
+                "Extrato previdenciário atualizado."
+            ),
+            (
+                "documento_ctps",
+                "CTPS",
+                "Carteira de Trabalho física ou digital."
+            ),
+            (
+                "documento_carnes_contribuicao",
+                "Carnês de contribuição",
+                "Carnês e comprovantes de recolhimento."
+            ),
+            (
+                "documento_guias_gps",
+                "Guias GPS",
+                "Guias da Previdência Social."
+            ),
+            (
+                "documento_certidao_tempo_contribuicao",
+                "Certidão de Tempo de Contribuição",
+                "CTC emitida por regime próprio."
+            )
+        ] %}
+
+        {% for campo, titulo, descricao in documentos_contributivos %}
+        <div class="col-md-6 col-xl-4">
+            <div class="documento-card">
+                <div class="form-check">
+                    <input
+                        class="form-check-input documento-checkbox"
+                        type="checkbox"
+                        value="1"
+                        id="{{ campo }}"
+                        name="{{ campo }}"
+                        {% if ficha|attr(campo) %}checked{% endif %}
+                    >
+                    <label class="form-check-label" for="{{ campo }}">
+                        <span class="documento-card-titulo">
+                            {{ titulo }}
+                        </span>
+                        <span class="documento-card-descricao">
+                            {{ descricao }}
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-shield-exclamation"></i>
+        </span>
+        <div>
+            <h3>Atividade especial</h3>
+            <p>Documentos técnicos para comprovação de exposição a agentes nocivos.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos_especiais = [
+            (
+                "documento_ppp",
+                "PPP",
+                "Perfil Profissiográfico Previdenciário."
+            ),
+            (
+                "documento_ltcat",
+                "LTCAT",
+                "Laudo Técnico das Condições Ambientais do Trabalho."
+            )
+        ] %}
+
+        {% for campo, titulo, descricao in documentos_especiais %}
+        <div class="col-md-6">
+            <div class="documento-card">
+                <div class="form-check">
+                    <input
+                        class="form-check-input documento-checkbox"
+                        type="checkbox"
+                        value="1"
+                        id="{{ campo }}"
+                        name="{{ campo }}"
+                        {% if ficha|attr(campo) %}checked{% endif %}
+                    >
+                    <label class="form-check-label" for="{{ campo }}">
+                        <span class="documento-card-titulo">
+                            {{ titulo }}
+                        </span>
+                        <span class="documento-card-descricao">
+                            {{ descricao }}
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-file-earmark-medical"></i>
+        </span>
+        <div>
+            <h3>Documentos médicos</h3>
+            <p>Documentos relacionados à saúde e à incapacidade.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos_medicos = [
+            (
+                "documento_laudos_medicos",
+                "Laudos médicos",
+                "Laudos com diagnóstico, CID e limitações."
+            ),
+            (
+                "documento_exames_medicos",
+                "Exames médicos",
+                "Exames laboratoriais, de imagem e complementares."
+            )
+        ] %}
+
+        {% for campo, titulo, descricao in documentos_medicos %}
+        <div class="col-md-6">
+            <div class="documento-card">
+                <div class="form-check">
+                    <input
+                        class="form-check-input documento-checkbox"
+                        type="checkbox"
+                        value="1"
+                        id="{{ campo }}"
+                        name="{{ campo }}"
+                        {% if ficha|attr(campo) %}checked{% endif %}
+                    >
+                    <label class="form-check-label" for="{{ campo }}">
+                        <span class="documento-card-titulo">
+                            {{ titulo }}
+                        </span>
+                        <span class="documento-card-descricao">
+                            {{ descricao }}
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-building"></i>
+        </span>
+        <div>
+            <h3>Processo administrativo</h3>
+            <p>Documentos relacionados a requerimentos anteriores no INSS.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos_inss = [
+            (
+                "documento_processo_inss",
+                "Processo administrativo do INSS",
+                "Cópia integral ou documentos do requerimento."
+            ),
+            (
+                "documento_carta_indeferimento",
+                "Carta de indeferimento",
+                "Comunicação de decisão ou indeferimento."
+            )
+        ] %}
+
+        {% for campo, titulo, descricao in documentos_inss %}
+        <div class="col-md-6">
+            <div class="documento-card">
+                <div class="form-check">
+                    <input
+                        class="form-check-input documento-checkbox"
+                        type="checkbox"
+                        value="1"
+                        id="{{ campo }}"
+                        name="{{ campo }}"
+                        {% if ficha|attr(campo) %}checked{% endif %}
+                    >
+                    <label class="form-check-label" for="{{ campo }}">
+                        <span class="documento-card-titulo">
+                            {{ titulo }}
+                        </span>
+                        <span class="documento-card-descricao">
+                            {{ descricao }}
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-card-checklist"></i>
+        </span>
+        <div>
+            <h3>Controle da documentação</h3>
+            <p>Registre outros documentos, pendências e observações.</p>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <span class="documentos-contador">
+            <i class="bi bi-check2-square"></i>
+            <span id="contador-documentos">0</span>
+            documento(s) marcado(s)
+        </span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="documentos_outros" class="form-label">
+                Outros documentos apresentados
+            </label>
+            <textarea
+                class="form-control"
+                id="documentos_outros"
+                name="documentos_outros"
+                rows="4"
+                placeholder="Informe documentos não listados acima."
+            >{{ ficha.documentos_outros or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="documentos_pendentes" class="form-label">
+                Documentos pendentes
+            </label>
+            <textarea
+                class="form-control"
+                id="documentos_pendentes"
+                name="documentos_pendentes"
+                rows="4"
+                placeholder="Liste os documentos que ainda precisam ser solicitados ou apresentados."
+            >{{ ficha.documentos_pendentes or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="observacoes_documentacao" class="form-label">
+                Observações sobre a documentação
+            </label>
+            <textarea
+                class="form-control"
+                id="observacoes_documentacao"
+                name="observacoes_documentacao"
+                rows="5"
+                placeholder="Registre autenticidade, legibilidade, necessidade de atualização ou outras observações."
+            >{{ ficha.observacoes_documentacao or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const caixas = document.querySelectorAll(
+            ".documento-checkbox"
+        );
+        const contador = document.getElementById(
+            "contador-documentos"
+        );
+
+        function atualizarContador() {
+            const total = Array.from(caixas).filter(
+                function (caixa) {
+                    return caixa.checked;
+                }
+            ).length;
+
+            contador.textContent = total;
+        }
+
+        caixas.forEach(function (caixa) {
+            caixa.addEventListener("change", atualizarContador);
+        });
+
+        atualizarContador();
+    });
+</script>
+
+{% endblock %}

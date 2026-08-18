@@ -1,0 +1,388 @@
+/* ==========================
+   SISTEMA JURÍDICO
+   ========================== */
+
+body{
+    background:#f5f7fb;
+    font-family: "Segoe UI", sans-serif;
+}
+
+
+/* Navbar */
+
+.navbar{
+    box-shadow:0 2px 12px rgba(0,0,0,.08);
+}
+
+
+/* Menu lateral */
+
+.sidebar{
+    background:white;
+    min-height:100vh;
+    border-right:1px solid #e8e8e8;
+}
+
+.sidebar .menu-title{
+    font-size:.75rem;
+    color:#999;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:15px;
+}
+
+.sidebar .nav-link{
+    color:#444;
+    border-radius:10px;
+    padding:12px 15px;
+    margin-bottom:8px;
+    transition:.25s;
+}
+
+.sidebar .nav-link:hover{
+    background:#0d6efd;
+    color:white;
+}
+
+.sidebar .nav-link.active{
+    background:#0d6efd;
+    color:white;
+}
+
+
+/* Cards */
+
+.card{
+    border:none;
+    border-radius:16px;
+    transition:.25s;
+    box-shadow:0 .25rem .75rem rgba(0,0,0,.08);
+}
+
+.card:hover{
+    transform:translate(-4px);
+    box-shadow:0 .8rem 1.8rem rgba(0,0,0,.12);
+}
+
+.card-header{
+    border-radius:16px 16px 0 0 !important;
+}
+
+
+/* Dashboard */
+
+.card-dashboard h2{
+    font-size:2.8rem;
+    font-weight:700;
+}
+
+.card-dashboard small{
+    color:#888;
+}
+
+
+/* Botões */
+
+.btn{
+    border-radius:10px;
+}
+
+
+/* Tabelas */
+
+.table{
+    vertical-align:middle;
+}
+
+.table thead{
+    background:#f8f9fa;
+}
+
+
+/* Badges */
+
+.badge{
+    font-size:.80rem;
+}
+
+/* ==========================
+   POLIMENTO GERAL
+   ========================== */
+
+main {
+    min-height: calc(100vh - 56px);
+}
+
+.card {
+    overflow: hidden;
+}
+
+.card-dashboard {
+    min-height: 145px;
+}
+
+.card-dashboard h2 {
+    margin: 8px 0;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #eef5ff;
+}
+
+.table th {
+    color: #555;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.table td {
+    font-size: 0.95rem;
+}
+
+.btn-sm {
+    padding: 6px 10px;
+    font-size: 0.82rem;
+}
+
+.input-group .form-control {
+    border-radius: 10px 0 0 10px;
+}
+
+.input-group .btn:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.alert {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 .25rem .75rem rgba(0,0,0,.08);
+}
+
+.financeiro-planilha {
+    max-height: 68vh;
+}
+
+.financeiro-planilha table {
+    min-width: 1450px;
+}
+
+.financeiro-planilha thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    white-space: nowrap;
+}
+
+.financeiro-coluna-descricao {
+    min-width: 230px;
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background-color: #ffffff;
+}
+
+.financeiro-planilha thead .financeiro-coluna-descricao {
+    z-index: 4;
+    background-color: #f8f9fa;
+}
+
+.financeiro-coluna-categoria {
+    min-width: 150px;
+}
+
+.financeiro-coluna-mes {
+    min-width: 105px;
+}
+
+.financeiro-coluna-total {
+    min-width: 120px;
+}
+
+.financeiro-celula {
+    min-width: 105px;
+    cursor: pointer;
+}
+
+.financeiro-celula:hover {
+    background-color: #eef5ff;
+}
+
+.financeiro-valor {
+    color: #212529;
+}
+
+.financeiro-celula {
+    cursor: cell;
+    transition: background-color 0.15s ease;
+}
+
+.financeiro-celula:hover {
+    background-color: #eaf3ff;
+    outline: 2px solid #9ec5fe;
+    outline-offset: -2px;
+}
+
+.financeiro-celula input {
+    min-width: 90px;
+}
+
+.financeiro-total-geral {
+    background-color: #fff4cc;
+    border-top: 3px solid #ffc107;
+}
+
+.financeiro-total-geral th {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    font-weight: 800;
+    vertical-align: middle;
+}
+
+.financeiro-total-label {
+    color: #5c4600;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+}
+
+.financeiro-total-mes {
+    color: #0d6efd !important;
+    background-color: #fff8df !important;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+.financeiro-total-anual {
+    color: #ffffff !important;
+    background-color: #198754 !important;
+    font-size: 16px;
+    white-space: nowrap;
+    box-shadow: inset 3px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+/* =====================================
+   DESTAQUE DO MÊS ATUAL
+===================================== */
+
+.financeiro-mes-atual {
+    background-color: #e7f1ff !important;
+    box-shadow:
+        inset 2px 0 0 #0d6efd,
+        inset -2px 0 0 #0d6efd;
+}
+
+.financeiro-planilha thead .financeiro-mes-atual {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+    font-weight: 800;
+}
+
+.financeiro-total-mes-atual {
+    background-color: #0d6efd !important;
+    color: #ffffff !important;
+    box-shadow:
+        inset 2px 0 0 #084298,
+        inset -2px 0 0 #084298;
+}
+
+/* =====================================
+   CORES PERSONALIZADAS DO SISTEMA
+===================================== */
+
+.navbar,
+.bg-dark {
+    background-color: var(--cor-principal) !important;
+}
+
+.sidebar .nav-link.active {
+    background-color: var(--cor-secundaria) !important;
+    color: #ffffff !important;
+}
+
+.sidebar .nav-link:hover {
+    background-color: color-mix(
+        in srgb,
+        var(--cor-secundaria) 80%,
+        white
+    );
+    color: #ffffff;
+}
+
+.btn-primary {
+    background-color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: color-mix(
+        in srgb,
+        var(--cor-secundaria) 85%,
+        black
+    );
+
+    border-color: color-mix(
+        in srgb,
+        var(--cor-secundaria) 85%,
+        black
+    );
+}
+
+.btn-outline-primary {
+    color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--cor-secundaria);
+    border-color: var(--cor-secundaria);
+    color: #ffffff;
+}
+
+.text-primary {
+    color: var(--cor-secundaria) !important;
+}
+
+.bg-primary {
+    background-color: var(--cor-secundaria) !important;
+}
+
+.border-primary {
+    border-color: var(--cor-secundaria) !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--cor-secundaria);
+    border-top: 3px solid var(--cor-secundaria);
+}
+
+a {
+    color: var(--cor-secundaria);
+}
+
+/* =====================================
+   CORREÇÃO DO MENU LATERAL
+===================================== */
+
+.sidebar {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border-right: 1px solid #dee2e6;
+}
+
+.sidebar .nav-link {
+    color: #495057 !important;
+}
+
+.sidebar .nav-link:hover {
+    background-color: #eef4ff !important;
+    color: var(--cor-secundaria) !important;
+}
+
+.sidebar .nav-link.active {
+    background-color: var(--cor-secundaria) !important;
+    color: #ffffff !important;
+}
+
+.sidebar .nav-link.active:hover {
+    color: #ffffff !important;
+}

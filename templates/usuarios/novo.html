@@ -1,0 +1,496 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Novo Usuário
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "➕ Novo Usuário",
+    "Cadastre um novo usuário para acessar o sistema."
+) }}
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-white py-3">
+
+        <h5 class="mb-0">
+            Dados do usuário
+        </h5>
+
+        <small class="text-muted">
+            Preencha as informações de acesso e escolha o perfil adequado.
+        </small>
+
+    </div>
+
+    <div class="card-body">
+
+        <form
+            method="POST"
+            action="{{ url_for('usuarios.novo_usuario') }}"
+            autocomplete="off">
+
+            <!-- =====================================
+                 DADOS PESSOAIS
+            ====================================== -->
+            <div class="mb-4">
+
+                <h6 class="fw-bold border-bottom pb-2 mb-3">
+                    👤 Dados pessoais
+                </h6>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="nome"
+                            class="form-label fw-semibold">
+
+                            Nome completo
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nome"
+                            name="nome"
+                            class="form-control"
+                            placeholder="Digite o nome completo"
+                            value="{{ dados.get('nome', '') }}"
+                            maxlength="120"
+                            required
+                            autofocus>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="cargo"
+                            class="form-label fw-semibold">
+
+                            Cargo
+
+                        </label>
+
+                        <input
+                            type="text"
+                            id="cargo"
+                            name="cargo"
+                            class="form-control"
+                            placeholder="Ex.: Advogado, Assistente, Financeiro"
+                            value="{{ dados.get('cargo', '') }}"
+                            maxlength="100">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="email"
+                            class="form-label fw-semibold">
+
+                            E-mail
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="form-control"
+                            placeholder="usuario@escritorio.com"
+                            value="{{ dados.get('email', '') }}"
+                            maxlength="120"
+                            autocomplete="off"
+                            required>
+
+                        <div class="form-text">
+                            Este e-mail será utilizado para entrar no sistema.
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="telefone"
+                            class="form-label fw-semibold">
+
+                            Telefone
+
+                        </label>
+
+                        <input
+                            type="text"
+                            id="telefone"
+                            name="telefone"
+                            class="form-control"
+                            placeholder="(00) 00000-0000"
+                            value="{{ dados.get('telefone', '') }}"
+                            maxlength="20"
+                            inputmode="numeric">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =====================================
+                 PERFIL DE ACESSO
+            ====================================== -->
+            <div class="mb-4">
+
+                <h6 class="fw-bold border-bottom pb-2 mb-3">
+                    🔐 Perfil de acesso
+                </h6>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="perfil"
+                            class="form-label fw-semibold">
+
+                            Perfil
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <select
+                            id="perfil"
+                            name="perfil"
+                            class="form-select"
+                            required>
+
+                            {% for codigo, descricao in perfis.items() %}
+
+                                <option
+                                    value="{{ codigo }}"
+                                    {% if dados.get('perfil', 'FUNC') == codigo %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ descricao }}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="alert alert-light border mb-0 h-100">
+
+                            <strong id="titulo-perfil">
+                                Funcionário
+                            </strong>
+
+                            <div
+                                id="descricao-perfil"
+                                class="small text-muted mt-1">
+
+                                Acesso ao sistema, exceto ao módulo Financeiro
+                                e ao gerenciamento de usuários.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =====================================
+                 SENHA
+            ====================================== -->
+            <div class="mb-4">
+
+                <h6 class="fw-bold border-bottom pb-2 mb-3">
+                    🔑 Senha de acesso
+                </h6>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="senha"
+                            class="form-label fw-semibold">
+
+                            Senha
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <input
+                                type="password"
+                                id="senha"
+                                name="senha"
+                                class="form-control"
+                                placeholder="Mínimo de 6 caracteres"
+                                minlength="6"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="alternarSenha(
+                                    'senha',
+                                    this
+                                )"
+                                title="Mostrar ou ocultar senha">
+
+                                👁️
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label
+                            for="confirmar_senha"
+                            class="form-label fw-semibold">
+
+                            Confirmar senha
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <input
+                                type="password"
+                                id="confirmar_senha"
+                                name="confirmar_senha"
+                                class="form-control"
+                                placeholder="Digite a senha novamente"
+                                minlength="6"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="alternarSenha(
+                                    'confirmar_senha',
+                                    this
+                                )"
+                                title="Mostrar ou ocultar senha">
+
+                                👁️
+
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="mensagem-senhas"
+                            class="form-text">
+
+                            As duas senhas devem ser iguais.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- =====================================
+                 BOTÕES
+            ====================================== -->
+            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+
+                <a
+                    href="{{ url_for('usuarios.listar_usuarios') }}"
+                    class="btn btn-outline-secondary">
+
+                    ← Voltar
+
+                </a>
+
+                <button
+                    type="submit"
+                    id="botao-salvar"
+                    class="btn btn-success">
+
+                    💾 Salvar usuário
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ super() }}
+
+<script>
+    function alternarSenha(campoId, botao) {
+        const campo = document.getElementById(campoId);
+
+        if (campo.type === "password") {
+            campo.type = "text";
+            botao.textContent = "🙈";
+            botao.title = "Ocultar senha";
+        } else {
+            campo.type = "password";
+            botao.textContent = "👁️";
+            botao.title = "Mostrar senha";
+        }
+    }
+
+
+    function atualizarDescricaoPerfil() {
+        const campoPerfil = document.getElementById("perfil");
+        const titulo = document.getElementById("titulo-perfil");
+        const descricao = document.getElementById("descricao-perfil");
+
+        const perfilSelecionado = campoPerfil.value;
+
+        if (perfilSelecionado === "ADMIN") {
+            titulo.textContent = "Administrador";
+            descricao.textContent =
+                "Acesso total ao sistema, incluindo Financeiro, " +
+                "configurações e gerenciamento de usuários.";
+        } else if (perfilSelecionado === "FIN") {
+            titulo.textContent = "Financeiro";
+            descricao.textContent =
+                "Acesso ao sistema e ao módulo Financeiro, " +
+                "sem permissão para gerenciar usuários.";
+        } else {
+            titulo.textContent = "Funcionário";
+            descricao.textContent =
+                "Acesso ao sistema, exceto ao módulo Financeiro " +
+                "e ao gerenciamento de usuários.";
+        }
+    }
+
+
+    function validarConfirmacaoSenha() {
+        const senha = document.getElementById("senha");
+        const confirmarSenha = document.getElementById("confirmar_senha");
+        const mensagem = document.getElementById("mensagem-senhas");
+
+        if (!confirmarSenha.value) {
+            confirmarSenha.classList.remove(
+                "is-valid",
+                "is-invalid"
+            );
+
+            mensagem.className = "form-text";
+            mensagem.textContent =
+                "As duas senhas devem ser iguais.";
+
+            return;
+        }
+
+        if (senha.value === confirmarSenha.value) {
+            confirmarSenha.classList.remove("is-invalid");
+            confirmarSenha.classList.add("is-valid");
+
+            mensagem.className = "form-text text-success";
+            mensagem.textContent = "As senhas coincidem.";
+        } else {
+            confirmarSenha.classList.remove("is-valid");
+            confirmarSenha.classList.add("is-invalid");
+
+            mensagem.className = "form-text text-danger";
+            mensagem.textContent = "As senhas não coincidem.";
+        }
+    }
+
+
+    function aplicarMascaraTelefone(evento) {
+        let valor = evento.target.value.replace(/\D/g, "");
+
+        valor = valor.substring(0, 11);
+
+        if (valor.length <= 10) {
+            valor = valor.replace(
+                /^(\d{2})(\d)/,
+                "($1) $2"
+            );
+
+            valor = valor.replace(
+                /(\d{4})(\d)/,
+                "$1-$2"
+            );
+        } else {
+            valor = valor.replace(
+                /^(\d{2})(\d)/,
+                "($1) $2"
+            );
+
+            valor = valor.replace(
+                /(\d{5})(\d)/,
+                "$1-$2"
+            );
+        }
+
+        evento.target.value = valor;
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const campoPerfil = document.getElementById("perfil");
+        const campoSenha = document.getElementById("senha");
+        const campoConfirmarSenha =
+            document.getElementById("confirmar_senha");
+        const campoTelefone = document.getElementById("telefone");
+
+        atualizarDescricaoPerfil();
+
+        campoPerfil.addEventListener(
+            "change",
+            atualizarDescricaoPerfil
+        );
+
+        campoSenha.addEventListener(
+            "input",
+            validarConfirmacaoSenha
+        );
+
+        campoConfirmarSenha.addEventListener(
+            "input",
+            validarConfirmacaoSenha
+        );
+
+        campoTelefone.addEventListener(
+            "input",
+            aplicarMascaraTelefone
+        );
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,331 @@
+{% extends "atendimentos/civel/layout.html" %}
+
+{% block titulo %}Análise Jurídica | Ficha Cível{% endblock %}
+
+{% block form_action %}
+{{ url_for("atendimentos.etapa_analise_civel", atendimento_id=atendimento.id) }}
+{% endblock %}
+
+{% block etapa_titulo %}Análise jurídica{% endblock %}
+
+{% block etapa_descricao %}
+Registre a avaliação inicial, a estratégia e a viabilidade da demanda.
+{% endblock %}
+
+{% block etapa_identificacao %}Etapa 9 de 9{% endblock %}
+
+{% block etapa_alertas %}
+<div class="civel-info-box">
+    <i class="bi bi-shield-check"></i>
+    <div>
+        Esta é a etapa final. Ao salvá-la, o progresso da Ficha Cível
+        será concluído.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+<style>
+    .campo-condicional { display: none; }
+    .campo-condicional.campo-condicional-visivel { display: block; }
+</style>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-hourglass-split"></i>
+        </span>
+        <div>
+            <h3>Prescrição e competência</h3>
+            <p>Analise prazos, competência e foro.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="existe_prescricao" class="form-label">
+                Existe risco ou ocorrência de prescrição?
+            </label>
+            <select class="form-select" id="existe_prescricao"
+                    name="existe_prescricao">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                <option value="{{ codigo }}"
+                    {% if ficha.existe_prescricao == codigo %}selected{% endif %}>
+                    {{ nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4 campo-condicional"
+             data-condicional="existe_prescricao">
+            <label for="prazo_prescricional" class="form-label">
+                Prazo prescricional
+            </label>
+            <input type="text" class="form-control"
+                   id="prazo_prescricional" name="prazo_prescricional"
+                   value="{{ ficha.prazo_prescricional or '' }}">
+        </div>
+
+        <div class="col-md-4 campo-condicional"
+             data-condicional="existe_prescricao">
+            <label for="data_final_prescricao" class="form-label">
+                Data final da prescrição
+            </label>
+            <input type="date" class="form-control"
+                   id="data_final_prescricao" name="data_final_prescricao"
+                   value="{{ ficha.data_final_prescricao.strftime('%Y-%m-%d') if ficha.data_final_prescricao else '' }}">
+        </div>
+
+        <div class="col-md-6">
+            <label for="competencia" class="form-label">Competência</label>
+            <input type="text" class="form-control" id="competencia"
+                   name="competencia" value="{{ ficha.competencia or '' }}">
+        </div>
+
+        <div class="col-md-6">
+            <label for="foro_competente" class="form-label">
+                Foro competente
+            </label>
+            <input type="text" class="form-control" id="foro_competente"
+                   name="foro_competente"
+                   value="{{ ficha.foro_competente or '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-people"></i></span>
+        <div>
+            <h3>Legitimidade</h3>
+            <p>Avalie a legitimidade das partes.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% for campo, rotulo in [
+            ("legitimidade_cliente", "O cliente possui legitimidade?"),
+            ("legitimidade_parte_contraria", "A parte contrária possui legitimidade?")
+        ] %}
+        <div class="col-md-6">
+            <label for="{{ campo }}" class="form-label">{{ rotulo }}</label>
+            <select class="form-select" id="{{ campo }}" name="{{ campo }}">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                <option value="{{ codigo }}"
+                    {% if ficha|attr(campo) == codigo %}selected{% endif %}>
+                    {{ nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-book"></i></span>
+        <div>
+            <h3>Fundamentação e pedidos</h3>
+            <p>Registre as teses e os pedidos inicialmente identificados.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="fundamentos_juridicos" class="form-label">
+                Fundamentos jurídicos
+            </label>
+            <textarea class="form-control" id="fundamentos_juridicos"
+                      name="fundamentos_juridicos" rows="7">{{ ficha.fundamentos_juridicos or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="pedidos_sugeridos" class="form-label">
+                Pedidos sugeridos
+            </label>
+            <textarea class="form-control" id="pedidos_sugeridos"
+                      name="pedidos_sugeridos" rows="7">{{ ficha.pedidos_sugeridos or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-lightning"></i></span>
+        <div>
+            <h3>Tutela de urgência</h3>
+            <p>Avalie a necessidade de medida urgente.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="necessidade_tutela_urgencia" class="form-label">
+                Há necessidade de tutela de urgência?
+            </label>
+            <select class="form-select" id="necessidade_tutela_urgencia"
+                    name="necessidade_tutela_urgencia">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                <option value="{{ codigo }}"
+                    {% if ficha.necessidade_tutela_urgencia == codigo %}selected{% endif %}>
+                    {{ nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-8 campo-condicional"
+             data-condicional="necessidade_tutela_urgencia">
+            <label for="fundamentos_tutela_urgencia" class="form-label">
+                Fundamentos da tutela de urgência
+            </label>
+            <textarea class="form-control" id="fundamentos_tutela_urgencia"
+                      name="fundamentos_tutela_urgencia" rows="4">{{ ficha.fundamentos_tutela_urgencia or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-diagram-3"></i></span>
+        <div>
+            <h3>Estratégia processual</h3>
+            <p>Defina riscos, provas e providências iniciais.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% for campo, rotulo in [
+            ("riscos_processo", "Riscos do processo"),
+            ("provas_necessarias", "Provas necessárias"),
+            ("providencias_iniciais", "Providências iniciais"),
+            ("estrategia_sugerida", "Estratégia sugerida")
+        ] %}
+        <div class="col-md-6">
+            <label for="{{ campo }}" class="form-label">{{ rotulo }}</label>
+            <textarea class="form-control" id="{{ campo }}"
+                      name="{{ campo }}" rows="5">{{ ficha|attr(campo) or '' }}</textarea>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-clipboard-check"></i></span>
+        <div>
+            <h3>Conclusão</h3>
+            <p>Conclua a avaliação inicial da demanda.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-5">
+            <label for="viabilidade_demanda" class="form-label">
+                Viabilidade da demanda
+            </label>
+            <select class="form-select" id="viabilidade_demanda"
+                    name="viabilidade_demanda">
+                <option value="">Selecione</option>
+                {% for valor, nome in [
+                    ("ALTA", "Alta"),
+                    ("MEDIA", "Média"),
+                    ("BAIXA", "Baixa"),
+                    ("INVIAVEL", "Inviável"),
+                    ("PENDENTE", "Pendente de documentos ou análise")
+                ] %}
+                <option value="{{ valor }}"
+                    {% if ficha.viabilidade_demanda == valor %}selected{% endif %}>
+                    {{ nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label for="parecer_inicial" class="form-label">
+                Parecer inicial
+            </label>
+            <textarea class="form-control" id="parecer_inicial"
+                      name="parecer_inicial" rows="7">{{ ficha.parecer_inicial or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="observacoes_gerais" class="form-label">
+                Observações gerais
+            </label>
+            <textarea class="form-control" id="observacoes_gerais"
+                      name="observacoes_gerais" rows="5">{{ ficha.observacoes_gerais or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+
+<section class="civel-section">
+    <div class="d-flex flex-column flex-md-row align-items-md-center
+                justify-content-between gap-3">
+        <div>
+            <h3 class="h5 mb-1">
+                <i class="bi bi-file-earmark-pdf me-2"></i>
+                PDF da Ficha Cível
+            </h3>
+            <p class="text-muted mb-0">
+                Baixe a ficha completa com todas as informações salvas.
+            </p>
+        </div>
+
+        <a class="btn btn-outline-danger"
+           href="{{ url_for('atendimentos.gerar_pdf_civel',
+                            atendimento_id=atendimento.id) }}">
+            <i class="bi bi-file-earmark-arrow-down me-2"></i>
+            Gerar PDF
+        </a>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const regras = [
+        "existe_prescricao",
+        "necessidade_tutela_urgencia"
+    ];
+
+    function atualizar(nome) {
+        const seletor = document.getElementById(nome);
+        if (!seletor) return;
+
+        const mostrar = seletor.value === "SIM";
+
+        document.querySelectorAll(
+            '[data-condicional="' + nome + '"]'
+        ).forEach(function (bloco) {
+            bloco.classList.toggle(
+                "campo-condicional-visivel",
+                mostrar
+            );
+
+            bloco.querySelectorAll("input, textarea, select")
+                .forEach(function (campo) {
+                    campo.disabled = !mostrar;
+                    if (!mostrar) campo.value = "";
+                });
+        });
+    }
+
+    regras.forEach(function (nome) {
+        const seletor = document.getElementById(nome);
+        if (seletor) {
+            seletor.addEventListener("change", function () {
+                atualizar(nome);
+            });
+        }
+        atualizar(nome);
+    });
+});
+</script>
+{% endblock %}

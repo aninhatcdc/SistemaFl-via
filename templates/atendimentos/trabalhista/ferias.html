@@ -1,0 +1,630 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+{% block titulo %}
+Férias | Ficha Trabalhista
+{% endblock %}
+
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_ferias",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+
+{% block etapa_titulo %}
+Férias
+{% endblock %}
+
+
+{% block etapa_descricao %}
+Registre os períodos de férias, a forma de pagamento,
+o adicional de um terço e eventuais irregularidades.
+{% endblock %}
+
+
+{% block etapa_identificacao %}
+Etapa 8 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+<div class="trabalhista-info-box">
+
+    <i class="bi bi-info-circle"></i>
+
+    <div>
+        Registre as férias efetivamente usufruídas, ainda que o cliente
+        não se recorde das datas exatas. Use o campo de observações
+        para anotar períodos aproximados e documentos disponíveis.
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+
+<!-- ============================================================
+     CONCESSÃO DAS FÉRIAS
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-calendar2-week"></i>
+        </span>
+
+        <div>
+            <h3>Concessão das férias</h3>
+
+            <p>
+                Informe se o cliente usufruiu férias durante todos
+                os anos do contrato.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="recebeu_ferias_todos_anos"
+                class="form-label"
+            >
+                Tirou férias em todos os anos trabalhados?
+            </label>
+
+            <select
+                name="recebeu_ferias_todos_anos"
+                id="recebeu_ferias_todos_anos"
+                class="form-select"
+                data-controla="grupo-detalhes-ferias"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.recebeu_ferias_todos_anos == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-detalhes-ferias"
+            class="col-12 campo-condicional"
+        >
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label
+                        for="quantidade_periodos_ferias"
+                        class="form-label"
+                    >
+                        Quantidade de períodos de férias
+                    </label>
+
+                    <input
+                        type="number"
+                        name="quantidade_periodos_ferias"
+                        id="quantidade_periodos_ferias"
+                        class="form-control"
+                        min="0"
+                        step="1"
+                        value="{{ ficha.quantidade_periodos_ferias if ficha.quantidade_periodos_ferias is not none else '' }}"
+                        placeholder="Ex.: 3"
+                    >
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <label
+                        for="datas_periodos_ferias"
+                        class="form-label"
+                    >
+                        Datas ou períodos aproximados
+                    </label>
+
+                    <textarea
+                        name="datas_periodos_ferias"
+                        id="datas_periodos_ferias"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Ex.: janeiro de 2024 por 20 dias; julho de 2025 por 30 dias."
+                    >{{ ficha.datas_periodos_ferias or "" }}</textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     PAGAMENTO DAS FÉRIAS
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-cash-coin"></i>
+        </span>
+
+        <div>
+            <h3>Pagamento das férias</h3>
+
+            <p>
+                Registre quando o pagamento foi realizado e se houve
+                o adicional constitucional de um terço.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="data_pagamento_ferias"
+                class="form-label"
+            >
+                Data ou período aproximado do pagamento
+            </label>
+
+            <input
+                type="text"
+                name="data_pagamento_ferias"
+                id="data_pagamento_ferias"
+                class="form-control"
+                value="{{ ficha.data_pagamento_ferias or '' }}"
+                placeholder="Ex.: dois dias antes, no início das férias ou após o retorno."
+            >
+
+        </div>
+
+
+        <div class="col-lg-6">
+
+            <label
+                for="momento_pagamento_ferias"
+                class="form-label"
+            >
+                Quando o pagamento era realizado?
+            </label>
+
+            <select
+                name="momento_pagamento_ferias"
+                id="momento_pagamento_ferias"
+                class="form-select"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in momentos_pagamento_ferias.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.momento_pagamento_ferias == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="col-lg-6">
+
+            <label
+                for="recebeu_um_terco_ferias"
+                class="form-label"
+            >
+                Recebeu o adicional de um terço de férias?
+            </label>
+
+            <select
+                name="recebeu_um_terco_ferias"
+                id="recebeu_um_terco_ferias"
+                class="form-select"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.recebeu_um_terco_ferias == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     VENDA DE FÉRIAS
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-calendar-minus"></i>
+        </span>
+
+        <div>
+            <h3>Venda de férias</h3>
+
+            <p>
+                Informe se parte das férias era convertida em pagamento
+                e se havia alguma imposição da empresa.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="vendia_ferias"
+                class="form-label"
+            >
+                Vendia parte das férias?
+            </label>
+
+            <select
+                name="vendia_ferias"
+                id="vendia_ferias"
+                class="form-select"
+                data-controla="grupo-venda-ferias"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.vendia_ferias == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-venda-ferias"
+            class="col-lg-6 campo-condicional"
+        >
+
+            <label
+                for="era_obrigado_vender_ferias"
+                class="form-label"
+            >
+                Era obrigado pela empresa a vender férias?
+            </label>
+
+            <select
+                name="era_obrigado_vender_ferias"
+                id="era_obrigado_vender_ferias"
+                class="form-select"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.era_obrigado_vender_ferias == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     TRABALHO DURANTE AS FÉRIAS
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-briefcase"></i>
+        </span>
+
+        <div>
+            <h3>Trabalho durante as férias</h3>
+
+            <p>
+                Registre se o cliente continuava trabalhando,
+                atendendo mensagens ou registrando ponto.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="trabalhou_durante_ferias"
+                class="form-label"
+            >
+                Trabalhou durante as férias?
+            </label>
+
+            <select
+                name="trabalhou_durante_ferias"
+                id="trabalhou_durante_ferias"
+                class="form-select"
+                data-controla="grupo-trabalho-ferias"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.trabalhou_durante_ferias == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-trabalho-ferias"
+            class="col-lg-6 campo-condicional"
+        >
+
+            <label
+                for="assinava_ponto_durante_ferias"
+                class="form-label"
+            >
+                Assinava ou registrava ponto durante as férias?
+            </label>
+
+            <select
+                name="assinava_ponto_durante_ferias"
+                id="assinava_ponto_durante_ferias"
+                class="form-select"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.assinava_ponto_durante_ferias == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     OBSERVAÇÕES
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+
+        <div>
+            <h3>Observações sobre as férias</h3>
+
+            <p>
+                Registre períodos não concedidos, pagamentos incorretos
+                e outras informações importantes.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-12">
+
+            <label
+                for="observacoes_ferias"
+                class="form-label"
+            >
+                Observações
+            </label>
+
+            <textarea
+                name="observacoes_ferias"
+                id="observacoes_ferias"
+                class="form-control"
+                rows="6"
+                placeholder="Ex.: férias vencidas, períodos fracionados, trabalho remoto durante o descanso, venda obrigatória ou documentos disponíveis."
+            >{{ ficha.observacoes_ferias or "" }}</textarea>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        function atualizarCampoCondicional(controle) {
+            const destinoId = controle.dataset.controla;
+            const valorEsperado = controle.dataset.exibirQuando;
+            const destino = document.getElementById(destinoId);
+
+            if (!destino) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorEsperado;
+
+            destino.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            const campos = destino.querySelectorAll(
+                "input, select, textarea"
+            );
+
+            campos.forEach(function (campo) {
+                campo.disabled = !deveExibir;
+            });
+        }
+
+
+        function atualizarTodosCamposCondicionais() {
+            const controles = document.querySelectorAll(
+                "[data-controla][data-exibir-quando]"
+            );
+
+            controles.forEach(function (controle) {
+                atualizarCampoCondicional(controle);
+            });
+        }
+
+
+        const controles = document.querySelectorAll(
+            "[data-controla][data-exibir-quando]"
+        );
+
+        controles.forEach(function (controle) {
+
+            controle.addEventListener("change", function () {
+                atualizarTodosCamposCondicionais();
+            });
+
+        });
+
+        atualizarTodosCamposCondicionais();
+
+    });
+</script>
+
+{% endblock %}

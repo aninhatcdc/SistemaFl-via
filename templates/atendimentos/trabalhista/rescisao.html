@@ -1,0 +1,494 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+{% block titulo %}
+Rescisão | Ficha Trabalhista
+{% endblock %}
+
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_rescisao",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+
+{% block etapa_titulo %}
+Rescisão
+{% endblock %}
+
+
+{% block etapa_descricao %}
+Registre a forma de desligamento, os pagamentos,
+os documentos entregues e as pendências finais.
+{% endblock %}
+
+
+{% block etapa_identificacao %}
+Etapa 10 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+<div class="trabalhista-info-box">
+
+    <i class="bi bi-info-circle"></i>
+
+    <div>
+        Esta é a última etapa da ficha. Revise os dados da rescisão,
+        registre os documentos pendentes e salve para concluir o atendimento.
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+<!-- ============================================================
+     DESLIGAMENTO
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-person-x"></i>
+        </span>
+
+        <div>
+            <h3>Desligamento</h3>
+
+            <p>
+                Informe quando e de que forma ocorreu o encerramento
+                do contrato de trabalho.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-md-6">
+
+            <label
+                for="data_demissao"
+                class="form-label"
+            >
+                Data da demissão
+            </label>
+
+            <input
+                type="date"
+                name="data_demissao"
+                id="data_demissao"
+                class="form-control"
+                value="{{ ficha.data_demissao.strftime('%Y-%m-%d') if ficha.data_demissao else '' }}"
+            >
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <label
+                for="tipo_rescisao"
+                class="form-label"
+            >
+                Tipo de rescisão
+            </label>
+
+            <input
+                type="text"
+                name="tipo_rescisao"
+                id="tipo_rescisao"
+                class="form-control"
+                value="{{ ficha.tipo_rescisao or '' }}"
+                placeholder="Ex.: dispensa sem justa causa, pedido de demissão ou acordo."
+            >
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     FGTS E MULTA RESCISÓRIA
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-bank"></i>
+        </span>
+
+        <div>
+            <h3>FGTS e multa rescisória</h3>
+
+            <p>
+                Registre os documentos e créditos relacionados
+                ao FGTS no momento da rescisão.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        {% set campos_fgts = [
+            (
+                "recebeu_extrato_fgts_rescisao",
+                "Recebeu o extrato do FGTS?"
+            ),
+            (
+                "recebeu_comprovante_multa_fgts",
+                "Recebeu comprovante da multa do FGTS?"
+            ),
+            (
+                "multa_fgts_creditada",
+                "A multa do FGTS foi creditada?"
+            )
+        ] %}
+
+        {% for campo, rotulo in campos_fgts %}
+
+            <div class="col-lg-4">
+
+                <label
+                    for="{{ campo }}"
+                    class="form-label"
+                >
+                    {{ rotulo }}
+                </label>
+
+                <select
+                    name="{{ campo }}"
+                    id="{{ campo }}"
+                    class="form-select"
+                >
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, nome in respostas.items() %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha|attr(campo) == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ nome }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     VERBAS RESCISÓRIAS
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-cash-coin"></i>
+        </span>
+
+        <div>
+            <h3>Verbas rescisórias</h3>
+
+            <p>
+                Informe se houve pagamento e quando ele foi realizado.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-md-6">
+
+            <label
+                for="recebeu_verbas_rescisorias"
+                class="form-label"
+            >
+                Recebeu as verbas rescisórias?
+            </label>
+
+            <select
+                name="recebeu_verbas_rescisorias"
+                id="recebeu_verbas_rescisorias"
+                class="form-select"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.recebeu_verbas_rescisorias == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <label
+                for="data_pagamento_rescisao"
+                class="form-label"
+            >
+                Data do pagamento da rescisão
+            </label>
+
+            <input
+                type="date"
+                name="data_pagamento_rescisao"
+                id="data_pagamento_rescisao"
+                class="form-control"
+                value="{{ ficha.data_pagamento_rescisao.strftime('%Y-%m-%d') if ficha.data_pagamento_rescisao else '' }}"
+            >
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     DOCUMENTOS DA RESCISÃO
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-file-earmark-check"></i>
+        </span>
+
+        <div>
+            <h3>Documentos e providências finais</h3>
+
+            <p>
+                Registre os documentos entregues e as providências
+                adotadas no encerramento do contrato.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        {% set campos_documentos = [
+            (
+                "assinou_termo_rescisao",
+                "Assinou o termo de rescisão?"
+            ),
+            (
+                "recebeu_copia_termo_rescisao",
+                "Recebeu cópia do termo de rescisão?"
+            ),
+            (
+                "recebeu_guias_seguro_desemprego",
+                "Recebeu as guias do seguro-desemprego?"
+            ),
+            (
+                "realizou_exame_demissional",
+                "Realizou exame demissional?"
+            )
+        ] %}
+
+        {% for campo, rotulo in campos_documentos %}
+
+            <div class="col-lg-6">
+
+                <label
+                    for="{{ campo }}"
+                    class="form-label"
+                >
+                    {{ rotulo }}
+                </label>
+
+                <select
+                    name="{{ campo }}"
+                    id="{{ campo }}"
+                    class="form-select"
+                >
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, nome in respostas.items() %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha|attr(campo) == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ nome }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     OBSERVAÇÕES FINAIS
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+
+        <div>
+            <h3>Observações e pendências</h3>
+
+            <p>
+                Registre informações finais e documentos que ainda
+                precisam ser apresentados.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-12">
+
+            <label
+                for="observacoes_rescisao"
+                class="form-label"
+            >
+                Observações sobre a rescisão
+            </label>
+
+            <textarea
+                name="observacoes_rescisao"
+                id="observacoes_rescisao"
+                class="form-control"
+                rows="5"
+                placeholder="Ex.: valores divergentes, atraso no pagamento, ausência de homologação ou dúvidas sobre a modalidade da rescisão."
+            >{{ ficha.observacoes_rescisao or "" }}</textarea>
+
+        </div>
+
+
+        <div class="col-12">
+
+            <label
+                for="observacoes_gerais"
+                class="form-label"
+            >
+                Observações gerais da ficha
+            </label>
+
+            <textarea
+                name="observacoes_gerais"
+                id="observacoes_gerais"
+                class="form-control"
+                rows="5"
+                placeholder="Registre informações gerais que não se encaixaram nas etapas anteriores."
+            >{{ ficha.observacoes_gerais or "" }}</textarea>
+
+        </div>
+
+
+        <div class="col-12">
+
+            <label
+                for="documentos_pendentes"
+                class="form-label"
+            >
+                Documentos pendentes
+            </label>
+
+            <textarea
+                name="documentos_pendentes"
+                id="documentos_pendentes"
+                class="form-control"
+                rows="4"
+                placeholder="Ex.: CTPS, contracheques, extrato do FGTS, TRCT, comprovantes de pagamento ou conversas."
+            >{{ ficha.documentos_pendentes or "" }}</textarea>
+
+        </div>
+
+
+        <div class="col-12">
+
+            <div class="form-check">
+
+                <input
+                    type="checkbox"
+                    name="avaliacao_google_solicitada"
+                    id="avaliacao_google_solicitada"
+                    class="form-check-input"
+                    value="1"
+                    {% if ficha.avaliacao_google_solicitada %}
+                        checked
+                    {% endif %}
+                >
+
+                <label
+                    for="avaliacao_google_solicitada"
+                    class="form-check-label"
+                >
+                    A avaliação no Google foi solicitada ao cliente.
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

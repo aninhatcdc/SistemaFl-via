@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Novo Arquivo
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "📂 Novo Arquivo",
+    "Adicionar um novo arquivo ao cliente."
+) }}
+
+<div class="alert alert-info mb-4">
+    <strong>Cliente:</strong> {{ cliente.nome }}
+</div>
+
+<form method="POST" enctype="multipart/form-data">
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-primary text-white fw-bold">
+            📁 Dados do Arquivo
+        </div>
+
+        <div class="card-body">
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Arquivo
+                </label>
+
+                <input
+                    type="file"
+                    class="form-control"
+                    name="arquivo"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.webp,.mp3,.wav,.ogg,.mp4,.avi,.mov,.zip,.rar"
+                    required>
+
+                <div class="form-text">
+                    Você pode enviar documentos, imagens, áudios, vídeos, planilhas ou arquivos compactados.
+                </div>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Descrição (opcional)
+                </label>
+
+                <textarea
+                    class="form-control"
+                    name="descricao"
+                    rows="4"
+                    placeholder="Ex.: Contrato assinado, Foto do acidente, Áudio da audiência..."></textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+
+        <a href="{{ url_for('clientes.detalhes_cliente', id=cliente.id) }}"
+           class="btn btn-secondary">
+            Cancelar
+        </a>
+
+        <button type="submit"
+                class="btn btn-success">
+            📂 Enviar Arquivo
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

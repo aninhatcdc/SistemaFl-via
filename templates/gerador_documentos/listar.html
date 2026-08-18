@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Modelos de Documentos
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+        <h2 class="mb-1">
+            Modelos de Documentos
+        </h2>
+
+        <p class="text-muted mb-0">
+            Cadastre e utilize os modelos oficiais do escritório.
+        </p>
+    </div>
+
+    <div class="d-flex gap-2">
+
+        <a href="{{ url_for('gerador_documentos.historico') }}"
+           class="btn btn-outline-secondary">
+            📋 Histórico
+        </a>
+
+        <a href="{{ url_for('gerador_documentos.novo') }}"
+           class="btn btn-primary">
+            + Novo Modelo
+        </a>
+
+    </div>
+
+</div>
+
+<form method="GET"
+      action="{{ url_for('gerador_documentos.listar') }}"
+      class="mb-4">
+
+    <div class="input-group">
+
+        <input type="text"
+               name="q"
+               class="form-control"
+               placeholder="Pesquisar por nome, categoria ou área jurídica..."
+               value="{{ termo }}">
+
+        <button class="btn btn-dark"
+                type="submit">
+            🔍 Pesquisar
+        </button>
+
+        <a href="{{ url_for('gerador_documentos.listar') }}"
+           class="btn btn-secondary">
+            Limpar
+        </a>
+
+    </div>
+
+</form>
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        {% if modelos %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+                            <th>Modelo</th>
+                            <th>Categoria</th>
+                            <th>Área</th>
+                            <th>Exigências</th>
+                            <th>Status</th>
+                            <th class="text-center">
+                                Ações
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for modelo in modelos %}
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="fw-bold">
+                                        {{ modelo.nome }}
+                                    </div>
+
+                                    {% if modelo.descricao %}
+
+                                        <small class="text-muted">
+                                            {{ modelo.descricao }}
+                                        </small>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ modelo.categoria_nome }}
+                                </td>
+
+                                <td>
+                                    {{ modelo.area_juridica or "Geral" }}
+                                </td>
+
+                                <td>
+
+                                    <div class="d-flex flex-wrap gap-1">
+
+                                        {% if modelo.exige_cliente %}
+
+                                            <span class="badge bg-primary">
+                                                Cliente
+                                            </span>
+
+                                        {% endif %}
+
+                                        {% if modelo.exige_processo %}
+
+                                            <span class="badge bg-info text-dark">
+                                                Processo
+                                            </span>
+
+                                        {% endif %}
+
+                                        {% if modelo.exige_honorario %}
+
+                                            <span class="badge bg-warning text-dark">
+                                                Honorários
+                                            </span>
+
+                                        {% endif %}
+
+                                        {% if (
+                                            not modelo.exige_cliente
+                                            and not modelo.exige_processo
+                                            and not modelo.exige_honorario
+                                        ) %}
+
+                                            <span class="text-muted">
+                                                Nenhuma
+                                            </span>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+                                <td>
+
+                                    {% if modelo.ativo %}
+
+                                        <span class="badge bg-success">
+                                            Ativo
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+                                            Inativo
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td class="text-center">
+
+                                    {% if modelo.ativo %}
+
+                                        <a href="{{ url_for(
+                                            'gerador_documentos.selecionar_cliente',
+                                            modelo_id=modelo.id
+                                        ) }}"
+                                           class="btn btn-success btn-sm">
+
+                                            📄 Gerar
+
+                                        </a>
+
+                                    {% else %}
+
+                                        <button type="button"
+                                                class="btn btn-secondary btn-sm"
+                                                disabled>
+
+                                            Indisponível
+
+                                        </button>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <div class="fs-1 mb-3">
+                    📄
+                </div>
+
+                <h5>
+                    Nenhum modelo encontrado
+                </h5>
+
+                <p class="text-muted">
+                    Cadastre o primeiro modelo oficial do escritório.
+                </p>
+
+                <a href="{{ url_for('gerador_documentos.novo') }}"
+                   class="btn btn-primary">
+
+                    + Cadastrar Modelo
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

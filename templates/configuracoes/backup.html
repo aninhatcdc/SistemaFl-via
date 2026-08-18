@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Backup
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "💾 Backup do Sistema",
+    "Crie uma cópia de segurança dos dados armazenados no sistema."
+) }}
+
+<div class="row justify-content-center">
+
+    <div class="col-xl-8">
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-dark text-white py-3">
+
+                <h5 class="mb-0">
+                    Banco de dados
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if informacoes_banco.existe %}
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-md-6">
+
+                            <div class="border rounded p-3 h-100 bg-light">
+
+                                <small class="text-muted d-block">
+                                    Arquivo
+                                </small>
+
+                                <strong>
+                                    sistema.db
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="border rounded p-3 h-100 bg-light">
+
+                                <small class="text-muted d-block">
+                                    Tamanho
+                                </small>
+
+                                <strong>
+                                    {{ informacoes_banco.tamanho_formatado }}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="border rounded p-3 h-100 bg-light">
+
+                                <small class="text-muted d-block">
+                                    Última alteração
+                                </small>
+
+                                <strong>
+
+                                    {% if informacoes_banco.modificado_em %}
+
+                                        {{ informacoes_banco.modificado_em.strftime(
+                                            "%d/%m/%Y %H:%M"
+                                        ) }}
+
+                                    {% else %}
+
+                                        -
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="alert alert-info">
+
+                        <strong class="d-block mb-1">
+                            ℹ️ O que será incluído?
+                        </strong>
+
+                        A cópia contém clientes, processos, agenda,
+                        financeiro, usuários, configurações e demais
+                        informações armazenadas no banco.
+
+                    </div>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'configuracoes.baixar_backup'
+                        ) }}"
+                        onsubmit="return confirmarBackup();">
+
+                        <button
+                            type="submit"
+                            class="btn btn-success btn-lg">
+
+                            ⬇ Baixar backup agora
+
+                        </button>
+
+                        <a
+                            href="{{ url_for(
+                                'configuracoes.pagina_configuracoes'
+                            ) }}"
+                            class="btn btn-outline-secondary btn-lg">
+
+                            ← Voltar
+
+                        </a>
+
+                    </form>
+
+                {% else %}
+
+                    <div class="alert alert-danger mb-0">
+
+                        <strong>
+                            Banco de dados não encontrado.
+                        </strong>
+
+                        <div class="mt-1">
+
+                            Verifique a configuração do sistema antes
+                            de tentar criar uma cópia de segurança.
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        <div class="card shadow-sm border-warning">
+
+            <div class="card-header bg-warning py-3">
+
+                <h5 class="mb-0">
+                    ⚠ Recomendações importantes
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <p>
+                    Guarde o arquivo em um local seguro e diferente do
+                    computador onde o sistema está instalado.
+                </p>
+
+                <p>
+                    Faça cópias regularmente, especialmente antes de
+                    atualizações importantes ou alterações no banco.
+                </p>
+
+                <p class="mb-0">
+
+                    O arquivo pode conter informações pessoais,
+                    jurídicas e financeiras. Não o envie para pessoas
+                    não autorizadas.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ super() }}
+
+<script>
+    function confirmarBackup() {
+        return window.confirm(
+            "Deseja criar e baixar uma cópia de segurança do sistema?"
+        );
+    }
+</script>
+
+{% endblock %}

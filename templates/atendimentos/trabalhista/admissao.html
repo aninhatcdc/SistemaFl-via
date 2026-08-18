@@ -1,0 +1,613 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+{% block title %}Admissão - Ficha Trabalhista{% endblock %}
+
+{% block form_action %}
+{{ url_for("atendimentos.etapa_admissao", atendimento_id=atendimento.id) }}
+{% endblock %}
+
+{% block etapa_titulo %}Admissão{% endblock %}
+
+{% block etapa_descricao %}
+Registre como ocorreu a contratação, os documentos assinados e as condições iniciais de trabalho.
+{% endblock %}
+
+{% block etapa_identificacao %}Etapa 4 de 10{% endblock %}
+
+{% block etapa_alertas %}
+<div class="trabalhista-info-box">
+    <i class="bi bi-person-check-fill"></i>
+    <div>
+        Utilize “Não sabe informar” quando o cliente não tiver certeza.
+        Os campos complementares serão habilitados conforme as respostas.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-calendar-check"></i>
+        </span>
+        <div>
+            <h3>Início do vínculo</h3>
+            <p>Datas e responsável pela contratação.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="data_admissao_real" class="form-label">
+                Data real de admissão
+            </label>
+            <input type="date" class="form-control"
+                   id="data_admissao_real"
+                   name="data_admissao_real"
+                   value="{{ ficha.data_admissao_real.strftime('%Y-%m-%d') if ficha.data_admissao_real else '' }}">
+        </div>
+
+        <div class="col-md-4">
+            <label for="data_admissao_carteira" class="form-label">
+                Data registrada na carteira
+            </label>
+            <input type="date" class="form-control"
+                   id="data_admissao_carteira"
+                   name="data_admissao_carteira"
+                   value="{{ ficha.data_admissao_carteira.strftime('%Y-%m-%d') if ficha.data_admissao_carteira else '' }}">
+        </div>
+
+        <div class="col-md-4">
+            <label for="responsavel_contratacao" class="form-label">
+                Quem realizou a contratação?
+            </label>
+            <input type="text" class="form-control"
+                   id="responsavel_contratacao"
+                   name="responsavel_contratacao"
+                   maxlength="150"
+                   value="{{ ficha.responsavel_contratacao or '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-chat-left-text"></i>
+        </span>
+        <div>
+            <h3>Seleção e exame admissional</h3>
+            <p>Indicação, entrevista e exame admissional.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="foi_indicado" class="form-label">
+                Foi indicado por alguém?
+            </label>
+            <select class="form-select" id="foi_indicado" name="foi_indicado">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.foi_indicado == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-8">
+            <label for="indicado_por" class="form-label">
+                Por quem?
+            </label>
+            <input type="text" class="form-control"
+                   id="indicado_por"
+                   name="indicado_por"
+                   maxlength="150"
+                   value="{{ ficha.indicado_por or '' }}">
+        </div>
+
+        <div class="col-md-4">
+            <label for="realizou_entrevista" class="form-label">
+                Realizou entrevista?
+            </label>
+            <select class="form-select"
+                    id="realizou_entrevista"
+                    name="realizou_entrevista">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.realizou_entrevista == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="fez_exame_admissional" class="form-label">
+                Fez exame admissional?
+            </label>
+            <select class="form-select"
+                    id="fez_exame_admissional"
+                    name="fez_exame_admissional">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.fez_exame_admissional == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="recebeu_copia_exame_admissional" class="form-label">
+                Recebeu cópia do exame?
+            </label>
+            <select class="form-select"
+                    id="recebeu_copia_exame_admissional"
+                    name="recebeu_copia_exame_admissional">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_copia_exame_admissional == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label for="exame_admissional_clinica" class="form-label">
+                Clínica onde realizou o exame
+            </label>
+            <input type="text" class="form-control"
+                   id="exame_admissional_clinica"
+                   name="exame_admissional_clinica"
+                   maxlength="200"
+                   value="{{ ficha.exame_admissional_clinica or '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-file-earmark-text"></i>
+        </span>
+        <div>
+            <h3>Contrato e documentos assinados</h3>
+            <p>Documentos apresentados ou assinados na admissão.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="assinou_contrato_antes_inicio" class="form-label">
+                Assinou contrato antes de iniciar?
+            </label>
+            <select class="form-select"
+                    id="assinou_contrato_antes_inicio"
+                    name="assinou_contrato_antes_inicio">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.assinou_contrato_antes_inicio == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="recebeu_copia_contrato" class="form-label">
+                Recebeu cópia do contrato?
+            </label>
+            <select class="form-select"
+                    id="recebeu_copia_contrato"
+                    name="recebeu_copia_contrato">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_copia_contrato == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="assinou_documento_em_branco" class="form-label">
+                Assinou documento em branco?
+            </label>
+            <select class="form-select"
+                    id="assinou_documento_em_branco"
+                    name="assinou_documento_em_branco">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.assinou_documento_em_branco == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <h4 class="h6 fw-bold mb-3">Quais documentos foram assinados?</h4>
+
+    <div class="row g-3">
+        {% set documentos = [
+            ("assinou_contrato_trabalho", "Contrato de trabalho"),
+            ("assinou_ficha_registro", "Ficha de registro"),
+            ("assinou_termo_responsabilidade", "Termo de responsabilidade"),
+            ("assinou_vale_transporte", "Vale-transporte"),
+            ("assinou_regulamento_interno", "Regulamento interno"),
+            ("assinou_termo_confidencialidade", "Termo de confidencialidade"),
+            ("assinou_outros_documentos", "Outros documentos")
+        ] %}
+
+        {% for campo, rotulo in documentos %}
+        <div class="col-md-6 col-xl-4">
+            <label for="{{ campo }}" class="form-label">{{ rotulo }}</label>
+            <select class="form-select" id="{{ campo }}" name="{{ campo }}">
+                <option value="">Selecione</option>
+                {% for valor, nome_resposta in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha|attr(campo) == valor %}selected{% endif %}>
+                    {{ nome_resposta }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endfor %}
+
+        <div class="col-12">
+            <label for="outros_documentos_admissao" class="form-label">
+                Quais outros documentos?
+            </label>
+            <textarea class="form-control"
+                      id="outros_documentos_admissao"
+                      name="outros_documentos_admissao"
+                      rows="3">{{ ficha.outros_documentos_admissao or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="recebeu_copia_documentos_admissao" class="form-label">
+                Recebeu cópia dos documentos assinados?
+            </label>
+            <select class="form-select"
+                    id="recebeu_copia_documentos_admissao"
+                    name="recebeu_copia_documentos_admissao">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_copia_documentos_admissao == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-journal-check"></i>
+        </span>
+        <div>
+            <h3>Carteira de trabalho</h3>
+            <p>Registro da CTPS e prazo para assinatura.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="carteira_trabalho_assinada" class="form-label">
+                A carteira foi assinada?
+            </label>
+            <select class="form-select"
+                    id="carteira_trabalho_assinada"
+                    name="carteira_trabalho_assinada">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.carteira_trabalho_assinada == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="carteira_assinada_mesmo_dia" class="form-label">
+                Foi assinada no mesmo dia?
+            </label>
+            <select class="form-select"
+                    id="carteira_assinada_mesmo_dia"
+                    name="carteira_assinada_mesmo_dia">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.carteira_assinada_mesmo_dia == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="carteira_dias_apos_inicio" class="form-label">
+                Quantos dias depois?
+            </label>
+            <input type="number" class="form-control"
+                   id="carteira_dias_apos_inicio"
+                   name="carteira_dias_apos_inicio"
+                   min="0"
+                   value="{{ ficha.carteira_dias_apos_inicio if ficha.carteira_dias_apos_inicio is not none else '' }}">
+        </div>
+
+        <div class="col-md-6">
+            <label for="carteira_nunca_assinada" class="form-label">
+                Nunca foi assinada?
+            </label>
+            <select class="form-select"
+                    id="carteira_nunca_assinada"
+                    name="carteira_nunca_assinada">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.carteira_nunca_assinada == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-shield-check"></i>
+        </span>
+        <div>
+            <h3>Treinamento, uniforme e EPIs</h3>
+            <p>Condições oferecidas no início das atividades.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="recebeu_treinamento" class="form-label">
+                Recebeu treinamento?
+            </label>
+            <select class="form-select"
+                    id="recebeu_treinamento"
+                    name="recebeu_treinamento">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_treinamento == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-8">
+            <label for="treinamento_duracao" class="form-label">
+                Duração do treinamento
+            </label>
+            <input type="text" class="form-control"
+                   id="treinamento_duracao"
+                   name="treinamento_duracao"
+                   maxlength="100"
+                   value="{{ ficha.treinamento_duracao or '' }}">
+        </div>
+
+        <div class="col-md-4">
+            <label for="recebeu_uniforme" class="form-label">
+                Recebeu uniforme?
+            </label>
+            <select class="form-select"
+                    id="recebeu_uniforme"
+                    name="recebeu_uniforme">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_uniforme == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="recebeu_epi" class="form-label">
+                Recebeu EPIs?
+            </label>
+            <select class="form-select"
+                    id="recebeu_epi"
+                    name="recebeu_epi">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_epi == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="assinou_ficha_entrega_epi" class="form-label">
+                Assinou ficha de entrega de EPI?
+            </label>
+            <select class="form-select"
+                    id="assinou_ficha_entrega_epi"
+                    name="assinou_ficha_entrega_epi">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.assinou_ficha_entrega_epi == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label for="epis_recebidos" class="form-label">
+                Quais EPIs foram recebidos?
+            </label>
+            <textarea class="form-control"
+                      id="epis_recebidos"
+                      name="epis_recebidos"
+                      rows="3">{{ ficha.epis_recebidos or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="observacoes_admissao" class="form-label">
+                Observações sobre a admissão
+            </label>
+            <textarea class="form-control"
+                      id="observacoes_admissao"
+                      name="observacoes_admissao"
+                      rows="4">{{ ficha.observacoes_admissao or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const regras = [
+        ["foi_indicado", ["indicado_por"]],
+        ["fez_exame_admissional", [
+            "exame_admissional_clinica",
+            "recebeu_copia_exame_admissional"
+        ]],
+        ["assinou_outros_documentos", ["outros_documentos_admissao"]],
+        ["recebeu_treinamento", ["treinamento_duracao"]],
+        ["recebeu_epi", [
+            "epis_recebidos",
+            "assinou_ficha_entrega_epi"
+        ]]
+    ];
+
+    function aplicarRegra(seletorId, camposIds) {
+        const seletor = document.getElementById(seletorId);
+
+        if (!seletor) {
+            return;
+        }
+
+        const habilitado = seletor.value === "SIM";
+
+        camposIds.forEach(function (campoId) {
+            const campo = document.getElementById(campoId);
+
+            if (!campo) {
+                return;
+            }
+
+            campo.disabled = !habilitado;
+
+            if (!habilitado) {
+                campo.value = "";
+            }
+        });
+    }
+
+    function atualizarCarteira() {
+        const assinada = document.getElementById(
+            "carteira_trabalho_assinada"
+        );
+
+        const mesmoDia = document.getElementById(
+            "carteira_assinada_mesmo_dia"
+        );
+
+        const dias = document.getElementById(
+            "carteira_dias_apos_inicio"
+        );
+
+        const nunca = document.getElementById(
+            "carteira_nunca_assinada"
+        );
+
+        const dataCarteira = document.getElementById(
+            "data_admissao_carteira"
+        );
+
+        if (!assinada || !mesmoDia || !dias || !nunca) {
+            return;
+        }
+
+        const carteiraAssinada = assinada.value === "SIM";
+        const nuncaAssinada = nunca.value === "SIM";
+
+        mesmoDia.disabled = !carteiraAssinada || nuncaAssinada;
+        dias.disabled = (
+            !carteiraAssinada ||
+            nuncaAssinada ||
+            mesmoDia.value === "SIM"
+        );
+
+        if (dataCarteira) {
+            dataCarteira.disabled = nuncaAssinada;
+        }
+
+        if (!carteiraAssinada || nuncaAssinada) {
+            mesmoDia.value = "";
+            dias.value = "";
+        }
+
+        if (mesmoDia.value === "SIM") {
+            dias.value = "0";
+        }
+
+        if (nuncaAssinada && dataCarteira) {
+            dataCarteira.value = "";
+        }
+    }
+
+    function atualizarTudo() {
+        regras.forEach(function (regra) {
+            aplicarRegra(regra[0], regra[1]);
+        });
+
+        atualizarCarteira();
+    }
+
+    regras.forEach(function (regra) {
+        const seletor = document.getElementById(regra[0]);
+
+        if (seletor) {
+            seletor.addEventListener("change", atualizarTudo);
+        }
+    });
+
+    [
+        "carteira_trabalho_assinada",
+        "carteira_assinada_mesmo_dia",
+        "carteira_nunca_assinada"
+    ].forEach(function (campoId) {
+        const campo = document.getElementById(campoId);
+
+        if (campo) {
+            campo.addEventListener("change", atualizarTudo);
+        }
+    });
+
+    atualizarTudo();
+});
+</script>
+
+{% endblock %}

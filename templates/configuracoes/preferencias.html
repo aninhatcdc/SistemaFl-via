@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Preferências
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "🎨 Preferências do Sistema",
+    "Personalize o comportamento e a exibição geral do sistema."
+) }}
+
+<form
+    method="POST"
+    action="{{ url_for(
+        'preferencias.preferencias'
+    ) }}">
+
+    <div class="row g-4">
+
+        <!-- =====================================
+             LISTAGENS E TABELAS
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-dark text-white py-3">
+
+                    <h5 class="mb-0">
+                        📋 Listagens e tabelas
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-4">
+
+                        <label
+                            for="itens_por_pagina"
+                            class="form-label fw-semibold">
+
+                            Itens por página
+
+                        </label>
+
+                        <select
+                            id="itens_por_pagina"
+                            name="itens_por_pagina"
+                            class="form-select">
+
+                            {% for quantidade in [5, 10, 15, 20, 30, 50] %}
+
+                                <option
+                                    value="{{ quantidade }}"
+                                    {% if configuracao.itens_por_pagina == quantidade %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ quantidade }} itens
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="form-text">
+
+                            Define quantos registros aparecem por página
+                            nas listagens do sistema.
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-check form-switch">
+
+                        <input
+                            type="checkbox"
+                            id="modo_compacto_tabelas"
+                            name="modo_compacto_tabelas"
+                            class="form-check-input"
+                            {% if configuracao.modo_compacto_tabelas %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="modo_compacto_tabelas"
+                            class="form-check-label fw-semibold">
+
+                            Usar tabelas compactas
+
+                        </label>
+
+                        <div class="form-text">
+
+                            Reduz o espaçamento das linhas para mostrar
+                            mais informações na tela.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             NOTIFICAÇÕES
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-warning py-3">
+
+                    <h5 class="mb-0">
+                        🔔 Notificações
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-4">
+
+                        <label
+                            for="dias_notificacoes"
+                            class="form-label fw-semibold">
+
+                            Período de avisos antecipados
+
+                        </label>
+
+                        <select
+                            id="dias_notificacoes"
+                            name="dias_notificacoes"
+                            class="form-select">
+
+                            {% for quantidade in [1, 3, 5, 7, 10, 15, 30] %}
+
+                                <option
+                                    value="{{ quantidade }}"
+                                    {% if configuracao.dias_notificacoes == quantidade %}
+                                        selected
+                                    {% endif %}>
+
+                                    {{ quantidade }}
+
+                                    {% if quantidade == 1 %}
+                                        dia
+                                    {% else %}
+                                        dias
+                                    {% endif %}
+
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="form-text">
+
+                            Prazos, compromissos e aniversários serão
+                            exibidos com essa antecedência.
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-check form-switch">
+
+                        <input
+                            type="checkbox"
+                            id="exibir_notificacoes_baixa"
+                            name="exibir_notificacoes_baixa"
+                            class="form-check-input"
+                            {% if configuracao.exibir_notificacoes_baixa %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="exibir_notificacoes_baixa"
+                            class="form-check-label fw-semibold">
+
+                            Exibir notificações de baixa prioridade
+
+                        </label>
+
+                        <div class="form-text">
+
+                            Quando desativado, o sino mostrará apenas
+                            notificações de prioridade alta e média.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             NAVEGAÇÃO
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-primary text-white py-3">
+
+                    <h5 class="mb-0">
+                        🏠 Navegação
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-0">
+
+                        <label
+                            for="pagina_inicial"
+                            class="form-label fw-semibold">
+
+                            Página inicial após o login
+
+                        </label>
+
+                        <select
+                            id="pagina_inicial"
+                            name="pagina_inicial"
+                            class="form-select">
+
+                            <option
+                                value="dashboard"
+                                {% if configuracao.pagina_inicial == "dashboard" %}
+                                    selected
+                                {% endif %}>
+
+                                Dashboard
+
+                            </option>
+
+                            <option
+                                value="clientes"
+                                {% if configuracao.pagina_inicial == "clientes" %}
+                                    selected
+                                {% endif %}>
+
+                                Clientes
+
+                            </option>
+
+                            <option
+                                value="processos"
+                                {% if configuracao.pagina_inicial == "processos" %}
+                                    selected
+                                {% endif %}>
+
+                                Processos
+
+                            </option>
+
+                            <option
+                                value="agenda"
+                                {% if configuracao.pagina_inicial == "agenda" %}
+                                    selected
+                                {% endif %}>
+
+                                Agenda
+
+                            </option>
+
+                            {% if current_user.pode_acessar_financeiro %}
+
+                                <option
+                                    value="financeiro"
+                                    {% if configuracao.pagina_inicial == "financeiro" %}
+                                        selected
+                                    {% endif %}>
+
+                                    Financeiro
+
+                                </option>
+
+                            {% endif %}
+
+                        </select>
+
+                        <div class="form-text">
+
+                            Essa será a primeira página exibida após
+                            o usuário entrar no sistema.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             DATA E EXIBIÇÃO
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-info text-white py-3">
+
+                    <h5 class="mb-0">
+                        📅 Datas e exibição
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <label
+                        for="formato_data"
+                        class="form-label fw-semibold">
+
+                        Formato padrão das datas
+
+                    </label>
+
+                    <select
+                        id="formato_data"
+                        name="formato_data"
+                        class="form-select">
+
+                        <option
+                            value="DD/MM/AAAA"
+                            {% if configuracao.formato_data == "DD/MM/AAAA" %}
+                                selected
+                            {% endif %}>
+
+                            DD/MM/AAAA — 16/07/2026
+
+                        </option>
+
+                        <option
+                            value="AAAA-MM-DD"
+                            {% if configuracao.formato_data == "AAAA-MM-DD" %}
+                                selected
+                            {% endif %}>
+
+                            AAAA-MM-DD — 2026-07-16
+
+                        </option>
+
+                        <option
+                            value="MM/DD/AAAA"
+                            {% if configuracao.formato_data == "MM/DD/AAAA" %}
+                                selected
+                            {% endif %}>
+
+                            MM/DD/AAAA — 07/16/2026
+
+                        </option>
+
+                    </select>
+
+                    <div class="form-text">
+
+                        Define o formato usado para exibir datas nos
+                        relatórios e nas telas que adotarem a preferência global.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================
+         BOTÕES
+    ====================================== -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+
+        <a
+            href="{{ url_for(
+                'configuracoes.pagina_configuracoes'
+            ) }}"
+            class="btn btn-outline-secondary">
+
+            ← Voltar
+
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-success btn-lg">
+
+            💾 Salvar preferências
+
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

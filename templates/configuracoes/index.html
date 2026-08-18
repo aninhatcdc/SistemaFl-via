@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Configurações
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "⚙ Configurações",
+    "Gerencie as preferências, os acessos e os dados do sistema."
+) }}
+
+<div class="row g-4">
+
+    <!-- =====================================
+         DADOS DO ESCRITÓRIO
+    ====================================== -->
+    <div class="col-md-6 col-lg-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body d-flex flex-column">
+
+                <div class="d-flex justify-content-between align-items-start mb-2">
+
+                    <h5 class="mb-0">
+                        🏢 Dados do escritório
+                    </h5>
+
+                    <span class="badge bg-success">
+                        Disponível
+                    </span>
+
+                </div>
+
+                <p class="text-muted flex-grow-1">
+
+                    Nome, CNPJ, contatos, endereço, logo e identidade
+                    visual utilizada em todo o sistema.
+
+                </p>
+
+                <div>
+
+                    <a
+                        href="{{ url_for(
+                            'configuracoes.dados_escritorio'
+                        ) }}"
+                        class="btn btn-outline-primary">
+
+                        ⚙ Configurar
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================
+         USUÁRIOS E ACESSO
+    ====================================== -->
+    <div class="col-md-6 col-lg-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body d-flex flex-column">
+
+                <div class="d-flex justify-content-between align-items-start mb-2">
+
+                    <h5 class="mb-0">
+                        👤 Usuários e acesso
+                    </h5>
+
+                    {% if current_user.pode_gerenciar_usuarios %}
+
+                        <span class="badge bg-success">
+                            Disponível
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            Restrito
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <p class="text-muted flex-grow-1">
+
+                    Cadastre usuários, altere perfis, redefina senhas e
+                    controle quem pode acessar o sistema.
+
+                </p>
+
+                <div>
+
+                    {% if current_user.pode_gerenciar_usuarios %}
+
+                        <a
+                            href="{{ url_for(
+                                'usuarios.listar_usuarios'
+                            ) }}"
+                            class="btn btn-outline-primary">
+
+                            👥 Gerenciar usuários
+
+                        </a>
+
+                    {% else %}
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            disabled
+                            title="Somente administradores podem gerenciar usuários.">
+
+                            🔒 Acesso do administrador
+
+                        </button>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================
+         PREFERÊNCIAS
+    ====================================== -->
+    <!-- =====================================
+     PREFERÊNCIAS
+===================================== -->
+<div class="col-md-6 col-lg-4">
+
+    <div class="card shadow-sm h-100">
+
+        <div class="card-body d-flex flex-column">
+
+            <div class="d-flex justify-content-between align-items-start mb-2">
+
+                <h5 class="mb-0">
+                    🎨 Preferências
+                </h5>
+
+                <span class="badge bg-success">
+                    Disponível
+                </span>
+
+            </div>
+
+            <p class="text-muted flex-grow-1">
+
+                Personalize o comportamento geral do sistema,
+                notificações, tabelas, página inicial e formato das
+                datas.
+
+            </p>
+
+            <div>
+
+                <a
+                    href="{{ url_for('preferencias.preferencias') }}"
+                    class="btn btn-outline-primary">
+
+                    ⚙ Configurar preferências
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- =====================================
+         CONFIGURAÇÕES FINANCEIRAS
+    ====================================== -->
+    <!-- =====================================
+     CONFIGURAÇÕES FINANCEIRAS
+===================================== -->
+<div class="col-md-6 col-lg-4">
+
+    <div class="card shadow-sm h-100">
+
+        <div class="card-body d-flex flex-column">
+
+            <div class="d-flex justify-content-between align-items-start mb-2">
+
+                <h5 class="mb-0">
+                    💰 Configurações Financeiras
+                </h5>
+
+                {% if current_user.pode_acessar_financeiro %}
+
+                    <span class="badge bg-success">
+                        Disponível
+                    </span>
+
+                {% else %}
+
+                    <span class="badge bg-secondary">
+                        Restrito
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+            <p class="text-muted flex-grow-1">
+
+                Configure padrões dos lançamentos,
+                metas, alertas financeiros e opções
+                utilizadas pelo módulo Financeiro.
+
+            </p>
+
+            <div>
+
+                {% if current_user.pode_acessar_financeiro %}
+
+                    <a
+                        href="{{ url_for('configuracao_financeiro.configuracoes_financeiras') }}"
+                        class="btn btn-outline-primary">
+
+                        💰 Configurar Financeiro
+
+                    </a>
+
+                {% else %}
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        disabled
+                        title="Seu perfil não possui acesso ao Financeiro.">
+
+                        🔒 Acesso restrito
+
+                    </button>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- =====================================
+         CONFIGURAÇÕES DE ARQUIVOS
+    ====================================== -->
+    <!-- =====================================
+     CONFIGURAÇÕES DE ARQUIVOS
+===================================== -->
+<div class="col-md-6 col-lg-4">
+
+    <div class="card shadow-sm h-100">
+
+        <div class="card-body d-flex flex-column">
+
+            <div class="d-flex justify-content-between align-items-start mb-2">
+
+                <h5 class="mb-0">
+                    📂 Arquivos
+                </h5>
+
+                {% if current_user.pode_gerenciar_usuarios %}
+
+                    <span class="badge bg-success">
+                        Disponível
+                    </span>
+
+                {% else %}
+
+                    <span class="badge bg-secondary">
+                        Restrito
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+            <p class="text-muted flex-grow-1">
+
+                Configure limites de upload, extensões permitidas,
+                organização dos documentos e regras de armazenamento.
+
+            </p>
+
+            <div>
+
+                {% if current_user.pode_gerenciar_usuarios %}
+
+                    <a
+                        href="{{ url_for('configuracao_arquivos.configuracoes_arquivos') }}"
+                        class="btn btn-outline-primary">
+
+                        📂 Configurar Arquivos
+
+                    </a>
+
+                {% else %}
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        disabled
+                        title="Somente administradores podem alterar estas configurações.">
+
+                        🔒 Acesso do administrador
+
+                    </button>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- =====================================
+         BACKUP
+    ====================================== -->
+    <div class="col-md-6 col-lg-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body d-flex flex-column">
+
+                <div class="d-flex justify-content-between align-items-start mb-2">
+
+                    <h5 class="mb-0">
+                        💾 Backup
+                    </h5>
+
+                    {% if current_user.pode_gerenciar_usuarios %}
+
+                        <span class="badge bg-success">
+                            Disponível
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-secondary">
+                            Restrito
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <p class="text-muted flex-grow-1">
+
+                    Exporte uma cópia segura do banco de dados para
+                    proteger clientes, processos, usuários e demais registros.
+
+                </p>
+
+                <div>
+
+                    {% if current_user.pode_gerenciar_usuarios %}
+
+                        <a
+                            href="{{ url_for(
+                                'configuracoes.pagina_backup'
+                            ) }}"
+                            class="btn btn-outline-primary">
+
+                            💾 Gerenciar backup
+
+                        </a>
+
+                    {% else %}
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            disabled
+                            title="Somente administradores podem gerenciar backups.">
+
+                            🔒 Acesso do administrador
+
+                        </button>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =====================================
+     INFORMAÇÕES DE ACESSO
+===================================== -->
+<div class="alert alert-light border mt-4 mb-0">
+
+    <div class="d-flex align-items-start gap-3">
+
+        <div style="font-size: 1.5rem;">
+            ℹ️
+        </div>
+
+        <div>
+
+            <strong class="d-block mb-1">
+                Seu perfil: {{ current_user.perfil_nome }}
+            </strong>
+
+            <small class="text-muted">
+
+                Algumas configurações são exibidas de acordo com as
+                permissões do usuário conectado. As opções marcadas como
+                restritas somente podem ser acessadas pelos perfis autorizados.
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% macro dashboard_card(titulo, valor, descricao, cor="dourado") %}
+
+<div class="col-md-3 mb-4">
+
+    <div class="card card-dashboard h-100">
+
+        <div class="card-body">
+
+            <div class="dashboard-card-topo">
+
+                <h6 class="dashboard-card-titulo">
+
+                    {{ titulo }}
+
+                </h6>
+
+                <span class="dashboard-card-indicador {{ cor }}">
+
+                </span>
+
+            </div>
+
+            <h2 class="dashboard-card-valor">
+
+                {{ valor }}
+
+            </h2>
+
+            <small class="dashboard-card-descricao">
+
+                {{ descricao }}
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endmacro %}

@@ -1,0 +1,355 @@
+{% extends "atendimentos/civel/layout.html" %}
+
+{% block etapa_conteudo %}
+
+<div class="civel-page-header">
+    <div>
+        <h2>Parte Contrária</h2>
+        <p>
+            Identifique a pessoa ou empresa envolvida no conflito.
+        </p>
+    </div>
+</div>
+
+<!-- ====================================================== -->
+<!-- IDENTIFICAÇÃO -->
+<!-- ====================================================== -->
+
+<section class="civel-section">
+
+    <div class="civel-section-title">
+        <i class="bi bi-person-vcard"></i>
+        Identificação
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <label class="form-label">
+                Tipo
+            </label>
+
+            <select
+                name="parte_contraria_tipo"
+                class="form-select"
+            >
+                <option value="">Selecione</option>
+
+                <option
+                    value="PESSOA_FISICA"
+                    {% if ficha.parte_contraria_tipo == "PESSOA_FISICA" %}selected{% endif %}
+                >
+                    Pessoa Física
+                </option>
+
+                <option
+                    value="PESSOA_JURIDICA"
+                    {% if ficha.parte_contraria_tipo == "PESSOA_JURIDICA" %}selected{% endif %}
+                >
+                    Pessoa Jurídica
+                </option>
+
+                <option
+                    value="NAO_INFORMADO"
+                    {% if ficha.parte_contraria_tipo == "NAO_INFORMADO" %}selected{% endif %}
+                >
+                    Não informado
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-8">
+            <label class="form-label">
+                Nome / Razão Social
+            </label>
+
+            <input
+                type="text"
+                name="parte_contraria_nome"
+                class="form-control"
+                value="{{ ficha.parte_contraria_nome or '' }}"
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">
+                CPF / CNPJ
+            </label>
+
+            <input
+                type="text"
+                name="parte_contraria_cpf_cnpj"
+                class="form-control"
+                value="{{ ficha.parte_contraria_cpf_cnpj or '' }}"
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">
+                RG
+            </label>
+
+            <input
+                type="text"
+                name="parte_contraria_rg"
+                class="form-control"
+                value="{{ ficha.parte_contraria_rg or '' }}"
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">
+                Relação com o cliente
+            </label>
+
+            <input
+                type="text"
+                name="relacao_com_cliente"
+                class="form-control"
+                placeholder="Ex.: Ex-cônjuge, fornecedor..."
+                value="{{ ficha.relacao_com_cliente or '' }}"
+            >
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ====================================================== -->
+<!-- CONTATO -->
+<!-- ====================================================== -->
+
+<section class="civel-section">
+
+    <div class="civel-section-title">
+        <i class="bi bi-telephone"></i>
+        Contato
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-6">
+            <label class="form-label">
+                Telefone
+            </label>
+
+            <input
+                type="text"
+                name="parte_contraria_telefone"
+                class="form-control"
+                value="{{ ficha.parte_contraria_telefone or '' }}"
+            >
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">
+                WhatsApp
+            </label>
+
+            <input
+                type="text"
+                name="parte_contraria_whatsapp"
+                class="form-control"
+                value="{{ ficha.parte_contraria_whatsapp or '' }}"
+            >
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">
+                E-mail
+            </label>
+
+            <input
+                type="email"
+                name="parte_contraria_email"
+                class="form-control"
+                value="{{ ficha.parte_contraria_email or '' }}"
+            >
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ====================================================== -->
+<!-- ENDEREÇO -->
+<!-- ====================================================== -->
+
+<section class="civel-section">
+
+    <div class="civel-section-title">
+        <i class="bi bi-geo-alt"></i>
+        Endereço
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-12">
+            <label class="form-label">
+                Endereço
+            </label>
+
+            <input
+                type="text"
+                name="parte_contraria_endereco"
+                class="form-control"
+                value="{{ ficha.parte_contraria_endereco or '' }}"
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">
+                CEP
+            </label>
+
+            <input
+                type="text"
+                name="parte_contraria_cep"
+                class="form-control"
+                value="{{ ficha.parte_contraria_cep or '' }}"
+            >
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">
+                Cidade
+            </label>
+
+            <input
+                type="text"
+                name="parte_contraria_cidade"
+                class="form-control"
+                value="{{ ficha.parte_contraria_cidade or '' }}"
+            >
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">
+                UF
+            </label>
+
+            <input
+                type="text"
+                maxlength="2"
+                name="parte_contraria_estado"
+                class="form-control text-uppercase"
+                value="{{ ficha.parte_contraria_estado or '' }}"
+            >
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ====================================================== -->
+<!-- ADVOGADO -->
+<!-- ====================================================== -->
+
+<section class="civel-section">
+
+    <div class="civel-section-title">
+        <i class="bi bi-briefcase"></i>
+        Representação Jurídica
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <label class="form-label">
+                Possui advogado?
+            </label>
+
+            <select
+                name="possui_advogado"
+                id="possui_advogado"
+                class="form-select"
+            >
+                <option value="">Selecione</option>
+
+                {% for codigo, nome in ficha.RESPOSTAS.items() %}
+                    <option
+                        value="{{ codigo }}"
+                        {% if ficha.possui_advogado == codigo %}selected{% endif %}
+                    >
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            class="col-md-8"
+            id="advogado_div"
+        >
+            <label class="form-label">
+                Nome do advogado
+            </label>
+
+            <input
+                type="text"
+                name="advogado_parte_contraria"
+                id="advogado_parte_contraria"
+                class="form-control"
+                value="{{ ficha.advogado_parte_contraria or '' }}"
+            >
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ====================================================== -->
+<!-- OBSERVAÇÕES -->
+<!-- ====================================================== -->
+
+<section class="civel-section">
+
+    <div class="civel-section-title">
+        <i class="bi bi-journal-text"></i>
+        Observações
+    </div>
+
+    <textarea
+        class="form-control"
+        rows="6"
+        name="observacoes_parte_contraria"
+        placeholder="Registre informações adicionais sobre a parte contrária."
+    >{{ ficha.observacoes_parte_contraria or '' }}</textarea>
+
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const possuiAdvogado = document.getElementById(
+            "possui_advogado"
+        );
+
+        const advogadoDiv = document.getElementById(
+            "advogado_div"
+        );
+
+        const advogadoCampo = document.getElementById(
+            "advogado_parte_contraria"
+        );
+
+        function atualizarAdvogado() {
+            const exibir = possuiAdvogado.value === "SIM";
+
+            advogadoDiv.style.display = exibir ? "block" : "none";
+            advogadoCampo.disabled = !exibir;
+
+            if (!exibir) {
+                advogadoCampo.value = "";
+            }
+        }
+
+        possuiAdvogado.addEventListener(
+            "change",
+            atualizarAdvogado
+        );
+
+        atualizarAdvogado();
+    });
+</script>
+
+{% endblock %}

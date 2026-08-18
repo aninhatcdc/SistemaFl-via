@@ -1,0 +1,510 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Usuários
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "👤 Usuários",
+    "Gerencie os usuários que possuem acesso ao sistema."
+) }}
+
+<!-- =====================================
+     PESQUISA E NOVO USUÁRIO
+===================================== -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <form method="GET"
+              action="{{ url_for('usuarios.listar_usuarios') }}">
+
+            <div class="row g-3 align-items-end">
+
+                <div class="col-lg-8 col-md-7">
+
+                    <label for="pesquisa-usuario"
+                           class="form-label fw-semibold">
+
+                        Pesquisar usuário
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="pesquisa-usuario"
+                        name="q"
+                        class="form-control"
+                        placeholder="Pesquisar por nome, e-mail, telefone, cargo ou perfil..."
+                        value="{{ termo }}">
+
+                </div>
+
+                <div class="col-lg-4 col-md-5">
+
+                    <div class="d-flex gap-2">
+
+                        <button
+                            type="submit"
+                            class="btn btn-dark flex-fill">
+
+                            🔍 Pesquisar
+
+                        </button>
+
+                        {% if termo %}
+
+                            <a
+                                href="{{ url_for('usuarios.listar_usuarios') }}"
+                                class="btn btn-outline-secondary"
+                                title="Limpar pesquisa">
+
+                                Limpar
+
+                            </a>
+
+                        {% endif %}
+
+                        <a
+                            href="{{ url_for('usuarios.novo_usuario') }}"
+                            class="btn btn-success text-nowrap">
+
+                            + Novo usuário
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- =====================================
+     LISTAGEM DE USUÁRIOS
+===================================== -->
+<div class="card shadow-sm">
+
+    <div class="card-header bg-white py-3">
+
+        <div class="d-flex justify-content-between align-items-center">
+
+            <div>
+
+                <h5 class="mb-0">
+
+                    Usuários cadastrados
+
+                </h5>
+
+                {% if termo %}
+
+                    <small class="text-muted">
+
+                        Resultado da pesquisa por:
+                        <strong>{{ termo }}</strong>
+
+                    </small>
+
+                {% endif %}
+
+            </div>
+
+            <span class="badge bg-dark">
+
+                {{ usuarios|length }}
+                {% if usuarios|length == 1 %}
+                    usuário
+                {% else %}
+                    usuários
+                {% endif %}
+
+            </span>
+
+        </div>
+
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if usuarios %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="ps-4">
+                                Usuário
+                            </th>
+
+                            <th>
+                                Cargo
+                            </th>
+
+                            <th>
+                                Contato
+                            </th>
+
+                            <th>
+                                Perfil
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th class="text-end pe-4"
+                                style="width: 220px;">
+
+                                Ações
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for usuario in usuarios %}
+
+                            <tr class="{% if not usuario.ativo %}table-light{% endif %}">
+
+                                <!-- USUÁRIO -->
+                                <td class="ps-4">
+
+                                    <div class="d-flex align-items-center gap-3">
+
+                                        <div
+                                            class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                                            style="width: 42px; height: 42px; font-weight: 600;">
+
+                                            {{ usuario.iniciais }}
+
+                                        </div>
+
+                                        <div>
+
+                                            <strong class="d-block">
+
+                                                {{ usuario.nome }}
+
+                                                {% if usuario.id == current_user.id %}
+
+                                                    <span class="badge bg-info text-dark ms-1">
+
+                                                        Você
+
+                                                    </span>
+
+                                                {% endif %}
+
+                                            </strong>
+
+                                            <small class="text-muted">
+
+                                                {{ usuario.email }}
+
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+                                <!-- CARGO -->
+                                <td>
+
+                                    {{ usuario.cargo or "Não informado" }}
+
+                                </td>
+
+                                <!-- CONTATO -->
+                                <td>
+
+                                    {% if usuario.telefone %}
+
+                                        {{ usuario.telefone }}
+
+                                    {% else %}
+
+                                        <span class="text-muted">
+
+                                            Não informado
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <!-- PERFIL -->
+                                <td>
+
+                                    {% if usuario.perfil == usuario.PERFIL_ADMIN %}
+
+                                        <span class="badge bg-danger">
+
+                                            Administrador
+
+                                        </span>
+
+                                    {% elif usuario.perfil == usuario.PERFIL_FINANCEIRO %}
+
+                                        <span class="badge bg-warning text-dark">
+
+                                            Financeiro
+
+                                        </span>
+
+                                    {% elif usuario.perfil == usuario.PERFIL_FUNCIONARIO %}
+
+                                        <span class="badge bg-primary">
+
+                                            Funcionário
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+
+                                            {{ usuario.perfil_nome }}
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <!-- STATUS -->
+                                <td>
+
+                                    {% if usuario.ativo %}
+
+                                        <span class="badge bg-success">
+
+                                            ● Ativo
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+
+                                            ● Inativo
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <!-- AÇÕES -->
+                                <td class="text-end pe-4">
+
+                                    <div class="d-flex justify-content-end gap-2 flex-wrap">
+
+                                        <a
+                                            href="{{ url_for(
+                                                'usuarios.editar_usuario',
+                                                id=usuario.id
+                                            ) }}"
+                                            class="btn btn-sm btn-outline-primary">
+
+                                            ✏️ Editar
+
+                                        </a>
+
+                                        {% if usuario.id == current_user.id %}
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-secondary"
+                                                disabled
+                                                title="Você não pode desativar ou excluir o próprio usuário.">
+
+                                                Desativar
+
+                                            </button>
+
+                                        {% else %}
+
+                                            <!-- ATIVAR OU DESATIVAR -->
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'usuarios.alterar_status_usuario',
+                                                    id=usuario.id
+                                                ) }}"
+                                                class="d-inline"
+                                                onsubmit="return confirmarAlteracaoStatus(
+                                                    '{{ usuario.nome|e }}',
+                                                    {{ 'true' if usuario.ativo else 'false' }}
+                                                );">
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-sm {% if usuario.ativo %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+
+                                                    {% if usuario.ativo %}
+
+                                                        ⛔ Desativar
+
+                                                    {% else %}
+
+                                                        ✅ Ativar
+
+                                                    {% endif %}
+
+                                                </button>
+
+                                            </form>
+
+                                            <!-- EXCLUIR -->
+                                            {% if not usuario.ativo %}
+
+                                                <form
+                                                    method="POST"
+                                                    action="{{ url_for(
+                                                        'usuarios.excluir_usuario',
+                                                        id=usuario.id
+                                                    ) }}"
+                                                    class="d-inline"
+                                                    onsubmit="return confirmarExclusao(
+                                                        '{{ usuario.nome|e }}'
+                                                    );">
+
+                                                    <button
+                                                        type="submit"
+                                                        class="btn btn-sm btn-outline-danger">
+
+                                                        🗑️ Excluir
+
+                                                    </button>
+
+                                                </form>
+
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <div class="mb-3"
+                     style="font-size: 3rem;">
+
+                    👤
+
+                </div>
+
+                <h5 class="text-muted">
+
+                    Nenhum usuário encontrado.
+
+                </h5>
+
+                {% if termo %}
+
+                    <p class="text-muted mb-3">
+
+                        Não encontramos usuários para a pesquisa
+                        <strong>{{ termo }}</strong>.
+
+                    </p>
+
+                    <a
+                        href="{{ url_for('usuarios.listar_usuarios') }}"
+                        class="btn btn-outline-secondary">
+
+                        Limpar pesquisa
+
+                    </a>
+
+                {% else %}
+
+                    <p class="text-muted mb-3">
+
+                        Cadastre o primeiro usuário para começar.
+
+                    </p>
+
+                    <a
+                        href="{{ url_for('usuarios.novo_usuario') }}"
+                        class="btn btn-success">
+
+                        + Cadastrar usuário
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ super() }}
+
+<script>
+    function confirmarAlteracaoStatus(nomeUsuario, usuarioAtivo) {
+        let mensagem;
+
+        if (usuarioAtivo) {
+            mensagem =
+                `Deseja realmente desativar o usuário "${nomeUsuario}"?`;
+        } else {
+            mensagem =
+                `Deseja realmente ativar o usuário "${nomeUsuario}"?`;
+        }
+
+        return window.confirm(mensagem);
+    }
+
+    function confirmarExclusao(nomeUsuario) {
+        return window.confirm(
+            `Tem certeza que deseja excluir definitivamente o usuário "${nomeUsuario}"?\n\n` +
+            "Esta ação não poderá ser desfeita."
+        );
+    }
+</script>
+
+{% endblock %}

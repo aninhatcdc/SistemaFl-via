@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Entrar —
+        {{ configuracao_global.nome_escritorio
+           if configuracao_global
+           and configuracao_global.nome_escritorio
+           else "Sistema Jurídico" }}
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --cor-principal:
+                {{ configuracao_global.cor_principal
+                   if configuracao_global
+                   and configuracao_global.cor_principal
+                   else '#212529' }};
+
+            --cor-secundaria:
+                {{ configuracao_global.cor_secundaria
+                   if configuracao_global
+                   and configuracao_global.cor_secundaria
+                   else '#0d6efd' }};
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--cor-principal),
+                    var(--cor-secundaria)
+                );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family:
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 980px;
+        }
+
+        .login-card {
+            border: none;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow:
+                0 24px 60px
+                rgba(0, 0, 0, 0.28);
+        }
+
+        .login-apresentacao {
+            min-height: 560px;
+            padding: 48px;
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--cor-principal),
+                    color-mix(
+                        in srgb,
+                        var(--cor-principal) 72%,
+                        var(--cor-secundaria)
+                    )
+                );
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .login-logo {
+            width: 92px;
+            height: 92px;
+            object-fit: contain;
+            border-radius: 18px;
+            background-color: #ffffff;
+            padding: 7px;
+            box-shadow:
+                0 10px 30px
+                rgba(0, 0, 0, 0.20);
+        }
+
+        .login-simbolo {
+            width: 92px;
+            height: 92px;
+            border-radius: 18px;
+            background-color:
+                rgba(255, 255, 255, 0.14);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+        }
+
+        .login-formulario {
+            min-height: 560px;
+            padding: 48px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-formulario h2 {
+            font-weight: 700;
+        }
+
+        .campo-wrapper {
+            position: relative;
+        }
+
+        .campo-icone {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 1rem;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .campo-wrapper .form-control {
+            padding-left: 46px;
+        }
+
+        .form-control {
+            min-height: 50px;
+            border-radius: 10px;
+        }
+
+        .form-control:focus {
+            border-color: var(--cor-secundaria);
+            box-shadow:
+                0 0 0 0.2rem
+                color-mix(
+                    in srgb,
+                    var(--cor-secundaria) 20%,
+                    transparent
+                );
+        }
+
+        .senha-wrapper {
+            position: relative;
+        }
+
+        .senha-wrapper .form-control {
+            padding-right: 52px;
+        }
+
+        .botao-senha {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            padding: 6px 8px;
+            color: #6c757d;
+            border-radius: 6px;
+            z-index: 3;
+        }
+
+        .botao-senha:hover,
+        .botao-senha:focus {
+            color: var(--cor-secundaria);
+            background-color: #f1f3f5;
+        }
+
+        .btn-entrar {
+            min-height: 50px;
+            border-radius: 10px;
+            background-color: var(--cor-secundaria);
+            border-color: var(--cor-secundaria);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .btn-entrar:hover,
+        .btn-entrar:focus {
+            background-color:
+                color-mix(
+                    in srgb,
+                    var(--cor-secundaria) 85%,
+                    black
+                );
+            border-color:
+                color-mix(
+                    in srgb,
+                    var(--cor-secundaria) 85%,
+                    black
+                );
+            color: #ffffff;
+        }
+
+        .btn-entrar:disabled {
+            background-color: var(--cor-secundaria);
+            border-color: var(--cor-secundaria);
+            color: #ffffff;
+            opacity: 0.75;
+        }
+
+        .link-recuperacao {
+            color: var(--cor-secundaria);
+            font-weight: 500;
+        }
+
+        .link-recuperacao:hover {
+            color:
+                color-mix(
+                    in srgb,
+                    var(--cor-secundaria) 75%,
+                    black
+                );
+        }
+
+        .login-rodape {
+            color:
+                rgba(255, 255, 255, 0.72);
+            font-size: 13px;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow:
+                0 20px 50px
+                rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            background-color: var(--cor-principal);
+            color: #ffffff;
+            border-bottom: none;
+            padding: 20px 24px;
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+        }
+
+        .contato-administrador {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .contato-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+        }
+
+        .contato-item + .contato-item {
+            border-top: 1px solid #e9ecef;
+        }
+
+        .contato-icone {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background-color:
+                color-mix(
+                    in srgb,
+                    var(--cor-secundaria) 12%,
+                    white
+                );
+            color: var(--cor-secundaria);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contato-item a {
+            color: #212529;
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        .contato-item a:hover {
+            color: var(--cor-secundaria);
+        }
+
+        .btn-fechar-modal {
+            background-color: var(--cor-secundaria);
+            border-color: var(--cor-secundaria);
+            color: #ffffff;
+        }
+
+        .btn-fechar-modal:hover,
+        .btn-fechar-modal:focus {
+            background-color:
+                color-mix(
+                    in srgb,
+                    var(--cor-secundaria) 85%,
+                    black
+                );
+            border-color:
+                color-mix(
+                    in srgb,
+                    var(--cor-secundaria) 85%,
+                    black
+                );
+            color: #ffffff;
+        }
+
+        @media (max-width: 767.98px) {
+            body {
+                padding: 14px;
+                align-items: flex-start;
+            }
+
+            .login-apresentacao {
+                min-height: auto;
+                padding: 32px;
+            }
+
+            .login-formulario {
+                min-height: auto;
+                padding: 32px;
+            }
+
+            .login-logo,
+            .login-simbolo {
+                width: 76px;
+                height: 76px;
+            }
+
+            .login-simbolo {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="card login-card">
+
+            <div class="row g-0">
+
+                <!-- =====================================
+                     APRESENTAÇÃO
+                ====================================== -->
+                <div class="col-md-5 login-apresentacao">
+
+                    <div>
+
+                        {% if configuracao_global
+                              and configuracao_global.logo %}
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename=configuracao_global.logo
+                                ) }}"
+                                alt="Logo do escritório"
+                                class="login-logo mb-4">
+
+                        {% else %}
+
+                            <div class="login-simbolo mb-4">
+                                ⚖
+                            </div>
+
+                        {% endif %}
+
+                        <h2 class="fw-bold mb-3">
+
+                            {{ configuracao_global.nome_escritorio
+                               if configuracao_global
+                               and configuracao_global.nome_escritorio
+                               else "Sistema Jurídico" }}
+
+                        </h2>
+
+                        <p class="mb-0 text-white-50">
+
+                            {% if configuracao_global
+                                  and configuracao_global.nome_fantasia %}
+
+                                {{ configuracao_global.nome_fantasia }}
+
+                            {% else %}
+
+                                Gestão segura e organizada do escritório.
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+                    <div class="login-rodape">
+
+                        <div class="mb-1">
+
+                            <i class="bi bi-shield-lock me-1"></i>
+
+                            Acesso restrito aos funcionários autorizados
+
+                        </div>
+
+                        <div>
+                            Sistema Jurídico — Versão 1.0
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- =====================================
+                     FORMULÁRIO
+                ====================================== -->
+                <div class="col-md-7 login-formulario">
+
+                    <div>
+
+                        <div class="mb-4">
+
+                            <h2 class="mb-2">
+                                Bem-vinda
+                            </h2>
+
+                            <p class="text-muted mb-0">
+
+                                Entre com seu e-mail e senha
+                                para acessar o sistema.
+
+                            </p>
+
+                        </div>
+
+                        <!-- =====================================
+                             MENSAGENS
+                        ====================================== -->
+                        {% with messages = get_flashed_messages(
+                            with_categories=true
+                        ) %}
+
+                            {% if messages %}
+
+                                {% for categoria, mensagem in messages %}
+
+                                    <div
+                                        class="alert alert-{{ categoria }}
+                                               alert-dismissible
+                                               fade
+                                               show"
+                                        role="alert">
+
+                                        {{ mensagem }}
+
+                                        <button
+                                            type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="alert"
+                                            aria-label="Fechar">
+                                        </button>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            {% endif %}
+
+                        {% endwith %}
+
+                        <form
+                            method="POST"
+                            id="formLogin">
+
+                            <!-- E-MAIL -->
+                            <div class="mb-3">
+
+                                <label
+                                    for="email"
+                                    class="form-label fw-semibold">
+
+                                    E-mail
+
+                                </label>
+
+                                <div class="campo-wrapper">
+
+                                    <i class="bi bi-envelope campo-icone"></i>
+
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        class="form-control"
+                                        placeholder="seuemail@escritorio.com"
+                                        autocomplete="email"
+                                        required
+                                        autofocus>
+
+                                </div>
+
+                            </div>
+
+                            <!-- SENHA -->
+                            <div class="mb-3">
+
+                                <label
+                                    for="senha"
+                                    class="form-label fw-semibold">
+
+                                    Senha
+
+                                </label>
+
+                                <div class="campo-wrapper senha-wrapper">
+
+                                    <i class="bi bi-lock campo-icone"></i>
+
+                                    <input
+                                        type="password"
+                                        id="senha"
+                                        name="senha"
+                                        class="form-control"
+                                        placeholder="Digite sua senha"
+                                        autocomplete="current-password"
+                                        required>
+
+                                    <button
+                                        type="button"
+                                        class="botao-senha"
+                                        id="alternarSenha"
+                                        aria-label="Mostrar senha"
+                                        title="Mostrar senha">
+
+                                        <i
+                                            class="bi bi-eye"
+                                            id="iconeSenha">
+                                        </i>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <!-- ENTRAR -->
+                            <button
+                                type="submit"
+                                class="btn btn-entrar w-100 mt-2"
+                                id="botaoEntrar">
+
+                                <span
+                                    id="conteudoBotaoEntrar"
+                                    class="d-inline-flex align-items-center gap-2">
+
+                                    <i class="bi bi-box-arrow-in-right"></i>
+
+                                    Entrar
+
+                                </span>
+
+                            </button>
+
+                        </form>
+
+                        <!-- RECUPERAÇÃO -->
+                        <div class="text-center mt-3">
+
+                            <button
+                                type="button"
+                                class="btn btn-link link-recuperacao
+                                       p-0 text-decoration-none"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalRecuperarSenha">
+
+                                <i class="bi bi-question-circle me-1"></i>
+
+                                Esqueceu sua senha?
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================
+         MODAL — RECUPERAÇÃO DE SENHA
+    ====================================== -->
+    <div
+        class="modal fade"
+        id="modalRecuperarSenha"
+        tabindex="-1"
+        aria-labelledby="tituloModalRecuperarSenha"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5
+                        class="modal-title"
+                        id="tituloModalRecuperarSenha">
+
+                        <i class="bi bi-shield-lock me-2"></i>
+
+                        Recuperação de senha
+
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Fechar">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <h6 class="fw-bold mb-2">
+                        Esqueceu sua senha?
+                    </h6>
+
+                    <p class="text-muted">
+
+                        Não se preocupe. Por motivos de segurança,
+                        a redefinição de senha é realizada pelo
+                        administrador do sistema.
+
+                    </p>
+
+                    <p class="text-muted">
+
+                        Entre em contato utilizando um dos meios
+                        disponíveis abaixo.
+
+                    </p>
+
+                    <div class="contato-administrador">
+
+                        <div class="mb-2">
+
+                            <small class="text-muted d-block">
+                                Administrador responsável
+                            </small>
+
+                            <strong>
+
+                           Ana Flávia Tavares
+
+                            </strong>
+
+                        </div>
+
+                        {% if configuracao_global
+                              and configuracao_global.telefone %}
+
+                            <div class="contato-item">
+
+                                <div class="contato-icone">
+
+                                    <i class="bi bi-telephone"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <small class="text-muted d-block">
+                                        Telefone
+                                    </small>
+
+                                    <a
+                                        href="tel:{{ configuracao_global.telefone }}">
+
+                                        {{ configuracao_global.telefone }}
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                        {% if configuracao_global
+                              and configuracao_global.whatsapp %}
+
+                            <div class="contato-item">
+
+                                <div class="contato-icone">
+
+                                    <i class="bi bi-whatsapp"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <small class="text-muted d-block">
+                                        WhatsApp
+                                    </small>
+
+                                    <a
+                                        href="https://wa.me/55{{ configuracao_global.whatsapp
+                                            |replace('(', '')
+                                            |replace(')', '')
+                                            |replace('-', '')
+                                            |replace(' ', '')
+                                            |replace('+55', '') }}"
+                                        target="_blank"
+                                        rel="noopener noreferrer">
+
+                                        {{ configuracao_global.whatsapp }}
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                        {% if configuracao_global
+                              and configuracao_global.email %}
+
+                            <div class="contato-item">
+
+                                <div class="contato-icone">
+
+                                    <i class="bi bi-envelope"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <small class="text-muted d-block">
+                                        E-mail
+                                    </small>
+
+                                    <a
+                                        href="mailto:{{ configuracao_global.email }}">
+
+                                        {{ configuracao_global.email }}
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                        {% if not configuracao_global
+                              or (
+                                  not configuracao_global.telefone
+                                  and not configuracao_global.whatsapp
+                                  and not configuracao_global.email
+                              ) %}
+
+                            <div class="alert alert-warning mt-3 mb-0">
+
+                                Os contatos do escritório ainda não
+                                foram cadastrados nas configurações.
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-fechar-modal"
+                        data-bs-dismiss="modal">
+
+                        Fechar
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+                const campoSenha =
+                    document.getElementById(
+                        "senha"
+                    );
+
+                const botaoSenha =
+                    document.getElementById(
+                        "alternarSenha"
+                    );
+
+                const iconeSenha =
+                    document.getElementById(
+                        "iconeSenha"
+                    );
+
+                const formularioLogin =
+                    document.getElementById(
+                        "formLogin"
+                    );
+
+                const botaoEntrar =
+                    document.getElementById(
+                        "botaoEntrar"
+                    );
+
+                const conteudoBotaoEntrar =
+                    document.getElementById(
+                        "conteudoBotaoEntrar"
+                    );
+
+                botaoSenha.addEventListener(
+                    "click",
+                    function () {
+                        const senhaEstaVisivel =
+                            campoSenha.type === "text";
+
+                        campoSenha.type =
+                            senhaEstaVisivel
+                                ? "password"
+                                : "text";
+
+                        iconeSenha.className =
+                            senhaEstaVisivel
+                                ? "bi bi-eye"
+                                : "bi bi-eye-slash";
+
+                        botaoSenha.setAttribute(
+                            "aria-label",
+                            senhaEstaVisivel
+                                ? "Mostrar senha"
+                                : "Ocultar senha"
+                        );
+
+                        botaoSenha.setAttribute(
+                            "title",
+                            senhaEstaVisivel
+                                ? "Mostrar senha"
+                                : "Ocultar senha"
+                        );
+                    }
+                );
+
+                formularioLogin.addEventListener(
+                    "submit",
+                    function () {
+                        botaoEntrar.disabled = true;
+
+                        conteudoBotaoEntrar.innerHTML = `
+                            <span
+                                class="spinner-border spinner-border-sm"
+                                aria-hidden="true">
+                            </span>
+
+                            Entrando...
+                        `;
+                    }
+                );
+            }
+        );
+    </script>
+
+</body>
+
+</html>

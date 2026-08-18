@@ -1,0 +1,194 @@
+{% macro agenda_section(titulo, eventos, cor="secondary") %}
+
+    {% if eventos %}
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-{{ cor }} text-white d-flex justify-content-between align-items-center">
+
+                <span class="fw-bold">
+                    {{ titulo }}
+                </span>
+
+                <span class="badge bg-light text-dark">
+                    {{ eventos|length }}
+                </span>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Horário</th>
+                                <th>Evento</th>
+                                <th>Tipo</th>
+                                <th>Cliente</th>
+                                <th>Processo</th>
+                                <th>Local</th>
+                                <th>Status</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for evento in eventos %}
+
+                                <tr {% if evento.concluido %}class="table-success"{% endif %}>
+
+                                    <td>
+                                        <strong>
+                                            {{ evento.data.strftime("%d/%m/%Y") }}
+                                        </strong>
+                                    </td>
+
+                                    <td>
+                                        {% if evento.horario %}
+                                            {{ evento.horario.strftime("%H:%M") }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        <strong>{{ evento.titulo }}</strong>
+
+                                        {% if evento.descricao %}
+                                            <div class="small text-muted">
+                                                {{ evento.descricao }}
+                                            </div>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if evento.tipo == "Audiência" %}
+                                            <span class="badge bg-danger">
+                                                ⚖ Audiência
+                                            </span>
+
+                                        {% elif evento.tipo == "Prazo" %}
+                                            <span class="badge bg-warning text-dark">
+                                                ⏰ Prazo
+                                            </span>
+
+                                        {% elif evento.tipo == "Reunião" %}
+                                            <span class="badge bg-primary">
+                                                👥 Reunião
+                                            </span>
+
+                                        {% elif evento.tipo == "Tarefa" %}
+                                            <span class="badge bg-info text-dark">
+                                                ✅ Tarefa
+                                            </span>
+
+                                        {% elif evento.tipo == "Compromisso" %}
+                                            <span class="badge bg-secondary">
+                                                📌 Compromisso
+                                            </span>
+
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                {{ evento.tipo or "Outro" }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if evento.cliente %}
+                                            <a href="{{ url_for('clientes.detalhes_cliente', id=evento.cliente.id) }}"
+                                               class="fw-bold text-decoration-none">
+                                                {{ evento.cliente.nome }}
+                                            </a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {% if evento.processo %}
+                                            <a href="{{ url_for('processos.detalhes_processo', id=evento.processo.id) }}"
+                                               class="fw-bold text-decoration-none">
+                                                {{ evento.processo.numero }}
+                                            </a>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    <td>
+                                        {{ evento.local or "-" }}
+                                    </td>
+
+                                    <td>
+                                        {% if evento.concluido %}
+                                            <span class="badge bg-success">
+                                                Concluído
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">
+                                                Pendente
+                                            </span>
+                                        {% endif %}
+                                    </td>
+
+                                    <td class="text-center">
+
+                                        <a href="{{ url_for('agenda.editar_evento', id=evento.id) }}"
+                                           class="btn btn-warning btn-sm">
+                                            ✏ Editar
+                                        </a>
+
+                                        <form action="{{ url_for('agenda.concluir_evento', id=evento.id) }}"
+                                              method="POST"
+                                              style="display:inline;">
+
+                                            <button type="submit"
+                                                    class="btn btn-success btn-sm">
+
+                                                {% if evento.concluido %}
+                                                    ↩ Reabrir
+                                                {% else %}
+                                                    ✔ Concluir
+                                                {% endif %}
+
+                                            </button>
+
+                                        </form>
+
+                                        <form action="{{ url_for('agenda.excluir_evento', id=evento.id) }}"
+                                              method="POST"
+                                              style="display:inline;">
+
+                                            <button type="submit"
+                                                    class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('Deseja excluir este evento?')">
+                                                🗑
+                                            </button>
+
+                                        </form>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+{% endmacro %}

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Novo Evento
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "📅 Novo Evento",
+    "Cadastrar um compromisso na agenda jurídica."
+) }}
+
+<form method="POST">
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-primary text-white">
+            Dados do Evento
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-8 mb-3">
+                    <label class="form-label">Título</label>
+
+                    <input type="text"
+                           name="titulo"
+                           class="form-control"
+                           placeholder="Ex.: Audiência de instrução"
+                           required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Tipo</label>
+
+                    <select name="tipo"
+                            class="form-select"
+                            required>
+
+                        <option value="">Selecione</option>
+                        <option value="Audiência">Audiência</option>
+                        <option value="Reunião">Reunião</option>
+                        <option value="Prazo">Prazo</option>
+                        <option value="Tarefa">Tarefa</option>
+                        <option value="Compromisso">Compromisso</option>
+
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Data</label>
+
+                    <input type="date"
+                           name="data"
+                           class="form-control"
+                           required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Horário</label>
+
+                    <input type="time"
+                           name="horario"
+                           class="form-control">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Local</label>
+
+                    <input type="text"
+                           name="local"
+                           class="form-control"
+                           placeholder="Ex.: Fórum, escritório ou videoconferência">
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Cliente</label>
+
+                    <select name="cliente_id"
+                            class="form-select">
+
+                        <option value="">Nenhum cliente vinculado</option>
+
+                        {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}">
+                                {{ cliente.nome }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Processo</label>
+
+                    <select name="processo_id"
+                            class="form-select">
+
+                        <option value="">Nenhum processo vinculado</option>
+
+                        {% for processo in processos %}
+                            <option value="{{ processo.id }}">
+                                {{ processo.numero }} — {{ processo.cliente.nome }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Descrição</label>
+
+                <textarea name="descricao"
+                          class="form-control"
+                          rows="4"
+                          placeholder="Observações, orientações ou informações importantes."></textarea>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+
+        <a href="{{ url_for('agenda.listar_eventos') }}"
+           class="btn btn-secondary">
+            Cancelar
+        </a>
+
+        <button type="submit"
+                class="btn btn-success">
+            💾 Salvar Evento
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

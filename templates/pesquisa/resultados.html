@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Pesquisa Global
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "🔍 Pesquisa Global",
+    "Pesquise clientes, processos, documentos, agenda e financeiro."
+) }}
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <form
+            method="GET"
+            action="{{ url_for('pesquisa.pesquisa_global') }}">
+
+            <div class="input-group">
+
+                <input
+                    type="text"
+                    name="q"
+                    class="form-control"
+                    placeholder="Digite sua pesquisa..."
+                    value="{{ termo }}"
+                    minlength="{{ termo_minimo }}"
+                    autofocus>
+
+                <button
+                    class="btn btn-primary">
+
+                    🔍 Pesquisar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% if termo %}
+
+<div class="alert alert-light border mb-4">
+
+    <strong>
+
+        {{ total_resultados }}
+
+    </strong>
+
+    resultado(s) encontrado(s) para:
+
+    <strong>
+
+        "{{ termo }}"
+
+    </strong>
+
+</div>
+
+{% endif %}
+
+<!-- CLIENTES -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        👥 Clientes ({{ clientes|length }})
+
+    </div>
+
+    <div class="card-body">
+
+        {% if clientes %}
+
+            <div class="list-group">
+
+                {% for cliente in clientes %}
+
+                    <a
+                        href="{{ url_for(
+                            'clientes.detalhes_cliente',
+                            id=cliente.id
+                        ) }}"
+                        class="list-group-item list-group-item-action">
+
+                        <strong>
+
+                            {{ cliente.nome }}
+
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            CPF:
+                            {{ cliente.cpf }}
+
+                            {% if cliente.area_juridica %}
+
+                                •
+                                {{ cliente.area_juridica }}
+
+                            {% endif %}
+
+                        </small>
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="text-muted mb-0">
+
+                Nenhum cliente encontrado.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- PROCESSOS -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        ⚖ Processos ({{ processos|length }})
+
+    </div>
+
+    <div class="card-body">
+
+        {% if processos %}
+
+            <div class="list-group">
+
+                {% for processo in processos %}
+
+                    <a
+                        href="{{ url_for(
+                            'clientes.detalhes_cliente',
+                            id=processo.cliente.id
+                        ) }}"
+                        class="list-group-item list-group-item-action">
+
+                        <strong>
+
+                            {{ processo.numero }}
+
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            {{ processo.cliente.nome }}
+
+                            {% if processo.area %}
+
+                                • {{ processo.area }}
+
+                            {% endif %}
+
+                        </small>
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="text-muted mb-0">
+
+                Nenhum processo encontrado.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- DOCUMENTOS -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        📂 Documentos ({{ documentos|length }})
+
+    </div>
+
+    <div class="card-body">
+
+        {% if documentos %}
+
+            <div class="list-group">
+
+                {% for documento in documentos %}
+
+                    <a
+                        href="{{ url_for(
+                            'clientes.detalhes_cliente',
+                            id=documento.cliente.id
+                        ) }}"
+                        class="list-group-item list-group-item-action">
+
+                        <strong>
+
+                            {{ documento.nome_arquivo }}
+
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            {{ documento.cliente.nome }}
+
+                        </small>
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="text-muted mb-0">
+
+                Nenhum documento encontrado.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- AGENDA -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header">
+
+        📅 Agenda ({{ eventos|length }})
+
+    </div>
+
+    <div class="card-body">
+
+        {% if eventos %}
+
+            <div class="list-group">
+
+                {% for evento in eventos %}
+
+                    <div class="list-group-item">
+
+                        <strong>
+
+                            {{ evento.titulo }}
+
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            {{ evento.data.strftime("%d/%m/%Y") }}
+
+                            {% if evento.local %}
+
+                                • {{ evento.local }}
+
+                            {% endif %}
+
+                        </small>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="text-muted mb-0">
+
+                Nenhum evento encontrado.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% if current_user.pode_acessar_financeiro %}
+
+<div class="card shadow-sm">
+
+    <div class="card-header">
+
+        💰 Financeiro ({{ financeiro|length }})
+
+    </div>
+
+    <div class="card-body">
+
+        {% if financeiro %}
+
+            <div class="list-group">
+
+                {% for lancamento in financeiro %}
+
+                    <a
+                        href="{{ url_for(
+                            'financeiro.listar_financeiro'
+                        ) }}"
+                        class="list-group-item list-group-item-action">
+
+                        <strong>
+
+                            {{ lancamento.descricao }}
+
+                        </strong>
+
+                        <br>
+
+                        <small class="text-muted">
+
+                            {{ lancamento.mes_nome }}
+
+                            /
+                            {{ lancamento.competencia_ano }}
+
+                            •
+
+                            R$
+                            {{ "%.2f"|format(lancamento.valor) }}
+
+                        </small>
+
+                    </a>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="text-muted mb-0">
+
+                Nenhum lançamento encontrado.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

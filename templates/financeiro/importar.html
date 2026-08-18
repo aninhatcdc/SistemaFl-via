@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Importar Excel
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+
+    {{ page_header(
+        "⬆ Importar Excel",
+        "Importe a planilha financeira utilizada pelo escritório."
+    ) }}
+
+    <a href="{{ url_for('financeiro.listar_financeiro') }}"
+       class="btn btn-secondary">
+        ← Voltar
+    </a>
+
+</div>
+
+{% if not previa %}
+
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-primary text-white">
+            Selecionar planilha
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST"
+                  enctype="multipart/form-data">
+
+                <div class="row">
+
+                    <div class="col-md-8 mb-3">
+
+                        <label class="form-label">
+                            Arquivo Excel
+                        </label>
+
+                        <input type="file"
+                               name="arquivo"
+                               class="form-control"
+                               accept=".xlsx"
+                               required>
+
+                        <div class="form-text">
+                            Envie uma planilha no formato .xlsx.
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+
+                        <label class="form-label">
+                            Ano da planilha
+                        </label>
+
+                        <input type="number"
+                               name="ano"
+                               class="form-control"
+                               min="2000"
+                               max="2100"
+                               placeholder="Ex.: 2026">
+
+                        <div class="form-text">
+                            Opcional. O sistema tenta identificar o ano pelo nome do arquivo.
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="alert alert-info">
+
+                    <strong>Como deve estar organizada:</strong>
+
+                    <div class="mt-2">
+                        A primeira coluna deve conter o nome da despesa, e as próximas colunas devem representar os meses de janeiro a dezembro.
+                    </div>
+
+                </div>
+
+                <div class="d-flex justify-content-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        🔍 Analisar Planilha
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+{% else %}
+
+    <div class="alert alert-success">
+
+        <strong>Planilha analisada com sucesso.</strong>
+
+        Confira os dados abaixo antes de confirmar a importação.
+
+    </div>
+
+    <div class="row mb-4">
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-primary">
+                        📅 Ano
+                    </h6>
+
+                    <h3>
+                        {{ previa.ano }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-success">
+                        📋 Itens
+                    </h6>
+
+                    <h3>
+                        {{ previa.quantidade_itens }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-info">
+                        🔢 Lançamentos
+                    </h6>
+
+                    <h3>
+                        {{ previa.quantidade_lancamentos }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-3 mb-3">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h6 class="text-danger">
+                        💸 Total
+                    </h6>
+
+                    <h3>
+                        R$ {{ "{:,.2f}".format(previa.total_geral).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-dark text-white">
+            Totais por mês
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered text-center align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+                            <th>JAN</th>
+                            <th>FEV</th>
+                            <th>MAR</th>
+                            <th>ABR</th>
+                            <th>MAI</th>
+                            <th>JUN</th>
+                            <th>JUL</th>
+                            <th>AGO</th>
+                            <th>SET</th>
+                            <th>OUT</th>
+                            <th>NOV</th>
+                            <th>DEZ</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            {% for mes in range(1, 13) %}
+
+                                <td>
+                                    R$ {{ "{:,.2f}".format(previa.totais_meses[mes]).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                                </td>
+
+                            {% endfor %}
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% if previa.avisos %}
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-warning">
+                ⚠ Células que precisam de atenção
+            </div>
+
+            <div class="card-body">
+
+                <p class="text-muted">
+                    Estas células não serão importadas porque não possuem valores numéricos reconhecidos.
+                </p>
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead>
+
+                            <tr>
+                                <th>Linha</th>
+                                <th>Despesa</th>
+                                <th>Mês</th>
+                                <th>Conteúdo</th>
+                                <th>Motivo</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for aviso in previa.avisos %}
+
+                                <tr>
+
+                                    <td>
+                                        {{ aviso.linha }}
+                                    </td>
+
+                                    <td>
+                                        {{ aviso.descricao }}
+                                    </td>
+
+                                    <td>
+                                        {{ aviso.mes }}
+                                    </td>
+
+                                    <td>
+                                        <code>{{ aviso.conteudo }}</code>
+                                    </td>
+
+                                    <td>
+                                        {{ aviso.mensagem }}
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-success text-white">
+            Confirmar importação
+        </div>
+
+        <div class="card-body">
+
+            <p>
+                Ao confirmar, os valores da planilha serão salvos no financeiro de <strong>{{ previa.ano }}</strong>.
+            </p>
+
+            <p class="text-muted">
+                Caso uma despesa já exista no mesmo mês e ano, o valor será atualizado em vez de duplicado.
+            </p>
+
+            <form method="POST"
+                  action="{{ url_for('financeiro.confirmar_importacao') }}">
+
+                <input type="hidden"
+                       name="token"
+                       value="{{ token }}">
+
+                <input type="hidden"
+                       name="ano"
+                       value="{{ previa.ano }}">
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a href="{{ url_for('financeiro.importar_excel') }}"
+                       class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-success"
+                            onclick="return confirm('Confirmar a importação desta planilha?')">
+                        ✅ Confirmar Importação
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,320 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+Documentos — Atendimento #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_documentos_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Documentos
+{% endblock %}
+
+{% block etapa_descricao %}
+Registre os documentos já apresentados, as provas disponíveis e as pendências necessárias para o caso.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 9 de 10
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="civel-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        Marque apenas os documentos efetivamente apresentados ou confirmados.
+        Utilize os campos descritivos para registrar detalhes e pendências.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-person-vcard"></i>
+        </span>
+        <div>
+            <h3>Documentos pessoais e familiares</h3>
+            <p>Marque os documentos básicos já apresentados.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos_pessoais = [
+            ("possui_documento_identificacao", "Documento de identificação com CPF", ficha.possui_documento_identificacao),
+            ("possui_comprovante_residencia", "Comprovante de residência", ficha.possui_comprovante_residencia),
+            ("possui_certidao_casamento", "Certidão de casamento", ficha.possui_certidao_casamento),
+            ("possui_certidao_uniao_estavel", "Escritura, contrato ou prova de união estável", ficha.possui_certidao_uniao_estavel),
+            ("possui_certidoes_nascimento_filhos", "Certidões de nascimento dos filhos", ficha.possui_certidoes_nascimento_filhos),
+            ("possui_comprovantes_renda", "Comprovantes de renda", ficha.possui_comprovantes_renda)
+        ] %}
+
+        {% for nome, rotulo, marcado in documentos_pessoais %}
+        <div class="col-md-6">
+            <div class="form-check form-switch border rounded-3 p-3 h-100">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="{{ nome }}"
+                    name="{{ nome }}"
+                    {% if marcado %}checked{% endif %}
+                >
+                <label class="form-check-label ms-2" for="{{ nome }}">
+                    {{ rotulo }}
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-receipt"></i>
+        </span>
+        <div>
+            <h3>Despesas e patrimônio</h3>
+            <p>Marque os comprovantes financeiros e patrimoniais disponíveis.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-check form-switch border rounded-3 p-3 h-100">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="possui_comprovantes_despesas"
+                    name="possui_comprovantes_despesas"
+                    {% if ficha.possui_comprovantes_despesas %}checked{% endif %}
+                >
+                <label
+                    class="form-check-label ms-2"
+                    for="possui_comprovantes_despesas"
+                >
+                    Comprovantes de despesas
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-check form-switch border rounded-3 p-3 h-100">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="possui_documentos_bens"
+                    name="possui_documentos_bens"
+                    {% if ficha.possui_documentos_bens %}checked{% endif %}
+                >
+                <label
+                    class="form-check-label ms-2"
+                    for="possui_documentos_bens"
+                >
+                    Documentos de bens e patrimônio
+                </label>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-bank"></i>
+        </span>
+        <div>
+            <h3>Documentos judiciais e administrativos</h3>
+            <p>Marque acordos, decisões e registros relacionados ao conflito.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos_judiciais = [
+            ("possui_acordo_anterior", "Acordo anterior", ficha.possui_acordo_anterior),
+            ("possui_decisao_judicial", "Decisão judicial", ficha.possui_decisao_judicial),
+            ("possui_boletim_ocorrencia", "Boletim de ocorrência", ficha.possui_boletim_ocorrencia),
+            ("possui_medida_protetiva", "Medida protetiva", ficha.possui_medida_protetiva)
+        ] %}
+
+        {% for nome, rotulo, marcado in documentos_judiciais %}
+        <div class="col-md-6">
+            <div class="form-check form-switch border rounded-3 p-3 h-100">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="{{ nome }}"
+                    name="{{ nome }}"
+                    {% if marcado %}checked{% endif %}
+                >
+                <label class="form-check-label ms-2" for="{{ nome }}">
+                    {{ rotulo }}
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-camera-video"></i>
+        </span>
+        <div>
+            <h3>Provas e registros</h3>
+            <p>Marque os materiais que podem auxiliar na demonstração dos fatos.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set provas = [
+            ("possui_conversas_mensagens", "Conversas, mensagens ou e-mails", ficha.possui_conversas_mensagens),
+            ("possui_fotos_videos_audios", "Fotos, vídeos ou áudios", ficha.possui_fotos_videos_audios),
+            ("possui_laudos_relatorios", "Laudos, relatórios ou documentos técnicos", ficha.possui_laudos_relatorios)
+        ] %}
+
+        {% for nome, rotulo, marcado in provas %}
+        <div class="col-md-6">
+            <div class="form-check form-switch border rounded-3 p-3 h-100">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="{{ nome }}"
+                    name="{{ nome }}"
+                    {% if marcado %}checked{% endif %}
+                >
+                <label class="form-check-label ms-2" for="{{ nome }}">
+                    {{ rotulo }}
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-folder-plus"></i>
+        </span>
+        <div>
+            <h3>Outros documentos e provas</h3>
+            <p>Descreva materiais relevantes que não aparecem nas opções anteriores.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="outros_documentos" class="form-label">
+                Outros documentos
+            </label>
+            <textarea
+                class="form-control"
+                id="outros_documentos"
+                name="outros_documentos"
+                rows="6"
+                maxlength="6000"
+                placeholder="Ex.: contratos, notificações, prontuários, boletins escolares, declarações, documentos de empresas ou informações sobre testemunhas."
+            >{{ ficha.outros_documentos or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-folder-check"></i>
+        </span>
+        <div>
+            <h3>Documentos entregues</h3>
+            <p>Liste os arquivos já recebidos e identifique detalhes importantes.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="documentos_entregues" class="form-label">
+                Relação de documentos entregues
+            </label>
+            <textarea
+                class="form-control"
+                id="documentos_entregues"
+                name="documentos_entregues"
+                rows="7"
+                maxlength="8000"
+                placeholder="Liste os documentos recebidos, datas, quantidade de páginas, formato, origem e onde os arquivos foram armazenados."
+            >{{ ficha.documentos_entregues or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-exclamation-circle"></i>
+        </span>
+        <div>
+            <h3>Pendências documentais</h3>
+            <p>Registre tudo que ainda precisa ser solicitado ou providenciado.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="documentos_pendentes" class="form-label">
+                Documentos pendentes
+            </label>
+            <textarea
+                class="form-control"
+                id="documentos_pendentes"
+                name="documentos_pendentes"
+                rows="7"
+                maxlength="8000"
+                placeholder="Informe o documento faltante, quem deverá providenciá-lo, prazo, forma de obtenção e eventual dificuldade."
+            >{{ ficha.documentos_pendentes or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+        <div>
+            <h3>Observações sobre documentos</h3>
+            <p>Registre informações complementares sobre autenticidade, legibilidade e organização.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="observacoes_documentos" class="form-label">
+                Observações
+            </label>
+            <textarea
+                class="form-control"
+                id="observacoes_documentos"
+                name="observacoes_documentos"
+                rows="6"
+                maxlength="6000"
+                placeholder="Ex.: documento ilegível, arquivo incompleto, necessidade de segunda via, autenticação, tradução ou conferência."
+            >{{ ficha.observacoes_documentos or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

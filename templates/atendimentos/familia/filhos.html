@@ -1,0 +1,711 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+    Filhos — Atendimento #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_filhos_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+    Filhos
+{% endblock %}
+
+{% block etapa_descricao %}
+    Registre os dados dos filhos, residência, saúde, educação e despesas mensais.
+{% endblock %}
+
+{% block etapa_identificacao %}
+    Etapa 5 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+    <div class="civel-info-box">
+
+        <i class="bi bi-info-circle-fill"></i>
+
+        <div>
+            Esta etapa servirá de base para as informações de guarda,
+            convivência e alimentos. Registre os dados individualmente
+            sempre que possível.
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+    <!-- =====================================================
+         INFORMAÇÕES GERAIS
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-person-hearts"></i>
+            </span>
+
+            <div>
+                <h3>Informações gerais</h3>
+                <p>Informe a existência e a situação geral dos filhos.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="possui_filhos"
+                        name="possui_filhos"
+                        {% if ficha.possui_filhos %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="possui_filhos"
+                    >
+                        Existem filhos relacionados à demanda?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-md-4"
+                id="grupo_quantidade_filhos"
+            >
+
+                <label
+                    for="quantidade_filhos"
+                    class="form-label"
+                >
+                    Quantidade de filhos
+                </label>
+
+                <input
+                    type="number"
+                    class="form-control"
+                    id="quantidade_filhos"
+                    name="quantidade_filhos"
+                    min="0"
+                    max="30"
+                    value="{% if ficha.quantidade_filhos is not none %}{{ ficha.quantidade_filhos }}{% endif %}"
+                    placeholder="0"
+                >
+
+            </div>
+
+
+            <div
+                class="col-md-8"
+                id="grupo_situacoes_filhos"
+            >
+
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+
+                        <div class="form-check form-switch">
+
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id="filhos_em_comum"
+                                name="filhos_em_comum"
+                                {% if ficha.filhos_em_comum %}checked{% endif %}
+                            >
+
+                            <label
+                                class="form-check-label"
+                                for="filhos_em_comum"
+                            >
+                                São filhos em comum?
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="form-check form-switch">
+
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id="filhos_menores"
+                                name="filhos_menores"
+                                {% if ficha.filhos_menores %}checked{% endif %}
+                            >
+
+                            <label
+                                class="form-check-label"
+                                for="filhos_menores"
+                            >
+                                Existem filhos menores?
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-4">
+
+                        <div class="form-check form-switch">
+
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id="filhos_incapazes"
+                                name="filhos_incapazes"
+                                {% if ficha.filhos_incapazes %}checked{% endif %}
+                            >
+
+                            <label
+                                class="form-check-label"
+                                for="filhos_incapazes"
+                            >
+                                Existem filhos incapazes?
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DADOS DOS FILHOS
+         ===================================================== -->
+
+    <section
+        class="civel-section"
+        id="secao_dados_filhos"
+    >
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-card-list"></i>
+            </span>
+
+            <div>
+                <h3>Dados dos filhos</h3>
+                <p>Registre individualmente os dados conhecidos de cada filho.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="dados_filhos"
+                    class="form-label"
+                >
+                    Identificação dos filhos
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="dados_filhos"
+                    name="dados_filhos"
+                    rows="9"
+                    maxlength="8000"
+                    placeholder="Exemplo:
+
+• João da Silva
+Data de nascimento: 14/03/2018
+Idade: 8 anos
+Filho em comum: Sim
+Reside com: Mãe
+
+• Maria da Silva
+Data de nascimento: 11/10/2013
+Idade: 12 anos
+Filha em comum: Sim
+Reside com: Pai e mãe em períodos alternados"
+                >{{ ficha.dados_filhos or '' }}</textarea>
+
+            </div>
+
+
+            <div class="col-12">
+
+                <label
+                    for="filhos_residem_com"
+                    class="form-label"
+                >
+                    Com quem os filhos residem atualmente?
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="filhos_residem_com"
+                    name="filhos_residem_com"
+                    maxlength="200"
+                    value="{{ ficha.filhos_residem_com or '' }}"
+                    placeholder="Ex.: Com a mãe, com o pai, com os avós ou em residências alternadas"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DEFICIÊNCIA E NECESSIDADES ESPECIAIS
+         ===================================================== -->
+
+    <section
+        class="civel-section"
+        id="secao_necessidades"
+    >
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-universal-access"></i>
+            </span>
+
+            <div>
+                <h3>Deficiência e necessidades especiais</h3>
+                <p>Informe condições que demandem cuidados, acompanhamento ou despesas específicas.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="existe_filho_com_deficiencia"
+                        name="existe_filho_com_deficiencia"
+                        {% if ficha.existe_filho_com_deficiencia %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="existe_filho_com_deficiencia"
+                    >
+                        Existe filho com deficiência ou necessidade especial?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-12"
+                id="grupo_necessidades_especiais"
+            >
+
+                <label
+                    for="necessidades_especiais_filhos"
+                    class="form-label"
+                >
+                    Necessidades especiais e cuidados
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="necessidades_especiais_filhos"
+                    name="necessidades_especiais_filhos"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="Informe diagnóstico, tratamento, terapias, medicações, limitações e cuidados necessários."
+                >{{ ficha.necessidades_especiais_filhos or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         EDUCAÇÃO E SAÚDE
+         ===================================================== -->
+
+    <section
+        class="civel-section"
+        id="secao_educacao_saude"
+    >
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-mortarboard"></i>
+            </span>
+
+            <div>
+                <h3>Educação e saúde</h3>
+                <p>Registre escola, plano de saúde e informações relevantes.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label
+                    for="escola_filhos"
+                    class="form-label"
+                >
+                    Escola e situação educacional
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="escola_filhos"
+                    name="escola_filhos"
+                    rows="5"
+                    maxlength="4000"
+                    placeholder="Informe nome da escola, rede pública ou privada, turno, mensalidade, transporte e atividades complementares."
+                >{{ ficha.escola_filhos or '' }}</textarea>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="plano_saude_filhos"
+                    class="form-label"
+                >
+                    Plano de saúde e acompanhamento médico
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="plano_saude_filhos"
+                    name="plano_saude_filhos"
+                    rows="5"
+                    maxlength="4000"
+                    placeholder="Informe plano, responsável pelo pagamento, mensalidade, tratamentos e acompanhamento médico."
+                >{{ ficha.plano_saude_filhos or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DESPESAS MENSAIS
+         ===================================================== -->
+
+    <section
+        class="civel-section"
+        id="secao_despesas"
+    >
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-cash-stack"></i>
+            </span>
+
+            <div>
+                <h3>Despesas mensais</h3>
+                <p>Registre o custo mensal aproximado relacionado aos filhos.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-lg-4">
+
+                <label
+                    for="despesas_mensais_filhos"
+                    class="form-label"
+                >
+                    Total mensal aproximado
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">R$</span>
+
+                    <input
+                        type="text"
+                        inputmode="decimal"
+                        class="form-control"
+                        id="despesas_mensais_filhos"
+                        name="despesas_mensais_filhos"
+                        value="{% if ficha.despesas_mensais_filhos is not none %}{{ '%.2f'|format(ficha.despesas_mensais_filhos)|replace('.', ',') }}{% endif %}"
+                        placeholder="0,00"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-8">
+
+                <label
+                    for="detalhamento_despesas_filhos"
+                    class="form-label"
+                >
+                    Detalhamento das despesas
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="detalhamento_despesas_filhos"
+                    name="detalhamento_despesas_filhos"
+                    rows="7"
+                    maxlength="6000"
+                    placeholder="Exemplo:
+Alimentação: R$ 600,00
+Escola: R$ 800,00
+Plano de saúde: R$ 350,00
+Medicamentos: R$ 120,00
+Transporte: R$ 200,00
+Vestuário e lazer: R$ 250,00"
+                >{{ ficha.detalhamento_despesas_filhos or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         OBSERVAÇÕES
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-journal-text"></i>
+            </span>
+
+            <div>
+                <h3>Observações sobre os filhos</h3>
+                <p>Registre informações complementares relevantes.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="observacoes_filhos"
+                    class="form-label"
+                >
+                    Observações
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="observacoes_filhos"
+                    name="observacoes_filhos"
+                    rows="6"
+                    maxlength="5000"
+                    placeholder="Registre rotina, vínculo afetivo, rede de apoio, conflitos, documentos pendentes ou outras informações relevantes."
+                >{{ ficha.observacoes_filhos or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const possuiFilhos = document.getElementById(
+                "possui_filhos"
+            );
+
+            const grupoQuantidade = document.getElementById(
+                "grupo_quantidade_filhos"
+            );
+
+            const grupoSituacoes = document.getElementById(
+                "grupo_situacoes_filhos"
+            );
+
+            const secoesFilhos = [
+                document.getElementById("secao_dados_filhos"),
+                document.getElementById("secao_necessidades"),
+                document.getElementById("secao_educacao_saude"),
+                document.getElementById("secao_despesas")
+            ];
+
+            const camposFilhos = [
+                document.getElementById("quantidade_filhos"),
+                document.getElementById("filhos_em_comum"),
+                document.getElementById("filhos_menores"),
+                document.getElementById("filhos_incapazes"),
+                document.getElementById("dados_filhos"),
+                document.getElementById("filhos_residem_com"),
+                document.getElementById("existe_filho_com_deficiencia"),
+                document.getElementById("necessidades_especiais_filhos"),
+                document.getElementById("escola_filhos"),
+                document.getElementById("plano_saude_filhos"),
+                document.getElementById("despesas_mensais_filhos"),
+                document.getElementById("detalhamento_despesas_filhos")
+            ];
+
+            const filhoComDeficiencia = document.getElementById(
+                "existe_filho_com_deficiencia"
+            );
+
+            const grupoNecessidades = document.getElementById(
+                "grupo_necessidades_especiais"
+            );
+
+            const necessidades = document.getElementById(
+                "necessidades_especiais_filhos"
+            );
+
+            const despesas = document.getElementById(
+                "despesas_mensais_filhos"
+            );
+
+            function atualizarFilhos() {
+                const mostrar = possuiFilhos.checked;
+
+                grupoQuantidade.classList.toggle(
+                    "d-none",
+                    !mostrar
+                );
+
+                grupoSituacoes.classList.toggle(
+                    "d-none",
+                    !mostrar
+                );
+
+                secoesFilhos.forEach(function (secao) {
+                    secao.classList.toggle(
+                        "d-none",
+                        !mostrar
+                    );
+                });
+
+                camposFilhos.forEach(function (campo) {
+                    campo.disabled = !mostrar;
+
+                    if (!mostrar) {
+                        if (campo.type === "checkbox") {
+                            campo.checked = false;
+                        } else {
+                            campo.value = "";
+                        }
+                    }
+                });
+
+                atualizarNecessidades();
+            }
+
+            function atualizarNecessidades() {
+                const mostrar = (
+                    possuiFilhos.checked
+                    && filhoComDeficiencia.checked
+                );
+
+                grupoNecessidades.classList.toggle(
+                    "d-none",
+                    !mostrar
+                );
+
+                necessidades.disabled = !mostrar;
+
+                if (!mostrar) {
+                    necessidades.value = "";
+                }
+            }
+
+            function formatarValor(valor) {
+                let limpo = valor.replace(/[^\d,]/g, "");
+
+                const partes = limpo.split(",");
+
+                if (partes.length > 2) {
+                    limpo = partes.shift() + "," + partes.join("");
+                }
+
+                return limpo;
+            }
+
+            possuiFilhos.addEventListener(
+                "change",
+                atualizarFilhos
+            );
+
+            filhoComDeficiencia.addEventListener(
+                "change",
+                atualizarNecessidades
+            );
+
+            despesas.addEventListener("input", function () {
+                despesas.value = formatarValor(
+                    despesas.value
+                );
+            });
+
+            atualizarFilhos();
+            atualizarNecessidades();
+        });
+    </script>
+
+{% endblock %}

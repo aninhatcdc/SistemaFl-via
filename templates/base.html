@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>
+
+        {% block titulo %}
+
+            {{ configuracao_global.nome_escritorio
+               if configuracao_global
+               and configuracao_global.nome_escritorio
+               else "Sistema Jurídico" }}
+
+        {% endblock %}
+
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}">
+
+    <style>
+
+        :root {
+            /* ===== PALETA PRETO & DOURADO ===== */
+            --cor-principal:
+                {{ configuracao_global.cor_principal
+                   if configuracao_global
+                   and configuracao_global.cor_principal
+                   else '#0b0b0b' }};
+
+            --cor-secundaria:
+                {{ configuracao_global.cor_secundaria
+                   if configuracao_global
+                   and configuracao_global.cor_secundaria
+                   else '#c9a227' }};
+
+            --preto-base: #0b0b0b;
+            --preto-suave: #161616;
+            --preto-card: #141414;
+            --dourado: #c9a227;
+            --dourado-claro: #e2c25c;
+            --dourado-escuro: #9c7d1a;
+            --texto-claro: #f5f1e6;
+            --texto-muted: #b8ad8e;
+            --borda-dourada: rgba(201, 162, 39, 0.35);
+
+            --bs-primary: var(--dourado);
+            --bs-primary-rgb: 201, 162, 39;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f7f5f0;
+            color: #1c1c1c;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        .navbar-brand,
+        .marca-escritorio-sidebar h6 {
+            font-family: 'Cormorant Garamond', 'Georgia', serif;
+            letter-spacing: 0.02em;
+        }
+
+        /* ===== MARCA / LOGO ===== */
+
+        .marca-logo-topo {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            border-radius: 8px;
+            background-color: #ffffff;
+            padding: 2px;
+            border: 1px solid var(--borda-dourada);
+        }
+
+        .marca-logo-sidebar {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            border-radius: 12px;
+            background-color: #ffffff;
+            border: 1px solid var(--borda-dourada);
+            padding: 4px;
+            flex-shrink: 0;
+        }
+
+        .marca-escritorio-sidebar {
+            min-width: 0;
+        }
+
+        .marca-escritorio-sidebar h6 {
+            line-height: 1.25;
+            overflow-wrap: anywhere;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--dourado-claro);
+        }
+
+        /* ===== NAVBAR ===== */
+
+        .navbar.bg-dark {
+            background: linear-gradient(90deg, #0b0b0b 0%, #161616 100%) !important;
+            border-bottom: 1px solid var(--borda-dourada);
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dourado-claro) !important;
+        }
+
+        .btn-outline-light {
+            color: var(--dourado-claro) !important;
+            border-color: var(--borda-dourada) !important;
+        }
+
+        .btn-outline-light:hover,
+        .btn-outline-light:focus {
+            background-color: var(--dourado) !important;
+            border-color: var(--dourado) !important;
+            color: #0b0b0b !important;
+        }
+
+        /* ===== SIDEBAR ===== */
+
+        .sidebar {
+            background-color: var(--preto-base) !important;
+            border-right: 1px solid var(--borda-dourada);
+            min-height: calc(100vh - 56px);
+        }
+
+        .sidebar .menu-title {
+            color: var(--texto-muted);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .sidebar .nav-link {
+            color: var(--texto-claro) !important;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            border: 1px solid transparent;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(201, 162, 39, 0.12) !important;
+            border-color: var(--borda-dourada);
+            color: var(--dourado-claro) !important;
+        }
+
+        .sidebar .nav-link.active {
+            background: linear-gradient(90deg, var(--dourado-escuro), var(--dourado)) !important;
+            color: #0b0b0b !important;
+            font-weight: 700;
+            border-color: var(--dourado);
+        }
+
+        .sidebar .nav-link.active:hover {
+            color: #0b0b0b !important;
+        }
+
+        .sidebar .mt-auto.small.text-muted {
+            color: var(--texto-muted) !important;
+            border-top: 1px solid var(--borda-dourada);
+            padding-top: 1rem;
+        }
+
+        /* ===== PESQUISA GLOBAL ===== */
+
+        .pesquisa-global-topo {
+            width: min(360px, 35vw);
+        }
+
+        .pesquisa-global-topo .form-control {
+            background-color: #1c1c1c;
+            border-color: var(--borda-dourada);
+            color: var(--texto-claro);
+        }
+
+        .pesquisa-global-topo .form-control::placeholder {
+            color: var(--texto-muted);
+        }
+
+        .pesquisa-global-topo .form-control:focus {
+            border-color: var(--dourado);
+            box-shadow: 0 0 0 0.2rem rgba(201, 162, 39, 0.2);
+            background-color: #1c1c1c;
+            color: var(--texto-claro);
+        }
+
+        .pesquisa-global-topo .input-group-text {
+            background-color: #1c1c1c;
+            border-color: var(--borda-dourada);
+            color: var(--dourado-claro);
+        }
+
+        .pesquisa-global-topo .btn-outline-light {
+            border-color: var(--dourado) !important;
+        }
+
+        /* ===== NOTIFICAÇÕES ===== */
+
+        .botao-notificacoes {
+            position: relative;
+            width: 38px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contador-notificacoes {
+            position: absolute;
+            top: -7px;
+            right: -8px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 5px;
+            border-radius: 10px;
+            border: 2px solid #0b0b0b;
+            font-size: 0.68rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--dourado) !important;
+            color: #0b0b0b !important;
+        }
+
+        .menu-notificacoes {
+            width: 390px;
+            max-width: calc(100vw - 30px);
+            max-height: 480px;
+            overflow-y: auto;
+            border: 1px solid var(--borda-dourada);
+        }
+
+        .item-notificacao-topo {
+            white-space: normal;
+        }
+
+        .item-notificacao-topo:hover {
+            background-color: #faf6ea;
+        }
+
+        .icone-notificacao-topo {
+            width: 36px;
+            height: 36px;
+            background-color: #f4ecd2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        /* ===== BOTÕES / DESTAQUES GERAIS ===== */
+
+        .btn-primary {
+            background-color: var(--dourado) !important;
+            border-color: var(--dourado) !important;
+            color: #0b0b0b !important;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: var(--dourado-escuro) !important;
+            border-color: var(--dourado-escuro) !important;
+            color: #ffffff !important;
+        }
+
+        .btn-outline-primary {
+            color: var(--dourado-escuro) !important;
+            border-color: var(--dourado) !important;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--dourado) !important;
+            border-color: var(--dourado) !important;
+            color: #0b0b0b !important;
+        }
+
+        a {
+            color: var(--dourado-escuro);
+        }
+
+        a:hover {
+            color: var(--dourado);
+        }
+
+        /* Cards com leve destaque dourado, no espírito do dashboard de referência */
+        .card {
+            border: 1px solid var(--borda-dourada);
+            border-radius: 10px;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 14px rgba(201, 162, 39, 0.15);
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =====================================
+         NAVBAR
+    ====================================== -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+
+        <div class="container-fluid">
+
+            <a
+                class="navbar-brand fw-bold d-flex align-items-center gap-2"
+                href="{{ url_for(
+                    'dashboard.dashboard'
+                ) }}">
+
+                {% if configuracao_global
+                      and configuracao_global.logo %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=configuracao_global.logo
+                        ) }}"
+                        alt="Logo do escritório"
+                        class="marca-logo-topo">
+
+                {% else %}
+
+                    <span>
+                        ⚖
+                    </span>
+
+                {% endif %}
+
+                <span>
+
+                    {{ configuracao_global.nome_escritorio
+                       if configuracao_global
+                       and configuracao_global.nome_escritorio
+                       else "Sistema Jurídico" }}
+
+                </span>
+
+            </a>
+
+            {% if current_user.is_authenticated %}
+
+                <!-- PESQUISA GLOBAL -->
+                <form
+                    class="d-none d-md-flex ms-auto me-3 pesquisa-global-topo"
+                    method="GET"
+                    action="{{ url_for(
+                        'pesquisa.pesquisa_global'
+                    ) }}"
+                    role="search">
+
+                    <div class="input-group input-group-sm">
+
+                        <span class="input-group-text">
+                            🔍
+                        </span>
+
+                        <input
+                            class="form-control"
+                            type="search"
+                            name="q"
+                            placeholder="Pesquisar no sistema..."
+                            aria-label="Pesquisar no sistema"
+                            minlength="2"
+                            value="{{ request.args.get(
+                                'q',
+                                ''
+                            ) if request.endpoint == 'pesquisa.pesquisa_global'
+                            else '' }}">
+
+                        <button
+                            type="submit"
+                            class="btn btn-outline-light">
+
+                            Buscar
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <!-- NOTIFICAÇÕES -->
+                <div class="dropdown me-3">
+
+                    <button
+                        class="btn btn-sm btn-outline-light botao-notificacoes"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        title="Notificações">
+
+                        🔔
+
+                        {% if notificacoes_globais.total > 0 %}
+
+                            <span
+                                class="badge contador-notificacoes">
+
+                                {% if notificacoes_globais.total > 99 %}
+                                    99+
+                                {% else %}
+                                    {{ notificacoes_globais.total }}
+                                {% endif %}
+
+                            </span>
+
+                        {% endif %}
+
+                    </button>
+
+                    <div
+                        class="dropdown-menu dropdown-menu-end p-0 menu-notificacoes">
+
+                        <div
+                            class="d-flex justify-content-between align-items-center px-3 py-3 border-bottom">
+
+                            <div>
+
+                                <strong>
+                                    🔔 Notificações
+                                </strong>
+
+                                <small class="d-block text-muted">
+
+                                    {{ notificacoes_globais.total }}
+                                    alerta(s) pendente(s)
+
+                                </small>
+
+                            </div>
+
+                            {% if notificacoes_globais.alta > 0 %}
+
+                                <span class="badge bg-danger">
+
+                                    {{ notificacoes_globais.alta }}
+                                    urgente(s)
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                        {% if notificacoes_globais.notificacoes %}
+
+                            {% for notificacao
+                               in notificacoes_globais.notificacoes[:5] %}
+
+                                <a
+                                    href="{{ notificacao.url }}"
+                                    class="dropdown-item item-notificacao-topo px-3 py-3 border-bottom">
+
+                                    <div class="d-flex gap-3">
+
+                                        <div class="icone-notificacao-topo">
+
+                                            {{ notificacao.icone }}
+
+                                        </div>
+
+                                        <div class="flex-grow-1">
+
+                                            <div
+                                                class="d-flex justify-content-between align-items-start gap-2">
+
+                                                <strong class="small">
+
+                                                    {{ notificacao.titulo }}
+
+                                                </strong>
+
+                                                {% if notificacao.prioridade == "alta" %}
+
+                                                    <span class="badge bg-danger">
+                                                        Alta
+                                                    </span>
+
+                                                {% elif notificacao.prioridade == "media" %}
+
+                                                    <span class="badge bg-warning text-dark">
+                                                        Média
+                                                    </span>
+
+                                                {% else %}
+
+                                                    <span class="badge bg-success">
+                                                        Baixa
+                                                    </span>
+
+                                                {% endif %}
+
+                                            </div>
+
+                                            <small class="text-muted d-block mt-1">
+
+                                                {{ notificacao.descricao }}
+
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                </a>
+
+                            {% endfor %}
+
+                            <div class="p-2">
+
+                                <a
+                                    href="{{ url_for(
+                                        'notificacoes.listar_notificacoes'
+                                    ) }}"
+                                    class="btn btn-outline-primary btn-sm w-100">
+
+                                    Ver todas as notificações
+
+                                </a>
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="text-center px-4 py-5">
+
+                                <div
+                                    class="mb-2"
+                                    style="font-size: 2rem;">
+
+                                    ✅
+
+                                </div>
+
+                                <strong class="d-block">
+
+                                    Tudo em dia
+
+                                </strong>
+
+                                <small class="text-muted">
+
+                                    Não existem notificações pendentes.
+
+                                </small>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+                <!-- USUÁRIO LOGADO -->
+                <div class="dropdown">
+
+                    <button
+                        class="btn btn-sm btn-outline-light dropdown-toggle"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false">
+
+                        👤 {{ current_user.primeiro_nome }}
+
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end">
+
+                        <li>
+
+                            <span class="dropdown-item-text">
+
+                                <strong>
+
+                                    {{ current_user.nome }}
+
+                                </strong>
+
+                                <small class="d-block text-muted">
+
+                                    {{ current_user.perfil_nome }}
+
+                                </small>
+
+                            </span>
+
+                        </li>
+
+                        <li>
+
+                            <hr class="dropdown-divider">
+
+                        </li>
+
+                        <li>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'auth.logout'
+                                ) }}">
+
+                                <button
+                                    type="submit"
+                                    class="dropdown-item text-danger">
+
+                                    🚪 Sair
+
+                                </button>
+
+                            </form>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </nav>
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <!-- =====================================
+                 SIDEBAR
+            ====================================== -->
+            <aside class="col-md-2 sidebar p-3 d-flex flex-column">
+
+                <div class="mb-4">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        {% if configuracao_global
+                              and configuracao_global.logo %}
+
+                            <img
+                                src="{{ url_for(
+                                    'static',
+                                    filename=configuracao_global.logo
+                                ) }}"
+                                alt="Logo do escritório"
+                                class="marca-logo-sidebar">
+
+                        {% else %}
+
+                            <div
+                                class="marca-logo-sidebar
+                                       d-flex
+                                       align-items-center
+                                       justify-content-center
+                                       fs-3">
+
+                                ⚖
+
+                            </div>
+
+                        {% endif %}
+
+                        <div class="marca-escritorio-sidebar">
+
+                            <h6 class="fw-bold mb-1">
+
+                                {{ configuracao_global.nome_escritorio
+                                   if configuracao_global
+                                   and configuracao_global.nome_escritorio
+                                   else "Sistema Jurídico" }}
+
+                            </h6>
+
+                            <small class="text-muted">
+
+                                {% if configuracao_global
+                                      and configuracao_global.nome_fantasia %}
+
+                                    {{ configuracao_global.nome_fantasia }}
+
+                                {% else %}
+
+                                    Gestão do escritório
+
+                                {% endif %}
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="menu-title">
+                    Menu Principal
+                </div>
+
+                <a
+                    href="{{ url_for(
+                        'dashboard.dashboard'
+                    ) }}"
+                    class="nav-link
+                           {% if request.path == '/' %}
+                               active
+                           {% endif %}">
+
+                    🏠 Dashboard
+
+                </a>
+
+                <a
+                    href="{{ url_for(
+                        'clientes.listar_clientes'
+                    ) }}"
+                    class="nav-link
+                           {% if request.path.startswith('/clientes') %}
+                               active
+                           {% endif %}">
+
+                    👥 Clientes
+
+                </a>
+
+                <a
+                    href="{{ url_for(
+                        'processos.listar_processos'
+                    ) }}"
+                    class="nav-link
+                           {% if request.path.startswith('/processos') %}
+                               active
+                           {% endif %}">
+
+                    ⚖ Processos
+
+                </a>
+
+                <a
+                    href="{{ url_for(
+                        'documentos.listar_documentos'
+                    ) }}"
+                    class="nav-link
+                           {% if request.path.startswith('/documentos') %}
+                               active
+                           {% endif %}">
+
+                    📂 Arquivos
+
+                </a>
+
+                <a
+                    href="{{ url_for(
+                        'agenda.listar_eventos'
+                    ) }}"
+                    class="nav-link
+                           {% if request.path.startswith('/agenda') %}
+                               active
+                           {% endif %}">
+
+                    📅 Agenda
+
+                </a>
+
+                <a
+                    href="{{ url_for(
+                        'notificacoes.listar_notificacoes'
+                    ) }}"
+                    class="nav-link
+                           {% if request.path.startswith('/notificacoes') %}
+                               active
+                           {% endif %}">
+
+                    🔔 Notificações
+
+                    {% if notificacoes_globais.total > 0 %}
+
+                        <span class="badge bg-danger float-end">
+
+                            {{ notificacoes_globais.total }}
+
+                        </span>
+
+                    {% endif %}
+
+                </a>
+
+                {% if current_user.is_authenticated
+                      and current_user.pode_acessar_financeiro %}
+
+                    <a
+                        href="{{ url_for(
+                            'financeiro.listar_financeiro'
+                        ) }}"
+                        class="nav-link
+                               {% if request.path.startswith('/financeiro') %}
+                                   active
+                               {% endif %}">
+
+                        💰 Financeiro
+
+                    </a>
+
+                {% endif %}
+
+                {% if current_user.is_authenticated
+                      and current_user.pode_gerenciar_usuarios %}
+
+                    <a
+                        href="{{ url_for(
+                            'usuarios.listar_usuarios'
+                        ) }}"
+                        class="nav-link
+                               {% if request.path.startswith('/usuarios') %}
+                                   active
+                               {% endif %}">
+
+                        👤 Usuários
+
+                    </a>
+
+                {% endif %}
+
+                <a
+                    href="{{ url_for(
+                        'configuracoes.pagina_configuracoes'
+                    ) }}"
+                    class="nav-link
+                           {% if request.path.startswith('/configuracoes') %}
+                               active
+                           {% endif %}">
+
+                    ⚙ Configurações
+
+                </a>
+
+                <div class="mt-auto pt-4 small text-muted">
+                    Versão 1.0
+                </div>
+
+            </aside>
+
+            <!-- =====================================
+                 CONTEÚDO PRINCIPAL
+            ====================================== -->
+            <main class="col-md-10 p-4">
+
+                {% with messages = get_flashed_messages(
+                    with_categories=true
+                ) %}
+
+                    {% if messages %}
+
+                        {% for categoria, mensagem in messages %}
+
+                            <div
+                                class="alert alert-{{ categoria }}
+                                       alert-dismissible
+                                       fade
+                                       show"
+                                role="alert">
+
+                                {{ mensagem }}
+
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Fechar">
+                                </button>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
+
+                {% block conteudo %}
+                {% endblock %}
+
+            </main>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script
+        src="{{ url_for(
+            'static',
+            filename='js/mascaras.js'
+        ) }}">
+    </script>
+
+    {% block scripts %}
+    {% endblock %}
+
+</body>
+
+</html>

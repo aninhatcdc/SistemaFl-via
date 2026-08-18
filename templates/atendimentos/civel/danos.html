@@ -1,0 +1,389 @@
+{% extends "atendimentos/civel/layout.html" %}
+
+{% block titulo %}
+Danos e valores | Ficha Cível
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_danos_civel",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Danos e valores
+{% endblock %}
+
+{% block etapa_descricao %}
+Registre os prejuízos sofridos pelo cliente, os valores estimados
+e as consequências materiais e extrapatrimoniais do caso.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 6 de 9
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="civel-info-box">
+    <i class="bi bi-info-circle"></i>
+    <div>
+        Informe os valores disponíveis neste momento. Eles poderão ser
+        revisados posteriormente durante a análise jurídica.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-box-seam"></i>
+        </span>
+        <div>
+            <h3>Dano material</h3>
+            <p>Prejuízos financeiros, perda de bens e despesas já realizadas.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="houve_dano_material" class="form-label">
+                Houve dano material?
+            </label>
+            <select class="form-select"
+                    id="houve_dano_material"
+                    name="houve_dano_material">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.houve_dano_material == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-8 campo-condicional"
+             data-condicional="houve_dano_material">
+            <label for="valor_dano_material" class="form-label">
+                Valor do dano material
+            </label>
+            <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input type="text"
+                       class="form-control"
+                       id="valor_dano_material"
+                       name="valor_dano_material"
+                       inputmode="decimal"
+                       placeholder="0,00"
+                       value="{% if ficha.valor_dano_material is not none %}{{ ficha.valor_dano_material }}{% endif %}">
+            </div>
+        </div>
+
+        <div class="col-12 campo-condicional"
+             data-condicional="houve_dano_material">
+            <label for="descricao_dano_material" class="form-label">
+                Descrição do dano material
+            </label>
+            <textarea class="form-control"
+                      id="descricao_dano_material"
+                      name="descricao_dano_material"
+                      rows="4">{{ ficha.descricao_dano_material or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-heartbreak"></i>
+        </span>
+        <div>
+            <h3>Dano moral</h3>
+            <p>Abalo, constrangimento, sofrimento ou violação de direitos da personalidade.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="houve_dano_moral" class="form-label">
+                Houve dano moral?
+            </label>
+            <select class="form-select"
+                    id="houve_dano_moral"
+                    name="houve_dano_moral">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.houve_dano_moral == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-8 campo-condicional"
+             data-condicional="houve_dano_moral">
+            <label for="valor_pretendido_dano_moral" class="form-label">
+                Valor pretendido para o dano moral
+            </label>
+            <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input type="text"
+                       class="form-control"
+                       id="valor_pretendido_dano_moral"
+                       name="valor_pretendido_dano_moral"
+                       inputmode="decimal"
+                       placeholder="0,00"
+                       value="{% if ficha.valor_pretendido_dano_moral is not none %}{{ ficha.valor_pretendido_dano_moral }}{% endif %}">
+            </div>
+        </div>
+
+        <div class="col-12 campo-condicional"
+             data-condicional="houve_dano_moral">
+            <label for="descricao_dano_moral" class="form-label">
+                Descrição do dano moral
+            </label>
+            <textarea class="form-control"
+                      id="descricao_dano_moral"
+                      name="descricao_dano_moral"
+                      rows="4">{{ ficha.descricao_dano_moral or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-graph-down-arrow"></i>
+        </span>
+        <div>
+            <h3>Lucros cessantes</h3>
+            <p>Valores que o cliente deixou de receber em razão dos fatos.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="houve_lucros_cessantes" class="form-label">
+                Houve lucros cessantes?
+            </label>
+            <select class="form-select"
+                    id="houve_lucros_cessantes"
+                    name="houve_lucros_cessantes">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.houve_lucros_cessantes == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-8 campo-condicional"
+             data-condicional="houve_lucros_cessantes">
+            <label for="valor_lucros_cessantes" class="form-label">
+                Valor estimado dos lucros cessantes
+            </label>
+            <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input type="text"
+                       class="form-control"
+                       id="valor_lucros_cessantes"
+                       name="valor_lucros_cessantes"
+                       inputmode="decimal"
+                       placeholder="0,00"
+                       value="{% if ficha.valor_lucros_cessantes is not none %}{{ ficha.valor_lucros_cessantes }}{% endif %}">
+            </div>
+        </div>
+
+        <div class="col-12 campo-condicional"
+             data-condicional="houve_lucros_cessantes">
+            <label for="descricao_lucros_cessantes" class="form-label">
+                Descrição dos lucros cessantes
+            </label>
+            <textarea class="form-control"
+                      id="descricao_lucros_cessantes"
+                      name="descricao_lucros_cessantes"
+                      rows="4">{{ ficha.descricao_lucros_cessantes or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-bandaid"></i>
+        </span>
+        <div>
+            <h3>Dano estético e gastos futuros</h3>
+            <p>Registre consequências permanentes e despesas que ainda serão necessárias.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="houve_dano_estetico" class="form-label">
+                Houve dano estético?
+            </label>
+            <select class="form-select"
+                    id="houve_dano_estetico"
+                    name="houve_dano_estetico">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.houve_dano_estetico == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="existem_gastos_futuros" class="form-label">
+                Existem gastos futuros?
+            </label>
+            <select class="form-select"
+                    id="existem_gastos_futuros"
+                    name="existem_gastos_futuros">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.existem_gastos_futuros == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6 campo-condicional"
+             data-condicional="houve_dano_estetico">
+            <label for="descricao_dano_estetico" class="form-label">
+                Descrição do dano estético
+            </label>
+            <textarea class="form-control"
+                      id="descricao_dano_estetico"
+                      name="descricao_dano_estetico"
+                      rows="4">{{ ficha.descricao_dano_estetico or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6 campo-condicional"
+             data-condicional="existem_gastos_futuros">
+            <label for="descricao_gastos_futuros" class="form-label">
+                Descrição dos gastos futuros
+            </label>
+            <textarea class="form-control"
+                      id="descricao_gastos_futuros"
+                      name="descricao_gastos_futuros"
+                      rows="4">{{ ficha.descricao_gastos_futuros or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-calculator"></i>
+        </span>
+        <div>
+            <h3>Resumo dos valores</h3>
+            <p>Informe a estimativa total do prejuízo e observações relevantes.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="valor_total_prejuizo" class="form-label">
+                Valor total estimado do prejuízo
+            </label>
+            <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input type="text"
+                       class="form-control"
+                       id="valor_total_prejuizo"
+                       name="valor_total_prejuizo"
+                       inputmode="decimal"
+                       placeholder="0,00"
+                       value="{% if ficha.valor_total_prejuizo is not none %}{{ ficha.valor_total_prejuizo }}{% endif %}">
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label for="observacoes_danos" class="form-label">
+                Observações sobre danos e valores
+            </label>
+            <textarea class="form-control"
+                      id="observacoes_danos"
+                      name="observacoes_danos"
+                      rows="5">{{ ficha.observacoes_danos or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const campos = [
+        "houve_dano_material",
+        "houve_dano_moral",
+        "houve_lucros_cessantes",
+        "houve_dano_estetico",
+        "existem_gastos_futuros"
+    ];
+
+    function atualizarCampo(nome) {
+        const seletor = document.getElementById(nome);
+        const dependentes = document.querySelectorAll(
+            '[data-condicional="' + nome + '"]'
+        );
+
+        if (!seletor) {
+            return;
+        }
+
+        const mostrar = seletor.value === "SIM";
+
+        dependentes.forEach(function (elemento) {
+            elemento.classList.toggle(
+                "campo-condicional-visivel",
+                mostrar
+            );
+
+            elemento.querySelectorAll("input, textarea, select")
+                .forEach(function (campo) {
+                    campo.disabled = !mostrar;
+
+                    if (!mostrar) {
+                        campo.value = "";
+                    }
+                });
+        });
+    }
+
+    campos.forEach(function (nome) {
+        const seletor = document.getElementById(nome);
+
+        if (seletor) {
+            seletor.addEventListener("change", function () {
+                atualizarCampo(nome);
+            });
+        }
+
+        atualizarCampo(nome);
+    });
+});
+</script>
+
+{% endblock %}

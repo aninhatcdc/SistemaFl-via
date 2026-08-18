@@ -1,0 +1,25 @@
+{% macro status_processo(status) %}
+
+    {% if status == "Em andamento" %}
+        <span class="badge bg-success">{{ status }}</span>
+
+    {% elif status == "Aguardando documentos" %}
+        <span class="badge bg-warning text-dark">{{ status }}</span>
+
+    {% elif status == "Aguardando audiência" %}
+        <span class="badge bg-info">{{ status }}</span>
+
+    {% elif status == "Arquivado" %}
+        <span class="badge bg-secondary">{{ status }}</span>
+
+    {% elif status == "Suspenso" %}
+        <span class="badge bg-danger">{{ status }}</span>
+
+    {% else %}
+        <span class="badge bg-light text-dark">
+            {{ status or "Sem situação" }}
+        </span>
+
+    {% endif %}
+
+{% endmacro %}

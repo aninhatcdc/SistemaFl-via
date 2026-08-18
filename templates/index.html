@@ -1,0 +1,642 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+{% from "components/dashboard_card.html" import dashboard_card %}
+{% from "components/file_icon.html" import file_icon %}
+{% from "components/status_badge.html" import status_processo %}
+{% from "components/prazo_badge.html" import prazo_badge %}
+
+{% block titulo %}
+Dashboard
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "🏠 Dashboard",
+    "Visão geral das informações do escritório."
+) }}
+
+<!-- Indicadores principais -->
+<div class="row mb-4">
+
+    {{ dashboard_card(
+        "👥 Clientes",
+        total_clientes,
+        "Clientes cadastrados",
+        "primary"
+    ) }}
+
+    {{ dashboard_card(
+        "⚖ Processos",
+        total_processos,
+        "Processos registrados",
+        "dark"
+    ) }}
+
+    {{ dashboard_card(
+        "📂 Arquivos",
+        total_documentos,
+        "Arquivos enviados",
+        "info"
+    ) }}
+
+    {{ dashboard_card(
+        "🟢 Em andamento",
+        processos_ativos,
+        "Processos ativos",
+        "success"
+    ) }}
+
+</div>
+
+<!-- Resumo da Agenda -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+
+        <span>
+            📅 Resumo da Agenda
+        </span>
+
+        <a href="{{ url_for('agenda.listar_eventos') }}"
+           class="btn btn-light btn-sm">
+            Abrir Agenda
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row text-center">
+
+            <div class="col-md-4 mb-3 mb-md-0">
+
+                <div class="border rounded p-3 h-100">
+
+                    <h6 class="text-danger">
+                        🔴 Hoje
+                    </h6>
+
+                    <h2 class="mb-1">
+                        {{ eventos_hoje }}
+                    </h2>
+
+                    <small class="text-muted">
+                        Eventos pendentes
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4 mb-3 mb-md-0">
+
+                <div class="border rounded p-3 h-100">
+
+                    <h6 class="text-warning">
+                        🟠 Amanhã
+                    </h6>
+
+                    <h2 class="mb-1">
+                        {{ eventos_amanha }}
+                    </h2>
+
+                    <small class="text-muted">
+                        Eventos pendentes
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="border rounded p-3 h-100">
+
+                    <h6 class="text-success">
+                        🟢 Próximos 7 dias
+                    </h6>
+
+                    <h2 class="mb-1">
+                        {{ eventos_semana }}
+                    </h2>
+
+                    <small class="text-muted">
+                        Eventos programados
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Próximos compromissos -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+        <span>
+            📅 Próximos Compromissos
+        </span>
+
+        <a href="{{ url_for('agenda.novo_evento') }}"
+           class="btn btn-light btn-sm">
+            + Novo Evento
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if proximos_eventos %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Horário</th>
+                            <th>Evento</th>
+                            <th>Tipo</th>
+                            <th>Cliente</th>
+                            <th>Processo</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for evento in proximos_eventos %}
+
+                            <tr>
+
+                                <td>
+                                    <strong>
+                                        {{ evento.data.strftime("%d/%m/%Y") }}
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    {% if evento.horario %}
+                                        {{ evento.horario.strftime("%H:%M") }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <a href="{{ url_for('agenda.editar_evento', id=evento.id) }}"
+                                       class="fw-bold text-decoration-none">
+                                        {{ evento.titulo }}
+                                    </a>
+
+                                    {% if evento.descricao %}
+                                        <div class="small text-muted">
+                                            {{ evento.descricao }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if evento.tipo == "Audiência" %}
+
+                                        <span class="badge bg-danger">
+                                            ⚖ Audiência
+                                        </span>
+
+                                    {% elif evento.tipo == "Prazo" %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            ⏰ Prazo
+                                        </span>
+
+                                    {% elif evento.tipo == "Reunião" %}
+
+                                        <span class="badge bg-primary">
+                                            👥 Reunião
+                                        </span>
+
+                                    {% elif evento.tipo == "Tarefa" %}
+
+                                        <span class="badge bg-info text-dark">
+                                            ✅ Tarefa
+                                        </span>
+
+                                    {% elif evento.tipo == "Compromisso" %}
+
+                                        <span class="badge bg-secondary">
+                                            📌 Compromisso
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+                                            {{ evento.tipo or "Outro" }}
+                                        </span>
+
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if evento.cliente %}
+
+                                        <a href="{{ url_for('clientes.detalhes_cliente', id=evento.cliente.id) }}"
+                                           class="fw-bold text-decoration-none">
+                                            {{ evento.cliente.nome }}
+                                        </a>
+
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if evento.processo %}
+
+                                        <a href="{{ url_for('processos.detalhes_processo', id=evento.processo.id) }}"
+                                           class="fw-bold text-decoration-none">
+                                            {{ evento.processo.numero }}
+                                        </a>
+
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-4">
+
+                <h5 class="text-muted">
+                    📅 Nenhum compromisso próximo
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Os próximos eventos da Agenda aparecerão aqui.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- Próximos prazos -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+
+        <span>
+            ⏰ Próximos Prazos Processuais
+        </span>
+
+        <a href="{{ url_for('processos.listar_processos') }}"
+           class="btn btn-light btn-sm">
+            Ver Processos
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if proximos_prazos %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Prazo</th>
+                            <th>Processo</th>
+                            <th>Cliente</th>
+                            <th>Situação</th>
+                            <th>Advogado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for processo in proximos_prazos %}
+
+                            <tr>
+
+                                <td>
+                                    {{ prazo_badge(
+                                        processo.proximo_prazo,
+                                        processo.dias_para_prazo
+                                    ) }}
+                                </td>
+
+                                <td>
+                                    <a href="{{ url_for('processos.detalhes_processo', id=processo.id) }}"
+                                       class="fw-bold text-decoration-none">
+                                        {{ processo.numero }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <a href="{{ url_for('clientes.detalhes_cliente', id=processo.cliente.id) }}"
+                                       class="fw-bold text-decoration-none">
+                                        {{ processo.cliente.nome }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ status_processo(processo.situacao) }}
+                                </td>
+
+                                <td>
+                                    {{ processo.advogado or "-" }}
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-4">
+
+                <h5 class="text-muted">
+                    ✅ Nenhum prazo cadastrado
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Os próximos prazos dos processos aparecerão aqui.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<div class="row">
+
+    <!-- Últimos clientes -->
+    <div class="col-lg-6 mb-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+                <span>
+                    👥 Últimos Clientes
+                </span>
+
+                <a href="{{ url_for('clientes.listar_clientes') }}"
+                   class="btn btn-light btn-sm">
+                    Ver Todos
+                </a>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if ultimos_clientes %}
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Área</th>
+                                    <th>WhatsApp</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for cliente in ultimos_clientes %}
+
+                                    <tr>
+
+                                        <td>
+                                            <a href="{{ url_for('clientes.detalhes_cliente', id=cliente.id) }}"
+                                               class="fw-bold text-decoration-none">
+                                                {{ cliente.nome }}
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            {{ cliente.area_juridica or "-" }}
+                                        </td>
+
+                                        <td>
+                                            {{ cliente.whatsapp or "-" }}
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="text-center py-4">
+
+                        <h5 class="text-muted">
+                            👥 Nenhum cliente cadastrado
+                        </h5>
+
+                        <p class="text-muted">
+                            Cadastre o primeiro cliente do sistema.
+                        </p>
+
+                        <a href="{{ url_for('clientes.novo_cliente') }}"
+                           class="btn btn-primary">
+                            + Novo Cliente
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Últimos arquivos -->
+    <div class="col-lg-6 mb-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+
+                <span>
+                    📂 Últimos Arquivos
+                </span>
+
+                <a href="{{ url_for('documentos.listar_documentos') }}"
+                   class="btn btn-light btn-sm">
+                    Ver Todos
+                </a>
+
+            </div>
+
+            <div class="card-body">
+
+                {% if ultimos_documentos %}
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>Arquivo</th>
+                                    <th>Cliente</th>
+                                    <th>Data de envio</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for documento in ultimos_documentos %}
+
+                                    <tr>
+
+                                        <td>
+                                            <a href="{{ url_for('documentos.detalhes_documento', id=documento.id) }}"
+                                               class="fw-bold text-decoration-none">
+
+                                                {{ file_icon(documento.nome_arquivo) }}
+                                                {{ documento.nome_arquivo }}
+
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            <a href="{{ url_for('clientes.detalhes_cliente', id=documento.cliente.id) }}"
+                                               class="fw-bold text-decoration-none">
+                                                {{ documento.cliente.nome }}
+                                            </a>
+                                        </td>
+
+                                        <td>
+                                            {% if documento.criado_em %}
+                                                {{ documento.criado_em.strftime("%d/%m/%Y") }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="text-center py-4">
+
+                        <h5 class="text-muted">
+                            📂 Nenhum arquivo enviado
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Os arquivos enviados recentemente aparecerão aqui.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Ações rápidas -->
+<div class="card shadow-sm">
+
+    <div class="card-header bg-secondary text-white">
+        ⚡ Ações Rápidas
+    </div>
+
+    <div class="card-body">
+
+        <div class="d-flex flex-wrap gap-2">
+
+            <a href="{{ url_for('clientes.novo_cliente') }}"
+               class="btn btn-primary">
+                + Novo Cliente
+            </a>
+
+            <a href="{{ url_for('clientes.listar_clientes') }}"
+               class="btn btn-outline-dark">
+                👥 Ver Clientes
+            </a>
+
+            <a href="{{ url_for('processos.listar_processos') }}"
+               class="btn btn-outline-dark">
+                ⚖ Ver Processos
+            </a>
+
+            <a href="{{ url_for('documentos.listar_documentos') }}"
+               class="btn btn-outline-dark">
+                📂 Ver Arquivos
+            </a>
+
+            <a href="{{ url_for('agenda.novo_evento') }}"
+               class="btn btn-outline-primary">
+                📅 Novo Evento
+            </a>
+
+            <a href="{{ url_for('agenda.listar_eventos') }}"
+               class="btn btn-outline-dark">
+                📅 Abrir Agenda
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

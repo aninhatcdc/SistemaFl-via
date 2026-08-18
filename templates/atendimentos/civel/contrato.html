@@ -1,0 +1,517 @@
+{% extends "atendimentos/civel/layout.html" %}
+
+{% block titulo_etapa %}
+Contratos e obrigações
+{% endblock %}
+
+{% block descricao_etapa %}
+Informe os dados do contrato, das obrigações assumidas pelas partes e de eventual descumprimento.
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<div class="civel-section">
+    <div class="civel-section-header">
+        <div>
+            <h5 class="civel-section-title">
+                <i class="bi bi-file-earmark-text"></i>
+                Existência do contrato
+            </h5>
+
+            <p class="civel-section-description">
+                Informe se há contrato relacionado aos fatos apresentados.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label
+                for="existe_contrato"
+                class="form-label"
+            >
+                Existe contrato entre as partes?
+            </label>
+
+            <select
+                class="form-select"
+                id="existe_contrato"
+                name="existe_contrato"
+            >
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in ficha.RESPOSTAS.items() %}
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.existe_contrato == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<div
+    id="grupo_dados_contrato"
+    class="civel-conditional-group mt-4"
+>
+    <div class="civel-section">
+        <div class="civel-section-header">
+            <div>
+                <h5 class="civel-section-title">
+                    <i class="bi bi-clipboard-check"></i>
+                    Dados do contrato
+                </h5>
+
+                <p class="civel-section-description">
+                    Preencha as informações principais do contrato.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label
+                    for="contrato_escrito"
+                    class="form-label"
+                >
+                    O contrato foi formalizado por escrito?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="contrato_escrito"
+                    name="contrato_escrito"
+                >
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, rotulo in ficha.RESPOSTAS.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.contrato_escrito == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label
+                    for="tipo_contrato"
+                    class="form-label"
+                >
+                    Tipo de contrato
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="tipo_contrato"
+                    name="tipo_contrato"
+                    value="{{ ficha.tipo_contrato or '' }}"
+                    placeholder="Ex.: compra e venda, prestação de serviços, locação"
+                >
+            </div>
+
+            <div class="col-md-6">
+                <label
+                    for="data_contrato"
+                    class="form-label"
+                >
+                    Data de início do contrato
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_contrato"
+                    name="data_contrato"
+                    value="{% if ficha.data_contrato %}{{ ficha.data_contrato.strftime('%Y-%m-%d') }}{% endif %}"
+                >
+            </div>
+
+            <div class="col-md-6">
+                <label
+                    for="data_fim_contrato"
+                    class="form-label"
+                >
+                    Data de término do contrato
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_fim_contrato"
+                    name="data_fim_contrato"
+                    value="{% if ficha.data_fim_contrato %}{{ ficha.data_fim_contrato.strftime('%Y-%m-%d') }}{% endif %}"
+                >
+            </div>
+
+            <div class="col-md-6">
+                <label
+                    for="valor_contrato"
+                    class="form-label"
+                >
+                    Valor do contrato
+                </label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        R$
+                    </span>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="valor_contrato"
+                        name="valor_contrato"
+                        value="{% if ficha.valor_contrato is not none %}{{ '%.2f'|format(ficha.valor_contrato)|replace('.', ',') }}{% endif %}"
+                        placeholder="0,00"
+                        inputmode="decimal"
+                    >
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label
+                    for="forma_pagamento"
+                    class="form-label"
+                >
+                    Forma de pagamento
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="forma_pagamento"
+                    name="forma_pagamento"
+                    value="{{ ficha.forma_pagamento or '' }}"
+                    placeholder="Ex.: à vista, parcelas, transferência"
+                >
+            </div>
+        </div>
+    </div>
+
+    <div class="civel-section mt-4">
+        <div class="civel-section-header">
+            <div>
+                <h5 class="civel-section-title">
+                    <i class="bi bi-cash-stack"></i>
+                    Pagamentos
+                </h5>
+
+                <p class="civel-section-description">
+                    Informe a situação dos pagamentos previstos no contrato.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label
+                    for="contrato_quitado"
+                    class="form-label"
+                >
+                    O contrato foi totalmente quitado?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="contrato_quitado"
+                    name="contrato_quitado"
+                >
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, rotulo in ficha.RESPOSTAS.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.contrato_quitado == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label
+                    for="possui_comprovantes_pagamento"
+                    class="form-label"
+                >
+                    Existem comprovantes de pagamento?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="possui_comprovantes_pagamento"
+                    name="possui_comprovantes_pagamento"
+                >
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, rotulo in ficha.RESPOSTAS.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.possui_comprovantes_pagamento == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="civel-section mt-4">
+        <div class="civel-section-header">
+            <div>
+                <h5 class="civel-section-title">
+                    <i class="bi bi-list-check"></i>
+                    Obrigações das partes
+                </h5>
+
+                <p class="civel-section-description">
+                    Descreva o que cada parte deveria cumprir.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-12">
+                <label
+                    for="obrigacao_cliente"
+                    class="form-label"
+                >
+                    Obrigações do cliente
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="obrigacao_cliente"
+                    name="obrigacao_cliente"
+                    rows="4"
+                    placeholder="Descreva as obrigações assumidas pelo cliente"
+                >{{ ficha.obrigacao_cliente or '' }}</textarea>
+            </div>
+
+            <div class="col-12">
+                <label
+                    for="obrigacao_parte_contraria"
+                    class="form-label"
+                >
+                    Obrigações da parte contrária
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="obrigacao_parte_contraria"
+                    name="obrigacao_parte_contraria"
+                    rows="4"
+                    placeholder="Descreva as obrigações assumidas pela parte contrária"
+                >{{ ficha.obrigacao_parte_contraria or '' }}</textarea>
+            </div>
+
+            <div class="col-12">
+                <label
+                    for="obrigacao_descumprida"
+                    class="form-label"
+                >
+                    Qual obrigação foi descumprida?
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="obrigacao_descumprida"
+                    name="obrigacao_descumprida"
+                    rows="4"
+                    placeholder="Explique qual obrigação não foi cumprida e de que forma ocorreu o descumprimento"
+                >{{ ficha.obrigacao_descumprida or '' }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="civel-section mt-4">
+        <div class="civel-section-header">
+            <div>
+                <h5 class="civel-section-title">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Multa contratual
+                </h5>
+
+                <p class="civel-section-description">
+                    Informe se o contrato prevê aplicação de multa.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label
+                    for="houve_multa_contratual"
+                    class="form-label"
+                >
+                    Existe multa contratual aplicável?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="houve_multa_contratual"
+                    name="houve_multa_contratual"
+                >
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, rotulo in ficha.RESPOSTAS.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.houve_multa_contratual == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div
+                class="col-md-6"
+                id="grupo_valor_multa"
+            >
+                <label
+                    for="valor_multa_contratual"
+                    class="form-label"
+                >
+                    Valor da multa contratual
+                </label>
+
+                <div class="input-group">
+                    <span class="input-group-text">
+                        R$
+                    </span>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="valor_multa_contratual"
+                        name="valor_multa_contratual"
+                        value="{% if ficha.valor_multa_contratual is not none %}{{ '%.2f'|format(ficha.valor_multa_contratual)|replace('.', ',') }}{% endif %}"
+                        placeholder="0,00"
+                        inputmode="decimal"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="civel-section mt-4">
+        <div class="civel-section-header">
+            <div>
+                <h5 class="civel-section-title">
+                    <i class="bi bi-chat-left-text"></i>
+                    Observações
+                </h5>
+
+                <p class="civel-section-description">
+                    Registre outras informações importantes sobre o contrato.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-12">
+                <label
+                    for="observacoes_contrato"
+                    class="form-label"
+                >
+                    Observações sobre o contrato
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="observacoes_contrato"
+                    name="observacoes_contrato"
+                    rows="5"
+                    placeholder="Inclua cláusulas relevantes, condições especiais ou outras informações"
+                >{{ ficha.observacoes_contrato or '' }}</textarea>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const respostaSim = "{{ ficha.RESPOSTA_SIM }}";
+
+        const campoExisteContrato = document.getElementById(
+            "existe_contrato"
+        );
+
+        const grupoDadosContrato = document.getElementById(
+            "grupo_dados_contrato"
+        );
+
+        const campoMulta = document.getElementById(
+            "houve_multa_contratual"
+        );
+
+        const grupoValorMulta = document.getElementById(
+            "grupo_valor_multa"
+        );
+
+        function atualizarDadosContrato() {
+            const existeContrato =
+                campoExisteContrato.value === respostaSim;
+
+            grupoDadosContrato.style.display =
+                existeContrato ? "" : "none";
+        }
+
+        function atualizarValorMulta() {
+            const existeMulta =
+                campoMulta.value === respostaSim;
+
+            grupoValorMulta.style.display =
+                existeMulta ? "" : "none";
+        }
+
+        campoExisteContrato.addEventListener(
+            "change",
+            atualizarDadosContrato
+        );
+
+        campoMulta.addEventListener(
+            "change",
+            atualizarValorMulta
+        );
+
+        atualizarDadosContrato();
+        atualizarValorMulta();
+    });
+</script>
+
+{% endblock %}

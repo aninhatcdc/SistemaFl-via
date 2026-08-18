@@ -1,0 +1,736 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Resumo da Ficha Trabalhista
+{% endblock %}
+
+
+{% block conteudo %}
+
+<div class="container-fluid py-3">
+
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
+
+        <div>
+
+            <div class="d-flex align-items-center gap-2 mb-1">
+
+                <h2 class="mb-0">
+                    <i class="bi bi-clipboard-check"></i>
+                    Resumo da Ficha Trabalhista
+                </h2>
+
+                <span class="badge bg-success">
+                    {{ progresso }}% concluída
+                </span>
+
+            </div>
+
+            <p class="text-muted mb-0">
+                Cliente:
+                <strong>{{ atendimento.cliente.nome }}</strong>
+                · Atendimento nº {{ atendimento.id }}
+            </p>
+
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <a
+                href="{{ url_for(
+                    'atendimentos.gerar_pdf_trabalhista',
+                    atendimento_id=atendimento.id
+                ) }}"
+                class="btn btn-danger"
+            >
+                <i class="bi bi-file-earmark-pdf"></i>
+                Gerar PDF
+            </a>
+
+            <a
+                href="{{ url_for(
+                    'atendimentos.etapa_rescisao',
+                    atendimento_id=atendimento.id
+                ) }}"
+                class="btn btn-outline-primary"
+            >
+                <i class="bi bi-pencil"></i>
+                Editar última etapa
+            </a>
+
+            <a
+                href="{{ url_for(
+                    'clientes.detalhes_cliente',
+                    id=atendimento.cliente_id
+                ) }}"
+                class="btn btn-secondary"
+            >
+                <i class="bi bi-arrow-left"></i>
+                Voltar ao cliente
+            </a>
+            
+        </div>
+        
+
+    </div>
+
+
+    <div class="card border-0 shadow-sm mb-4">
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+                    <small class="text-muted d-block">
+                        CPF
+                    </small>
+                    <strong>
+                        {{ atendimento.cliente.cpf or "Não informado" }}
+                    </strong>
+                </div>
+
+                <div class="col-md-3">
+                    <small class="text-muted d-block">
+                        WhatsApp
+                    </small>
+                    <strong>
+                        {{ atendimento.cliente.whatsapp or atendimento.cliente.telefone or "Não informado" }}
+                    </strong>
+                </div>
+
+                <div class="col-md-3">
+                    <small class="text-muted d-block">
+                        Responsável
+                    </small>
+                    <strong>
+                        {{ atendimento.responsavel.nome if atendimento.responsavel else "Não informado" }}
+                    </strong>
+                </div>
+
+                <div class="col-md-3">
+                    <small class="text-muted d-block">
+                        Última atualização
+                    </small>
+                    <strong>
+                        {{ ficha.atualizado_em.strftime("%d/%m/%Y às %H:%M") if ficha.atualizado_em else "Não registrada" }}
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="row g-4">
+
+        <div class="col-xl-3">
+
+            <div class="card border-0 shadow-sm sticky-xl-top" style="top: 90px;">
+
+                <div class="card-header bg-white py-3">
+                    <strong>Etapas da ficha</strong>
+                </div>
+
+                <div class="list-group list-group-flush">
+
+                    {% for etapa in etapas %}
+
+                        <a
+                            href="{{ etapa.url }}"
+                            class="list-group-item list-group-item-action d-flex align-items-center justify-content-between gap-2"
+                        >
+
+                            <span>
+                                <i class="bi {{ etapa.icone }} me-2"></i>
+                                {{ etapa.titulo }}
+                            </span>
+
+                            {% if etapa.concluida %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {% else %}
+                                <i class="bi bi-circle text-muted"></i>
+                            {% endif %}
+
+                        </a>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-xl-9">
+
+            <!-- ATENDIMENTO -->
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                    <strong>
+                        <i class="bi bi-star me-2 text-primary"></i>
+                        Atendimento
+                    </strong>
+
+                    <a
+                        href="{{ url_for(
+                            'atendimentos.etapa_atendimento',
+                            atendimento_id=atendimento.id
+                        ) }}"
+                        class="btn btn-sm btn-outline-primary"
+                    >
+                        Editar
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Título</small>
+                            <strong>{{ atendimento.titulo or "Não informado" }}</strong>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Data</small>
+                            <strong>
+                                {{ atendimento.data_atendimento.strftime("%d/%m/%Y") if atendimento.data_atendimento else "Não informada" }}
+                            </strong>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Horário</small>
+                            <strong>
+                                {{ atendimento.horario_atendimento.strftime("%H:%M") if atendimento.horario_atendimento else "Não informado" }}
+                            </strong>
+                        </div>
+
+                        <div class="col-12">
+                            <small class="text-muted d-block">Resumo do caso</small>
+                            <div class="border rounded p-3 bg-light">
+                                {{ atendimento.resumo_caso or "Não informado" }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CLIENTE -->
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                    <strong>
+                        <i class="bi bi-person me-2 text-primary"></i>
+                        Cliente
+                    </strong>
+
+                    <a
+                        href="{{ url_for(
+                            'atendimentos.etapa_cliente',
+                            atendimento_id=atendimento.id
+                        ) }}"
+                        class="btn btn-sm btn-outline-primary"
+                    >
+                        Editar
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <small class="text-muted d-block">Nome</small>
+                            <strong>{{ atendimento.cliente.nome }}</strong>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">CPF</small>
+                            <strong>{{ atendimento.cliente.cpf or "Não informado" }}</strong>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Estado civil</small>
+                            <strong>{{ atendimento.cliente.estado_civil or "Não informado" }}</strong>
+                        </div>
+
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Profissão</small>
+                            <strong>{{ atendimento.cliente.profissao or "Não informada" }}</strong>
+                        </div>
+
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">Telefone</small>
+                            <strong>{{ atendimento.cliente.telefone or "Não informado" }}</strong>
+                        </div>
+
+                        <div class="col-md-4">
+                            <small class="text-muted d-block">E-mail</small>
+                            <strong>{{ atendimento.cliente.email or "Não informado" }}</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- EMPRESA E ADMISSÃO -->
+            <div class="row g-4 mb-4">
+
+                <div class="col-lg-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                            <strong>
+                                <i class="bi bi-building me-2 text-primary"></i>
+                                Empresa
+                            </strong>
+
+                            <a
+                                href="{{ url_for(
+                                    'atendimentos.etapa_empresa',
+                                    atendimento_id=atendimento.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                Editar
+                            </a>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-sm-5">Razão social</dt>
+                                <dd class="col-sm-7">{{ ficha.empresa_razao_social or "Não informada" }}</dd>
+
+                                <dt class="col-sm-5">Nome fantasia</dt>
+                                <dd class="col-sm-7">{{ ficha.empresa_nome_fantasia or "Não informado" }}</dd>
+
+                                <dt class="col-sm-5">CNPJ</dt>
+                                <dd class="col-sm-7">{{ ficha.empresa_cnpj or "Não informado" }}</dd>
+
+                                <dt class="col-sm-5">Foi vendida</dt>
+                                <dd class="col-sm-7">{{ respostas.get(ficha.empresa_foi_vendida, "Não informado") }}</dd>
+
+                                <dt class="col-sm-5">Trocou CNPJ</dt>
+                                <dd class="col-sm-7">{{ respostas.get(ficha.empresa_trocou_cnpj, "Não informado") }}</dd>
+
+                            </dl>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                            <strong>
+                                <i class="bi bi-person-workspace me-2 text-primary"></i>
+                                Admissão
+                            </strong>
+
+                            <a
+                                href="{{ url_for(
+                                    'atendimentos.etapa_admissao',
+                                    atendimento_id=atendimento.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                Editar
+                            </a>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-sm-5">Data de admissão</dt>
+                                <dd class="col-sm-7">
+                                    {{ ficha.data_admissao.strftime("%d/%m/%Y") if ficha.data_admissao else "Não informada" }}
+                                </dd>
+
+                                <dt class="col-sm-5">Função</dt>
+                                <dd class="col-sm-7">{{ ficha.funcao_admissao or "Não informada" }}</dd>
+
+                                <dt class="col-sm-5">CTPS assinada</dt>
+                                <dd class="col-sm-7">{{ respostas.get(ficha.carteira_assinada, "Não informado") }}</dd>
+
+                                <dt class="col-sm-5">Exame admissional</dt>
+                                <dd class="col-sm-7">{{ respostas.get(ficha.realizou_exame_admissional, "Não informado") }}</dd>
+
+                            </dl>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTRATO E LOCAL -->
+            <div class="row g-4 mb-4">
+
+                <div class="col-lg-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                            <strong>
+                                <i class="bi bi-file-earmark-text me-2 text-primary"></i>
+                                Contrato
+                            </strong>
+
+                            <a
+                                href="{{ url_for(
+                                    'atendimentos.etapa_contrato',
+                                    atendimento_id=atendimento.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                Editar
+                            </a>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-sm-5">Tipo</dt>
+                                <dd class="col-sm-7">{{ ficha.tipo_contrato_nome }}</dd>
+
+                                <dt class="col-sm-5">Função adicional</dt>
+                                <dd class="col-sm-7">{{ respostas.get(ficha.exercia_mais_uma_funcao, "Não informado") }}</dd>
+
+                                <dt class="col-sm-5">Promoção</dt>
+                                <dd class="col-sm-7">{{ respostas.get(ficha.recebeu_promocao, "Não informado") }}</dd>
+
+                                <dt class="col-sm-5">Mudança de cidade</dt>
+                                <dd class="col-sm-7">{{ respostas.get(ficha.mudou_cidade, "Não informado") }}</dd>
+
+                            </dl>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-6">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                            <strong>
+                                <i class="bi bi-geo-alt me-2 text-primary"></i>
+                                Local de trabalho
+                            </strong>
+
+                            <a
+                                href="{{ url_for(
+                                    'atendimentos.etapa_local_trabalho',
+                                    atendimento_id=atendimento.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                Editar
+                            </a>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-sm-6">Mesmo local</dt>
+                                <dd class="col-sm-6">{{ respostas.get(ficha.trabalhava_mesmo_local, "Não informado") }}</dd>
+
+                                <dt class="col-sm-6">Viajava</dt>
+                                <dd class="col-sm-6">{{ respostas.get(ficha.trabalhava_viajando, "Não informado") }}</dd>
+
+                                <dt class="col-sm-6">Usava veículo próprio</dt>
+                                <dd class="col-sm-6">{{ respostas.get(ficha.usava_veiculo_proprio, "Não informado") }}</dd>
+
+                                <dt class="col-sm-6">Celular particular</dt>
+                                <dd class="col-sm-6">{{ respostas.get(ficha.utilizava_celular_particular, "Não informado") }}</dd>
+
+                            </dl>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SALÁRIO, FÉRIAS E 13º -->
+            <div class="row g-4 mb-4">
+
+                <div class="col-lg-4">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                            <strong>
+                                <i class="bi bi-cash-stack me-2 text-primary"></i>
+                                Salário
+                            </strong>
+
+                            <a
+                                href="{{ url_for(
+                                    'atendimentos.etapa_salario',
+                                    atendimento_id=atendimento.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                Editar
+                            </a>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <small class="text-muted d-block">Registrado</small>
+                            <strong class="d-block mb-3">
+                                R$ {{ "%.2f"|format(ficha.salario_registrado) if ficha.salario_registrado is not none else "Não informado" }}
+                            </strong>
+
+                            <small class="text-muted d-block">Real</small>
+                            <strong class="d-block mb-3">
+                                R$ {{ "%.2f"|format(ficha.salario_real) if ficha.salario_real is not none else "Não informado" }}
+                            </strong>
+
+                            <small class="text-muted d-block">Valor extrafolha</small>
+                            <strong>
+                                {{ respostas.get(ficha.recebia_valor_extrafolha, "Não informado") }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-4">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                            <strong>
+                                <i class="bi bi-calendar2-week me-2 text-primary"></i>
+                                Férias
+                            </strong>
+
+                            <a
+                                href="{{ url_for(
+                                    'atendimentos.etapa_ferias',
+                                    atendimento_id=atendimento.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                Editar
+                            </a>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <small class="text-muted d-block">Todos os anos</small>
+                            <strong class="d-block mb-3">
+                                {{ respostas.get(ficha.recebeu_ferias_todos_anos, "Não informado") }}
+                            </strong>
+
+                            <small class="text-muted d-block">Períodos</small>
+                            <strong class="d-block mb-3">
+                                {{ ficha.quantidade_periodos_ferias if ficha.quantidade_periodos_ferias is not none else "Não informado" }}
+                            </strong>
+
+                            <small class="text-muted d-block">Adicional de 1/3</small>
+                            <strong>
+                                {{ respostas.get(ficha.recebeu_um_terco_ferias, "Não informado") }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-4">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                            <strong>
+                                <i class="bi bi-wallet2 me-2 text-primary"></i>
+                                13º salário
+                            </strong>
+
+                            <a
+                                href="{{ url_for(
+                                    'atendimentos.etapa_decimo_terceiro',
+                                    atendimento_id=atendimento.id
+                                ) }}"
+                                class="btn btn-sm btn-outline-primary"
+                            >
+                                Editar
+                            </a>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <small class="text-muted d-block">Recebia</small>
+                            <strong class="d-block mb-3">
+                                {{ respostas.get(ficha.recebia_decimo_terceiro, "Não informado") }}
+                            </strong>
+
+                            <small class="text-muted d-block">Pago corretamente</small>
+                            <strong class="d-block mb-3">
+                                {{ respostas.get(ficha.recebia_decimo_terceiro_corretamente, "Não informado") }}
+                            </strong>
+
+                            <small class="text-muted d-block">Duas parcelas</small>
+                            <strong>
+                                {{ respostas.get(ficha.recebia_decimo_terceiro_duas_parcelas, "Não informado") }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- RESCISÃO -->
+            <div class="card border-0 shadow-sm mb-4">
+
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+
+                    <strong>
+                        <i class="bi bi-person-x me-2 text-primary"></i>
+                        Rescisão
+                    </strong>
+
+                    <a
+                        href="{{ url_for(
+                            'atendimentos.etapa_rescisao',
+                            atendimento_id=atendimento.id
+                        ) }}"
+                        class="btn btn-sm btn-outline-primary"
+                    >
+                        Editar
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Data da demissão</small>
+                            <strong>
+                                {{ ficha.data_demissao.strftime("%d/%m/%Y") if ficha.data_demissao else "Não informada" }}
+                            </strong>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Tipo</small>
+                            <strong>{{ ficha.tipo_rescisao or "Não informado" }}</strong>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Verbas recebidas</small>
+                            <strong>
+                                {{ respostas.get(ficha.recebeu_verbas_rescisorias, "Não informado") }}
+                            </strong>
+                        </div>
+
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Termo recebido</small>
+                            <strong>
+                                {{ respostas.get(ficha.recebeu_copia_termo_rescisao, "Não informado") }}
+                            </strong>
+                        </div>
+
+                        <div class="col-12">
+                            <small class="text-muted d-block">Documentos pendentes</small>
+                            <div class="border rounded p-3 bg-light">
+                                {{ ficha.documentos_pendentes or "Nenhum documento pendente informado." }}
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="alert alert-success d-flex align-items-start gap-3">
+
+                <i class="bi bi-check-circle-fill fs-4"></i>
+
+                <div>
+
+                    <strong class="d-block">
+                        Ficha trabalhista preenchida
+                    </strong>
+
+                    <span>
+                        Todas as dez etapas foram disponibilizadas.
+                        Revise os dados acima antes de utilizar as informações
+                        para elaboração de documentos ou análise jurídica.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

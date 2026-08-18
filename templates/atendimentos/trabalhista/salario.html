@@ -1,0 +1,773 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+{% block titulo %}
+Salário | Ficha Trabalhista
+{% endblock %}
+
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_salario",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+
+{% block etapa_titulo %}
+Salário
+{% endblock %}
+
+
+{% block etapa_descricao %}
+Registre a remuneração formal, os valores pagos por fora,
+as gorjetas e a regularidade dos pagamentos.
+{% endblock %}
+
+
+{% block etapa_identificacao %}
+Etapa 7 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+<div class="trabalhista-info-box">
+
+    <i class="bi bi-info-circle"></i>
+
+    <div>
+        Informe os valores com base nos documentos e no relato do cliente.
+        Quando houver diferenças entre o salário registrado e o efetivamente
+        recebido, registre os dois valores.
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+
+<!-- ============================================================
+     REMUNERAÇÃO PRINCIPAL
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-cash-stack"></i>
+        </span>
+
+        <div>
+            <h3>Remuneração principal</h3>
+
+            <p>
+                Compare o salário registrado com o valor realmente
+                recebido pelo cliente.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-md-6">
+
+            <label
+                for="salario_registrado"
+                class="form-label"
+            >
+                Salário registrado
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    R$
+                </span>
+
+                <input
+                    type="text"
+                    name="salario_registrado"
+                    id="salario_registrado"
+                    class="form-control campo-monetario"
+                    value="{% if ficha.salario_registrado is not none %}{{ ficha.salario_registrado }}{% endif %}"
+                    inputmode="decimal"
+                    placeholder="0,00"
+                >
+
+            </div>
+
+            <div class="form-text">
+                Valor anotado na CTPS, contrato ou contracheque.
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <label
+                for="salario_real"
+                class="form-label"
+            >
+                Salário efetivamente recebido
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    R$
+                </span>
+
+                <input
+                    type="text"
+                    name="salario_real"
+                    id="salario_real"
+                    class="form-control campo-monetario"
+                    value="{% if ficha.salario_real is not none %}{{ ficha.salario_real }}{% endif %}"
+                    inputmode="decimal"
+                    placeholder="0,00"
+                >
+
+            </div>
+
+            <div class="form-text">
+                Valor total normalmente recebido pelo cliente.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     PAGAMENTO EXTRAFOLHA
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-wallet2"></i>
+        </span>
+
+        <div>
+            <h3>Valores pagos por fora</h3>
+
+            <p>
+                Registre pagamentos que não apareciam integralmente
+                na folha ou no contracheque.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="recebia_valor_extrafolha"
+                class="form-label"
+            >
+                Recebia algum valor extrafolha?
+            </label>
+
+            <select
+                name="recebia_valor_extrafolha"
+                id="recebia_valor_extrafolha"
+                class="form-select"
+                data-controla="grupo-extrafolha"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.recebia_valor_extrafolha == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-extrafolha"
+            class="col-12 campo-condicional"
+        >
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label
+                        for="valor_extrafolha_mensal"
+                        class="form-label"
+                    >
+                        Valor médio mensal
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            R$
+                        </span>
+
+                        <input
+                            type="text"
+                            name="valor_extrafolha_mensal"
+                            id="valor_extrafolha_mensal"
+                            class="form-control campo-monetario"
+                            value="{% if ficha.valor_extrafolha_mensal is not none %}{{ ficha.valor_extrafolha_mensal }}{% endif %}"
+                            inputmode="decimal"
+                            placeholder="0,00"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label
+                        for="responsavel_pagamento_extrafolha"
+                        class="form-label"
+                    >
+                        Quem realizava o pagamento?
+                    </label>
+
+                    <input
+                        type="text"
+                        name="responsavel_pagamento_extrafolha"
+                        id="responsavel_pagamento_extrafolha"
+                        class="form-control"
+                        value="{{ ficha.responsavel_pagamento_extrafolha or '' }}"
+                        placeholder="Ex.: proprietário, gerente ou setor financeiro."
+                    >
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label
+                        for="forma_pagamento_extrafolha"
+                        class="form-label"
+                    >
+                        Forma de pagamento
+                    </label>
+
+                    <select
+                        name="forma_pagamento_extrafolha"
+                        id="forma_pagamento_extrafolha"
+                        class="form-select"
+                        data-controla="grupo-forma-pagamento-outro"
+                        data-exibir-quando="OUTRO"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in formas_pagamento_extrafolha.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.forma_pagamento_extrafolha == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="grupo-forma-pagamento-outro"
+                    class="col-md-6 campo-condicional"
+                >
+
+                    <label
+                        for="forma_pagamento_extrafolha_outro"
+                        class="form-label"
+                    >
+                        Outra forma de pagamento
+                    </label>
+
+                    <input
+                        type="text"
+                        name="forma_pagamento_extrafolha_outro"
+                        id="forma_pagamento_extrafolha_outro"
+                        class="form-control"
+                        value="{{ ficha.forma_pagamento_extrafolha_outro or '' }}"
+                        placeholder="Descreva como o valor era pago."
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     GORJETAS
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-coin"></i>
+        </span>
+
+        <div>
+            <h3>Gorjetas</h3>
+
+            <p>
+                Informe se havia gorjetas, como eram registradas
+                e como ocorria a divisão entre os empregados.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="recebia_gorjetas"
+                class="form-label"
+            >
+                Recebia gorjetas?
+            </label>
+
+            <select
+                name="recebia_gorjetas"
+                id="recebia_gorjetas"
+                class="form-select"
+                data-controla="grupo-gorjetas"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.recebia_gorjetas == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-gorjetas"
+            class="col-12 campo-condicional"
+        >
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label
+                        for="valor_medio_gorjetas"
+                        class="form-label"
+                    >
+                        Valor médio mensal das gorjetas
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            R$
+                        </span>
+
+                        <input
+                            type="text"
+                            name="valor_medio_gorjetas"
+                            id="valor_medio_gorjetas"
+                            class="form-control campo-monetario"
+                            value="{% if ficha.valor_medio_gorjetas is not none %}{{ ficha.valor_medio_gorjetas }}{% endif %}"
+                            inputmode="decimal"
+                            placeholder="0,00"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label
+                        for="gorjetas_constavam_contracheque"
+                        class="form-label"
+                    >
+                        As gorjetas constavam no contracheque?
+                    </label>
+
+                    <select
+                        name="gorjetas_constavam_contracheque"
+                        id="gorjetas_constavam_contracheque"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.gorjetas_constavam_contracheque == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label
+                        for="gorjetas_divididas_empregados"
+                        class="form-label"
+                    >
+                        As gorjetas eram divididas entre os empregados?
+                    </label>
+
+                    <select
+                        name="gorjetas_divididas_empregados"
+                        id="gorjetas_divididas_empregados"
+                        class="form-select"
+                        data-controla="grupo-divisao-gorjetas"
+                        data-exibir-quando="SIM"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.gorjetas_divididas_empregados == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="grupo-divisao-gorjetas"
+                    class="col-12 campo-condicional"
+                >
+
+                    <label
+                        for="forma_divisao_gorjetas"
+                        class="form-label"
+                    >
+                        Como era feita a divisão?
+                    </label>
+
+                    <textarea
+                        name="forma_divisao_gorjetas"
+                        id="forma_divisao_gorjetas"
+                        class="form-control"
+                        rows="4"
+                        placeholder="Informe critérios, percentuais, funções participantes e quem controlava a divisão."
+                    >{{ ficha.forma_divisao_gorjetas or "" }}</textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     DATA DO PAGAMENTO
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-calendar-check"></i>
+        </span>
+
+        <div>
+            <h3>Regularidade do pagamento</h3>
+
+            <p>
+                Informe se o salário era pago dentro do prazo habitual.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="pagamento_quinto_dia_util"
+                class="form-label"
+            >
+                O pagamento era realizado até o quinto dia útil?
+            </label>
+
+            <select
+                name="pagamento_quinto_dia_util"
+                id="pagamento_quinto_dia_util"
+                class="form-select"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.pagamento_quinto_dia_util == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     OBSERVAÇÕES
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+
+        <div>
+            <h3>Observações sobre o salário</h3>
+
+            <p>
+                Registre diferenças, atrasos, descontos ou outras
+                informações relevantes.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-12">
+
+            <label
+                for="observacoes_salario"
+                class="form-label"
+            >
+                Observações
+            </label>
+
+            <textarea
+                name="observacoes_salario"
+                id="observacoes_salario"
+                class="form-control"
+                rows="6"
+                placeholder="Ex.: pagamentos atrasados, valores variáveis, descontos não autorizados, comissões, prêmios ou documentos disponíveis."
+            >{{ ficha.observacoes_salario or "" }}</textarea>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        function atualizarCampoCondicional(controle) {
+            const destinoId = controle.dataset.controla;
+            const valorEsperado = controle.dataset.exibirQuando;
+            const destino = document.getElementById(destinoId);
+
+            if (!destino) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorEsperado;
+
+            destino.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            const campos = destino.querySelectorAll(
+                "input, select, textarea"
+            );
+
+            campos.forEach(function (campo) {
+                campo.disabled = !deveExibir;
+            });
+        }
+
+
+        function atualizarTodosCamposCondicionais() {
+            const controles = document.querySelectorAll(
+                "[data-controla][data-exibir-quando]"
+            );
+
+            controles.forEach(function (controle) {
+                atualizarCampoCondicional(controle);
+            });
+        }
+
+
+        const controles = document.querySelectorAll(
+            "[data-controla][data-exibir-quando]"
+        );
+
+        controles.forEach(function (controle) {
+
+            controle.addEventListener("change", function () {
+                atualizarTodosCamposCondicionais();
+            });
+
+        });
+
+        atualizarTodosCamposCondicionais();
+
+
+        const camposMonetarios = document.querySelectorAll(
+            ".campo-monetario"
+        );
+
+        camposMonetarios.forEach(function (campo) {
+
+            campo.addEventListener("input", function () {
+                campo.value = campo.value.replace(
+                    /[^0-9.,]/g,
+                    ""
+                );
+            });
+
+            campo.addEventListener("blur", function () {
+                let valor = campo.value.trim();
+
+                if (!valor) {
+                    return;
+                }
+
+                if (valor.includes(",")) {
+                    valor = valor
+                        .replace(/\./g, "")
+                        .replace(",", ".");
+                }
+
+                const numero = Number(valor);
+
+                if (!Number.isNaN(numero)) {
+                    campo.value = numero.toLocaleString(
+                        "pt-BR",
+                        {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }
+                    );
+                }
+            });
+
+        });
+
+    });
+</script>
+
+{% endblock %}

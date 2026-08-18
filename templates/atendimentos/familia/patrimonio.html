@@ -1,0 +1,428 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+Patrimônio — Atendimento #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_patrimonio_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Patrimônio e partilha
+{% endblock %}
+
+{% block etapa_descricao %}
+Registre os bens comuns, bens particulares, dívidas, indícios de ocultação e eventual proposta de partilha.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 8 de 10
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="civel-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        Informe o máximo possível sobre titularidade, data de aquisição,
+        valor aproximado e documentos disponíveis de cada bem.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-buildings"></i>
+        </span>
+        <div>
+            <h3>Patrimônio comum</h3>
+            <p>Informe os bens e obrigações que podem integrar a partilha.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="possui_bens_partilhar"
+                    name="possui_bens_partilhar"
+                    {% if ficha.possui_bens_partilhar %}checked{% endif %}
+                >
+                <label
+                    class="form-check-label"
+                    for="possui_bens_partilhar"
+                >
+                    Existem bens ou dívidas a partilhar?
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div id="grupo_bens_partilhar" class="mt-3">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="imoveis" class="form-label">Imóveis</label>
+                <textarea
+                    class="form-control"
+                    id="imoveis"
+                    name="imoveis"
+                    rows="6"
+                    maxlength="6000"
+                    placeholder="Descreva casas, apartamentos, terrenos, localização, matrícula, titularidade, financiamento e valor aproximado."
+                >{{ ficha.imoveis or '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label for="veiculos" class="form-label">Veículos</label>
+                <textarea
+                    class="form-control"
+                    id="veiculos"
+                    name="veiculos"
+                    rows="6"
+                    maxlength="6000"
+                    placeholder="Informe marca, modelo, ano, placa, titularidade, financiamento e valor aproximado."
+                >{{ ficha.veiculos or '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label for="contas_bancarias_investimentos" class="form-label">
+                    Contas bancárias e investimentos
+                </label>
+                <textarea
+                    class="form-control"
+                    id="contas_bancarias_investimentos"
+                    name="contas_bancarias_investimentos"
+                    rows="6"
+                    maxlength="6000"
+                    placeholder="Informe bancos, aplicações, previdência privada, ações, criptoativos e valores conhecidos."
+                >{{ ficha.contas_bancarias_investimentos or '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label for="empresas_quotas_sociais" class="form-label">
+                    Empresas e quotas sociais
+                </label>
+                <textarea
+                    class="form-control"
+                    id="empresas_quotas_sociais"
+                    name="empresas_quotas_sociais"
+                    rows="6"
+                    maxlength="6000"
+                    placeholder="Informe razão social, CNPJ, participação societária, atividade e valor estimado."
+                >{{ ficha.empresas_quotas_sociais or '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label for="bens_moveis_relevantes" class="form-label">
+                    Bens móveis relevantes
+                </label>
+                <textarea
+                    class="form-control"
+                    id="bens_moveis_relevantes"
+                    name="bens_moveis_relevantes"
+                    rows="6"
+                    maxlength="6000"
+                    placeholder="Descreva máquinas, equipamentos, joias, obras de arte, móveis de valor e outros bens relevantes."
+                >{{ ficha.bens_moveis_relevantes or '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label for="dividas_comuns" class="form-label">
+                    Dívidas comuns
+                </label>
+                <textarea
+                    class="form-control"
+                    id="dividas_comuns"
+                    name="dividas_comuns"
+                    rows="6"
+                    maxlength="6000"
+                    placeholder="Informe financiamentos, empréstimos, cartões, tributos, credores, saldos e responsáveis."
+                >{{ ficha.dividas_comuns or '' }}</textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label for="valor_estimado_patrimonio" class="form-label">
+                    Valor total estimado do patrimônio
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text">R$</span>
+                    <input
+                        type="text"
+                        class="form-control campo-moeda"
+                        id="valor_estimado_patrimonio"
+                        name="valor_estimado_patrimonio"
+                        inputmode="decimal"
+                        value="{% if ficha.valor_estimado_patrimonio is not none %}{{ '%.2f'|format(ficha.valor_estimado_patrimonio)|replace('.', ',') }}{% endif %}"
+                        placeholder="0,00"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-person-badge"></i>
+        </span>
+        <div>
+            <h3>Bens particulares</h3>
+            <p>Registre os bens que não devem integrar a partilha.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="bens_particulares_cliente" class="form-label">
+                Bens particulares do cliente
+            </label>
+            <textarea
+                class="form-control"
+                id="bens_particulares_cliente"
+                name="bens_particulares_cliente"
+                rows="7"
+                maxlength="6000"
+                placeholder="Informe bens anteriores à relação, heranças, doações, sub-rogações e documentos comprobatórios."
+            >{{ ficha.bens_particulares_cliente or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="bens_particulares_parte_contraria" class="form-label">
+                Bens particulares da parte contrária
+            </label>
+            <textarea
+                class="form-control"
+                id="bens_particulares_parte_contraria"
+                name="bens_particulares_parte_contraria"
+                rows="7"
+                maxlength="6000"
+                placeholder="Informe bens anteriores à relação, heranças, doações e outras informações conhecidas."
+            >{{ ficha.bens_particulares_parte_contraria or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-eye-slash"></i>
+        </span>
+        <div>
+            <h3>Ocultação patrimonial</h3>
+            <p>Registre suspeitas de bens, valores ou rendimentos não declarados.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="existe_ocultacao_patrimonial"
+                    name="existe_ocultacao_patrimonial"
+                    {% if ficha.existe_ocultacao_patrimonial %}checked{% endif %}
+                >
+                <label
+                    class="form-check-label"
+                    for="existe_ocultacao_patrimonial"
+                >
+                    Existem indícios de ocultação patrimonial?
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12" id="grupo_ocultacao_patrimonial">
+            <label for="indicios_ocultacao_patrimonial" class="form-label">
+                Indícios de ocultação
+            </label>
+            <textarea
+                class="form-control"
+                id="indicios_ocultacao_patrimonial"
+                name="indicios_ocultacao_patrimonial"
+                rows="6"
+                maxlength="6000"
+                placeholder="Descreva transferências, empresas, contas, bens em nome de terceiros, vendas simuladas e provas disponíveis."
+            >{{ ficha.indicios_ocultacao_patrimonial or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-people"></i>
+        </span>
+        <div>
+            <h3>Acordo e proposta de partilha</h3>
+            <p>Informe se as partes já possuem entendimento sobre a divisão do patrimônio.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="existe_acordo_partilha"
+                    name="existe_acordo_partilha"
+                    {% if ficha.existe_acordo_partilha %}checked{% endif %}
+                >
+                <label class="form-check-label" for="existe_acordo_partilha">
+                    Existe acordo ou proposta de partilha?
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12" id="grupo_proposta_partilha">
+            <label for="proposta_partilha" class="form-label">
+                Proposta de partilha
+            </label>
+            <textarea
+                class="form-control"
+                id="proposta_partilha"
+                name="proposta_partilha"
+                rows="6"
+                maxlength="6000"
+                placeholder="Descreva quais bens ficariam com cada parte, compensações financeiras, assunção de dívidas e pontos ainda controvertidos."
+            >{{ ficha.proposta_partilha or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+        <div>
+            <h3>Observações patrimoniais</h3>
+            <p>Registre informações complementares relevantes para a análise.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="observacoes_patrimonio" class="form-label">
+                Observações
+            </label>
+            <textarea
+                class="form-control"
+                id="observacoes_patrimonio"
+                name="observacoes_patrimonio"
+                rows="6"
+                maxlength="6000"
+                placeholder="Registre datas de aquisição, origem dos recursos, posse atual, documentos faltantes, urgências e outras particularidades."
+            >{{ ficha.observacoes_patrimonio or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const possuiBens = document.getElementById("possui_bens_partilhar");
+    const grupoBens = document.getElementById("grupo_bens_partilhar");
+
+    const camposBens = [
+        "imoveis",
+        "veiculos",
+        "contas_bancarias_investimentos",
+        "empresas_quotas_sociais",
+        "bens_moveis_relevantes",
+        "dividas_comuns",
+        "valor_estimado_patrimonio"
+    ];
+
+    const ocultacao = document.getElementById("existe_ocultacao_patrimonial");
+    const grupoOcultacao = document.getElementById("grupo_ocultacao_patrimonial");
+    const descricaoOcultacao = document.getElementById("indicios_ocultacao_patrimonial");
+
+    const acordo = document.getElementById("existe_acordo_partilha");
+    const grupoAcordo = document.getElementById("grupo_proposta_partilha");
+    const proposta = document.getElementById("proposta_partilha");
+
+    function atualizarBens() {
+        const mostrar = possuiBens.checked;
+        grupoBens.classList.toggle("d-none", !mostrar);
+
+        camposBens.forEach(function (id) {
+            const campo = document.getElementById(id);
+            campo.disabled = !mostrar;
+
+            if (!mostrar) {
+                campo.value = "";
+            }
+        });
+
+        ocultacao.disabled = !mostrar;
+        acordo.disabled = !mostrar;
+
+        if (!mostrar) {
+            ocultacao.checked = false;
+            acordo.checked = false;
+        }
+
+        atualizarOcultacao();
+        atualizarAcordo();
+    }
+
+    function atualizarOcultacao() {
+        const mostrar = possuiBens.checked && ocultacao.checked;
+        grupoOcultacao.classList.toggle("d-none", !mostrar);
+        descricaoOcultacao.disabled = !mostrar;
+
+        if (!mostrar) {
+            descricaoOcultacao.value = "";
+        }
+    }
+
+    function atualizarAcordo() {
+        const mostrar = possuiBens.checked && acordo.checked;
+        grupoAcordo.classList.toggle("d-none", !mostrar);
+        proposta.disabled = !mostrar;
+
+        if (!mostrar) {
+            proposta.value = "";
+        }
+    }
+
+    document.querySelectorAll(".campo-moeda").forEach(function (campo) {
+        campo.addEventListener("input", function () {
+            let valor = campo.value.replace(/[^0-9,]/g, "");
+            const partes = valor.split(",");
+
+            if (partes.length > 2) {
+                valor = partes[0] + "," + partes.slice(1).join("");
+            }
+
+            if (valor.includes(",")) {
+                const separadas = valor.split(",");
+                valor = separadas[0] + "," + separadas[1].slice(0, 2);
+            }
+
+            campo.value = valor;
+        });
+    });
+
+    possuiBens.addEventListener("change", atualizarBens);
+    ocultacao.addEventListener("change", atualizarOcultacao);
+    acordo.addEventListener("change", atualizarAcordo);
+
+    atualizarBens();
+});
+</script>
+
+{% endblock %}

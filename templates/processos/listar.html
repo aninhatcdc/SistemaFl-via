@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% from "components/status_badge.html" import status_processo %}
+{% from "components/pagination.html" import pagination %}
+{% from "components/prazo_badge.html" import prazo_badge %}
+
+{% block titulo %}
+Processos
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="mb-4">
+    <h2>Processos</h2>
+
+    <p class="text-muted">
+        Todos os processos cadastrados no sistema.
+    </p>
+</div>
+
+<!-- Indicadores -->
+<div class="row mb-4">
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+
+                <h6 class="text-muted">
+                    ⚖ Total
+                </h6>
+
+                <h2>{{ total }}</h2>
+
+                <small>
+                    Total de processos
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+
+                <h6 class="text-success">
+                    🟢 Em andamento
+                </h6>
+
+                <h2>{{ em_andamento }}</h2>
+
+                <small>
+                    Processos ativos
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+
+                <h6 class="text-info">
+                    🔵 Audiência
+                </h6>
+
+                <h2>{{ audiencia }}</h2>
+
+                <small>
+                    Aguardando audiência
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card card-dashboard">
+            <div class="card-body">
+
+                <h6 class="text-secondary">
+                    ⚫ Arquivados
+                </h6>
+
+                <h2>{{ arquivados }}</h2>
+
+                <small>
+                    Processos arquivados
+                </small>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Filtros -->
+<div class="mb-4 d-flex flex-wrap gap-2">
+
+    <a href="{{ url_for('processos.listar_processos') }}"
+       class="btn {% if not situacao %}btn-dark{% else %}btn-outline-dark{% endif %}">
+        Todos
+    </a>
+
+    <a href="{{ url_for('processos.listar_processos', situacao='Em andamento') }}"
+       class="btn {% if situacao == 'Em andamento' %}btn-success{% else %}btn-outline-success{% endif %}">
+        🟢 Em andamento
+    </a>
+
+    <a href="{{ url_for('processos.listar_processos', situacao='Aguardando audiência') }}"
+       class="btn {% if situacao == 'Aguardando audiência' %}btn-info{% else %}btn-outline-info{% endif %}">
+        🔵 Audiência
+    </a>
+
+    <a href="{{ url_for('processos.listar_processos', situacao='Aguardando documentos') }}"
+       class="btn {% if situacao == 'Aguardando documentos' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+        🟡 Documentos
+    </a>
+
+    <a href="{{ url_for('processos.listar_processos', situacao='Arquivado') }}"
+       class="btn {% if situacao == 'Arquivado' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+        ⚫ Arquivados
+    </a>
+
+    <a href="{{ url_for('processos.listar_processos', situacao='Suspenso') }}"
+       class="btn {% if situacao == 'Suspenso' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+        🔴 Suspensos
+    </a>
+
+</div>
+
+<!-- Pesquisa -->
+<form method="GET"
+      action="{{ url_for('processos.listar_processos') }}"
+      class="mb-4">
+
+    {% if situacao %}
+        <input type="hidden"
+               name="situacao"
+               value="{{ situacao }}">
+    {% endif %}
+
+    <div class="input-group">
+
+        <input type="text"
+               name="q"
+               class="form-control"
+               placeholder="Pesquisar por número, área, situação ou advogado..."
+               value="{{ termo }}">
+
+        <button type="submit"
+                class="btn btn-dark">
+            🔍 Pesquisar
+        </button>
+
+        <a href="{{ url_for('processos.listar_processos') }}"
+           class="btn btn-secondary">
+            Limpar
+        </a>
+
+    </div>
+
+</form>
+
+<!-- Lista -->
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        {% if processos.items %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Cliente</th>
+                            <th>Área</th>
+                            <th>Situação</th>
+                            <th>Próximo Prazo</th>
+                            <th>Status do Prazo</th>
+                            <th>Advogado</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for processo in processos.items %}
+
+                            <tr>
+
+                                <td>
+                                    <a href="{{ url_for('processos.detalhes_processo', id=processo.id) }}"
+                                       class="fw-bold text-decoration-none">
+                                        {{ processo.numero }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    <a href="{{ url_for('clientes.detalhes_cliente', id=processo.cliente.id) }}"
+                                       class="fw-bold text-decoration-none">
+                                        {{ processo.cliente.nome }}
+                                    </a>
+                                </td>
+
+                                <td>
+                                    {{ processo.area or "-" }}
+                                </td>
+
+                                <td>
+                                    {{ status_processo(processo.situacao) }}
+                                </td>
+
+                                <td>
+                                    {% if processo.proximo_prazo %}
+                                        {{ processo.proximo_prazo.strftime("%d/%m/%Y") }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {{ prazo_badge(
+                                        processo.proximo_prazo,
+                                        processo.dias_para_prazo
+                                    ) }}
+                                </td>
+
+                                <td>
+                                    {{ processo.advogado or "-" }}
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a href="{{ url_for('processos.editar_processo', id=processo.id) }}"
+                                       class="btn btn-warning btn-sm">
+                                        ✏ Editar
+                                    </a>
+
+                                    <form action="{{ url_for('processos.excluir_processo', id=processo.id) }}"
+                                          method="POST"
+                                          style="display:inline;">
+
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm"
+                                                onclick="return confirm('Tem certeza que deseja excluir este processo? Os eventos vinculados da Agenda também serão removidos.')">
+                                            🗑 Excluir
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {{ pagination(
+                processos,
+                "processos.listar_processos",
+                termo,
+                situacao
+            ) }}
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <h5 class="text-muted">
+                    ⚖ Nenhum processo encontrado
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Cadastre processos pela ficha de um cliente.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,493 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+Análise Jurídica — Atendimento #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_analise_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Análise jurídica
+{% endblock %}
+
+{% block etapa_descricao %}
+Registre a avaliação técnica, a estratégia processual, os riscos, os pedidos e a viabilidade da demanda.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 10 de 10
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="civel-info-box">
+    <i class="bi bi-shield-check"></i>
+    <div>
+        Esta etapa encerra a Ficha de Direito de Família.
+        Revise as informações antes de salvar a conclusão.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-bank"></i>
+        </span>
+        <div>
+            <h3>Competência e foro</h3>
+            <p>Defina os aspectos processuais iniciais da demanda.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="competencia" class="form-label">Competência</label>
+            <input
+                type="text"
+                class="form-control"
+                id="competencia"
+                name="competencia"
+                maxlength="150"
+                value="{{ ficha.competencia or '' }}"
+                placeholder="Ex.: Vara de Família, Vara da Infância e Juventude"
+            >
+        </div>
+
+        <div class="col-md-6">
+            <label for="foro_competente" class="form-label">
+                Foro competente
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="foro_competente"
+                name="foro_competente"
+                maxlength="150"
+                value="{{ ficha.foro_competente or '' }}"
+                placeholder="Informe comarca, foro ou justificativa territorial"
+            >
+        </div>
+
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="existe_prevencao"
+                    name="existe_prevencao"
+                    {% if ficha.existe_prevencao %}checked{% endif %}
+                >
+                <label class="form-check-label" for="existe_prevencao">
+                    Existe prevenção?
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12" id="grupo_processo_prevento">
+            <label for="processo_prevento" class="form-label">
+                Processo prevento
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="processo_prevento"
+                name="processo_prevento"
+                maxlength="80"
+                value="{{ ficha.processo_prevento or '' }}"
+                placeholder="Informe o número do processo relacionado"
+            >
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+        </span>
+        <div>
+            <h3>Providências processuais especiais</h3>
+            <p>Indique medidas obrigatórias ou necessárias desde o início.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="form-check form-switch border rounded-3 p-3 h-100">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="necessidade_intervencao_mp"
+                    name="necessidade_intervencao_mp"
+                    {% if ficha.necessidade_intervencao_mp %}checked{% endif %}
+                >
+                <label
+                    class="form-check-label ms-2"
+                    for="necessidade_intervencao_mp"
+                >
+                    Necessita intervenção do Ministério Público
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-check form-switch border rounded-3 p-3 h-100">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="necessidade_segredo_justica"
+                    name="necessidade_segredo_justica"
+                    {% if ficha.necessidade_segredo_justica %}checked{% endif %}
+                >
+                <label
+                    class="form-check-label ms-2"
+                    for="necessidade_segredo_justica"
+                >
+                    Necessita segredo de justiça
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="form-check form-switch border rounded-3 p-3 h-100">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="necessidade_tutela_urgencia"
+                    name="necessidade_tutela_urgencia"
+                    {% if ficha.necessidade_tutela_urgencia %}checked{% endif %}
+                >
+                <label
+                    class="form-check-label ms-2"
+                    for="necessidade_tutela_urgencia"
+                >
+                    Necessita tutela de urgência
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12" id="grupo_tutela_urgencia">
+            <label for="fundamentos_tutela_urgencia" class="form-label">
+                Fundamentos da tutela de urgência
+            </label>
+            <textarea
+                class="form-control"
+                id="fundamentos_tutela_urgencia"
+                name="fundamentos_tutela_urgencia"
+                rows="6"
+                maxlength="8000"
+                placeholder="Descreva probabilidade do direito, perigo de dano, urgência concreta, fatos e documentos que sustentam o pedido."
+            >{{ ficha.fundamentos_tutela_urgencia or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-journal-bookmark"></i>
+        </span>
+        <div>
+            <h3>Fundamentação e pedidos</h3>
+            <p>Organize a base jurídica e os pedidos possíveis para a demanda.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="fundamentos_juridicos" class="form-label">
+                Fundamentos jurídicos
+            </label>
+            <textarea
+                class="form-control"
+                id="fundamentos_juridicos"
+                name="fundamentos_juridicos"
+                rows="9"
+                maxlength="12000"
+                placeholder="Indique legislação, precedentes, princípios, teses e fundamentos aplicáveis."
+            >{{ ficha.fundamentos_juridicos or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="pedidos_sugeridos" class="form-label">
+                Pedidos sugeridos
+            </label>
+            <textarea
+                class="form-control"
+                id="pedidos_sugeridos"
+                name="pedidos_sugeridos"
+                rows="9"
+                maxlength="12000"
+                placeholder="Liste pedidos principais, acessórios, provisórios, cautelares e providências finais."
+            >{{ ficha.pedidos_sugeridos or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-search"></i>
+        </span>
+        <div>
+            <h3>Provas, riscos e estratégia</h3>
+            <p>Registre o que ainda precisa ser produzido e os principais pontos de atenção.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="provas_necessarias" class="form-label">
+                Provas necessárias
+            </label>
+            <textarea
+                class="form-control"
+                id="provas_necessarias"
+                name="provas_necessarias"
+                rows="8"
+                maxlength="10000"
+                placeholder="Informe documentos, testemunhas, perícias, estudos psicossociais, ofícios e outras provas."
+            >{{ ficha.provas_necessarias or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="riscos_processo" class="form-label">
+                Riscos do processo
+            </label>
+            <textarea
+                class="form-control"
+                id="riscos_processo"
+                name="riscos_processo"
+                rows="8"
+                maxlength="10000"
+                placeholder="Descreva riscos jurídicos, probatórios, financeiros, processuais e pessoais."
+            >{{ ficha.riscos_processo or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="estrategia_sugerida" class="form-label">
+                Estratégia sugerida
+            </label>
+            <textarea
+                class="form-control"
+                id="estrategia_sugerida"
+                name="estrategia_sugerida"
+                rows="8"
+                maxlength="10000"
+                placeholder="Indique a medida recomendada, ordem das providências, possibilidade de composição e estratégia processual."
+            >{{ ficha.estrategia_sugerida or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="providencias_iniciais" class="form-label">
+                Providências iniciais
+            </label>
+            <textarea
+                class="form-control"
+                id="providencias_iniciais"
+                name="providencias_iniciais"
+                rows="8"
+                maxlength="10000"
+                placeholder="Liste documentos a solicitar, consultas, notificações, diligências, contatos e medidas urgentes."
+            >{{ ficha.providencias_iniciais or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-people"></i>
+        </span>
+        <div>
+            <h3>Possibilidade de acordo</h3>
+            <p>Avalie a viabilidade de solução consensual e os possíveis termos.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    role="switch"
+                    id="possibilidade_acordo"
+                    name="possibilidade_acordo"
+                    {% if ficha.possibilidade_acordo %}checked{% endif %}
+                >
+                <label class="form-check-label" for="possibilidade_acordo">
+                    Existe possibilidade de acordo?
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12" id="grupo_termos_acordo">
+            <label for="termos_possivel_acordo" class="form-label">
+                Termos do possível acordo
+            </label>
+            <textarea
+                class="form-control"
+                id="termos_possivel_acordo"
+                name="termos_possivel_acordo"
+                rows="7"
+                maxlength="10000"
+                placeholder="Descreva concessões possíveis, limites do cliente, condições, prazos, valores e pontos inegociáveis."
+            >{{ ficha.termos_possivel_acordo or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-clipboard-check"></i>
+        </span>
+        <div>
+            <h3>Conclusão da análise</h3>
+            <p>Defina a viabilidade e registre o parecer jurídico inicial.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-5">
+            <label for="viabilidade_demanda" class="form-label">
+                Viabilidade da demanda
+            </label>
+            <select
+                class="form-select"
+                id="viabilidade_demanda"
+                name="viabilidade_demanda"
+            >
+                {% for codigo, rotulo in viabilidades.items() %}
+                <option
+                    value="{{ codigo }}"
+                    {% if ficha.viabilidade_demanda == codigo %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label for="parecer_inicial" class="form-label">
+                Parecer jurídico inicial
+            </label>
+            <textarea
+                class="form-control"
+                id="parecer_inicial"
+                name="parecer_inicial"
+                rows="10"
+                maxlength="15000"
+                placeholder="Apresente a conclusão técnica, a solução recomendada, os fundamentos principais e as orientações transmitidas ao cliente."
+            >{{ ficha.parecer_inicial or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="observacoes_gerais" class="form-label">
+                Observações gerais
+            </label>
+            <textarea
+                class="form-control"
+                id="observacoes_gerais"
+                name="observacoes_gerais"
+                rows="6"
+                maxlength="8000"
+                placeholder="Registre ressalvas, informações adicionais, decisões internas e pontos que deverão ser acompanhados."
+            >{{ ficha.observacoes_gerais or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+
+<section class="civel-section">
+    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div>
+            <h3 class="h5 mb-1">
+                <i class="bi bi-file-earmark-pdf me-2"></i>
+                Ficha completa
+            </h3>
+            <p class="text-muted mb-0">
+                Gere o PDF completo da ficha de Direito de Família no mesmo padrão das demais áreas.
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('atendimentos.gerar_pdf_familia', atendimento_id=atendimento.id) }}"
+            class="btn btn-danger"
+        >
+            <i class="bi bi-file-earmark-pdf me-2"></i>
+            Gerar PDF
+        </a>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const prevencao = document.getElementById("existe_prevencao");
+    const grupoPrevencao = document.getElementById("grupo_processo_prevento");
+    const processoPrevento = document.getElementById("processo_prevento");
+
+    const tutela = document.getElementById("necessidade_tutela_urgencia");
+    const grupoTutela = document.getElementById("grupo_tutela_urgencia");
+    const fundamentosTutela = document.getElementById(
+        "fundamentos_tutela_urgencia"
+    );
+
+    const acordo = document.getElementById("possibilidade_acordo");
+    const grupoAcordo = document.getElementById("grupo_termos_acordo");
+    const termosAcordo = document.getElementById("termos_possivel_acordo");
+
+    function atualizarPrevencao() {
+        const mostrar = prevencao.checked;
+        grupoPrevencao.classList.toggle("d-none", !mostrar);
+        processoPrevento.disabled = !mostrar;
+
+        if (!mostrar) {
+            processoPrevento.value = "";
+        }
+    }
+
+    function atualizarTutela() {
+        const mostrar = tutela.checked;
+        grupoTutela.classList.toggle("d-none", !mostrar);
+        fundamentosTutela.disabled = !mostrar;
+
+        if (!mostrar) {
+            fundamentosTutela.value = "";
+        }
+    }
+
+    function atualizarAcordo() {
+        const mostrar = acordo.checked;
+        grupoAcordo.classList.toggle("d-none", !mostrar);
+        termosAcordo.disabled = !mostrar;
+
+        if (!mostrar) {
+            termosAcordo.value = "";
+        }
+    }
+
+    prevencao.addEventListener("change", atualizarPrevencao);
+    tutela.addEventListener("change", atualizarTutela);
+    acordo.addEventListener("change", atualizarAcordo);
+
+    atualizarPrevencao();
+    atualizarTutela();
+    atualizarAcordo();
+});
+</script>
+
+{% endblock %}

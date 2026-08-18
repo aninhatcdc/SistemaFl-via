@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% from "components/pagination.html" import pagination %}
+
+{% block titulo %}
+Clientes
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Clientes</h2>
+
+    <a href="{{ url_for('clientes.novo_cliente') }}"
+       class="btn btn-primary">
+        + Novo Cliente
+    </a>
+</div>
+
+<form method="GET"
+      action="{{ url_for('clientes.listar_clientes') }}"
+      class="mb-4">
+
+    <div class="input-group">
+
+        <input type="text"
+               name="q"
+               class="form-control"
+               placeholder="Pesquisar por nome, CPF, WhatsApp ou área jurídica..."
+               value="{{ termo }}">
+
+        <button class="btn btn-dark"
+                type="submit">
+            🔍 Pesquisar
+        </button>
+
+        <a href="{{ url_for('clientes.listar_clientes') }}"
+           class="btn btn-secondary">
+            Limpar
+        </a>
+
+    </div>
+
+</form>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+
+        {% if clientes.items %}
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>WhatsApp</th>
+                        <th>Área</th>
+                        <th>Status</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for cliente in clientes.items %}
+
+                    <tr>
+
+                        <td>
+                            <a href="{{ url_for('clientes.detalhes_cliente', id=cliente.id) }}"
+                               class="fw-bold text-decoration-none">
+                                {{ cliente.nome }}
+                            </a>
+                        </td>
+
+                        <td>{{ cliente.cpf or "-" }}</td>
+
+                        <td>{{ cliente.whatsapp or "-" }}</td>
+
+                        <td>{{ cliente.area_juridica or "-" }}</td>
+
+                        <td>
+                            {% if cliente.ativo %}
+                                <span class="badge bg-success">
+                                    Ativo
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">
+                                    Inativo
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center">
+
+                            <a href="{{ url_for('clientes.editar_cliente', id=cliente.id) }}"
+                               class="btn btn-warning btn-sm">
+                                ✏ Editar
+                            </a>
+
+                            <form action="{{ url_for('clientes.excluir_cliente', id=cliente.id) }}"
+                                  method="POST"
+                                  style="display:inline;">
+
+                                <button type="submit"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Tem certeza que deseja excluir este cliente?')">
+                                    🗑 Excluir
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {{ pagination(
+                clientes,
+                "clientes.listar_clientes",
+                termo
+            ) }}
+
+        {% else %}
+
+            <div class="text-center py-4">
+
+                <p class="mb-1">
+                    Nenhum cliente encontrado.
+                </p>
+
+                <small class="text-muted">
+                    Cadastre um novo cliente ou altere os termos da pesquisa.
+                </small>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,119 @@
+{% extends "atendimentos/civel/layout.html" %}
+
+{% block titulo %}Documentos | Ficha Cível{% endblock %}
+
+{% block form_action %}
+{{ url_for("atendimentos.etapa_documentos_civel", atendimento_id=atendimento.id) }}
+{% endblock %}
+
+{% block etapa_titulo %}Documentos{% endblock %}
+
+{% block etapa_descricao %}
+Registre os documentos disponíveis, entregues e ainda pendentes.
+{% endblock %}
+
+{% block etapa_identificacao %}Etapa 8 de 9{% endblock %}
+
+{% block etapa_alertas %}
+<div class="civel-info-box">
+    <i class="bi bi-info-circle"></i>
+    <div>
+        Marque a situação de cada documento e descreva claramente
+        o que já foi entregue e o que ainda precisa ser solicitado.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-folder-check"></i>
+        </span>
+        <div>
+            <h3>Checklist de documentos</h3>
+            <p>Informe quais documentos o cliente possui.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos = [
+            ("possui_documento_identificacao", "Documento de identificação"),
+            ("possui_comprovante_residencia", "Comprovante de residência"),
+            ("possui_contrato", "Contrato"),
+            ("possui_comprovantes", "Comprovantes de pagamento ou despesas"),
+            ("possui_conversas", "Conversas, mensagens ou e-mails"),
+            ("possui_fotos", "Fotos"),
+            ("possui_audios", "Áudios"),
+            ("possui_videos", "Vídeos"),
+            ("possui_laudos", "Laudos ou relatórios"),
+            ("possui_orcamentos", "Orçamentos"),
+            ("possui_notificacoes", "Notificações"),
+            ("possui_boletim_ocorrencia", "Boletim de ocorrência")
+        ] %}
+
+        {% for campo, rotulo in documentos %}
+        <div class="col-md-6">
+            <label for="{{ campo }}" class="form-label">{{ rotulo }}</label>
+            <select class="form-select" id="{{ campo }}" name="{{ campo }}">
+                <option value="">Selecione</option>
+                {% for codigo, nome in respostas.items() %}
+                <option value="{{ codigo }}"
+                    {% if ficha|attr(campo) == codigo %}selected{% endif %}>
+                    {{ nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-files"></i>
+        </span>
+        <div>
+            <h3>Controle documental</h3>
+            <p>Descreva outros documentos, entregas e pendências.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="outros_documentos" class="form-label">
+                Outros documentos
+            </label>
+            <textarea class="form-control" id="outros_documentos"
+                      name="outros_documentos" rows="3">{{ ficha.outros_documentos or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="documentos_entregues" class="form-label">
+                Documentos entregues
+            </label>
+            <textarea class="form-control" id="documentos_entregues"
+                      name="documentos_entregues" rows="5"
+                      placeholder="Liste os documentos já recebidos.">{{ ficha.documentos_entregues or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="documentos_pendentes" class="form-label">
+                Documentos pendentes
+            </label>
+            <textarea class="form-control" id="documentos_pendentes"
+                      name="documentos_pendentes" rows="5"
+                      placeholder="Liste os documentos que ainda precisam ser entregues.">{{ ficha.documentos_pendentes or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="observacoes_documentos" class="form-label">
+                Observações
+            </label>
+            <textarea class="form-control" id="observacoes_documentos"
+                      name="observacoes_documentos" rows="4">{{ ficha.observacoes_documentos or '' }}</textarea>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,612 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+    Cliente — Família #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_cliente_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+    Dados do cliente
+{% endblock %}
+
+{% block etapa_descricao %}
+    Complete as informações pessoais, econômicas e familiares relevantes para a demanda.
+{% endblock %}
+
+{% block etapa_identificacao %}
+    Etapa 2 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+    <div class="civel-info-box">
+
+        <i class="bi bi-info-circle-fill"></i>
+
+        <div>
+            Os dados básicos abaixo são exibidos a partir do cadastro do cliente.
+            Complete somente as informações complementares necessárias para a
+            análise da demanda de Família.
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+    <!-- =====================================================
+         DADOS DO CADASTRO
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-person-vcard"></i>
+            </span>
+
+            <div>
+                <h3>Dados do cadastro</h3>
+                <p>Informações gerais vinculadas ao cadastro principal do cliente.</p>
+            </div>
+
+        </div>
+
+
+        {% if cliente %}
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label for="cliente_nome" class="form-label">
+                        Nome completo
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_nome"
+                        value="{{ cliente.nome or 'Não informado' }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <label for="cliente_cpf" class="form-label">
+                        CPF
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_cpf"
+                        value="{{ cliente.cpf or 'Não informado' }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <label for="cliente_nascimento" class="form-label">
+                        Data de nascimento
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_nascimento"
+                        value="{% if cliente.data_nascimento %}{{ cliente.data_nascimento.strftime('%d/%m/%Y') }}{% else %}Não informado{% endif %}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label for="cliente_contato" class="form-label">
+                        Telefone ou WhatsApp
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_contato"
+                        value="{{ cliente.whatsapp or cliente.telefone or 'Não informado' }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label for="cliente_email" class="form-label">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_email"
+                        value="{{ cliente.email or 'Não informado' }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <label for="cliente_endereco" class="form-label">
+                        Endereço cadastrado
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_endereco"
+                        value="{% if cliente.rua %}{{ cliente.rua }}{% if cliente.numero %}, {{ cliente.numero }}{% endif %}{% if cliente.bairro %} — {{ cliente.bairro }}{% endif %}{% if cliente.cidade %} — {{ cliente.cidade }}{% endif %}{% if cliente.estado %}/{{ cliente.estado }}{% endif %}{% else %}Não informado{% endif %}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <a
+                        href="{{ url_for(
+                            'clientes.detalhes_cliente',
+                            id=cliente.id
+                        ) }}"
+                        class="btn btn-sm btn-outline-secondary"
+                        target="_blank"
+                    >
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        Abrir cadastro completo do cliente
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-warning mb-0">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                Não foi encontrado um cliente vinculado a este atendimento.
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         SITUAÇÃO PESSOAL E ECONÔMICA
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-person-lines-fill"></i>
+            </span>
+
+            <div>
+                <h3>Situação pessoal e econômica</h3>
+                <p>Registre a situação atual informada durante o atendimento.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label for="cliente_estado_civil" class="form-label">
+                    Estado civil atual
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="cliente_estado_civil"
+                    name="cliente_estado_civil"
+                    maxlength="50"
+                    value="{{ ficha.cliente_estado_civil or '' }}"
+                    placeholder="Ex.: Solteiro, casado, divorciado ou união estável"
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label for="cliente_profissao" class="form-label">
+                    Profissão ou ocupação atual
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="cliente_profissao"
+                    name="cliente_profissao"
+                    maxlength="120"
+                    value="{{ ficha.cliente_profissao or '' }}"
+                    placeholder="Ex.: Professora, autônomo ou desempregado"
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label for="cliente_renda_mensal" class="form-label">
+                    Renda mensal aproximada
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">R$</span>
+
+                    <input
+                        type="text"
+                        inputmode="decimal"
+                        class="form-control"
+                        id="cliente_renda_mensal"
+                        name="cliente_renda_mensal"
+                        value="{% if ficha.cliente_renda_mensal is not none %}{{ '%.2f'|format(ficha.cliente_renda_mensal)|replace('.', ',') }}{% endif %}"
+                        placeholder="0,00"
+                    >
+
+                </div>
+
+                <div class="form-text">
+                    Informe uma estimativa quando o cliente não souber o valor exato.
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label for="cliente_reside_com_quem" class="form-label">
+                    Com quem o cliente reside atualmente?
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="cliente_reside_com_quem"
+                    name="cliente_reside_com_quem"
+                    maxlength="200"
+                    value="{{ ficha.cliente_reside_com_quem or '' }}"
+                    placeholder="Ex.: Sozinho, com os filhos, com os pais ou com o companheiro"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DEPENDENTES
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-people"></i>
+            </span>
+
+            <div>
+                <h3>Dependentes</h3>
+                <p>Informe pessoas que dependem econômica ou diretamente do cliente.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label for="cliente_dependentes" class="form-label">
+                    Dependentes do cliente
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="cliente_dependentes"
+                    name="cliente_dependentes"
+                    rows="5"
+                    maxlength="3000"
+                    placeholder="Informe nome, idade, parentesco e, quando relevante, a forma de dependência."
+                >{{ ficha.cliente_dependentes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DEFICIÊNCIA OU NECESSIDADE ESPECIAL
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-universal-access"></i>
+            </span>
+
+            <div>
+                <h3>Deficiência ou necessidade especial</h3>
+                <p>Registre condições relevantes para o atendimento e para a demanda.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="cliente_possui_deficiencia"
+                        name="cliente_possui_deficiencia"
+                        {% if ficha.cliente_possui_deficiencia %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="cliente_possui_deficiencia"
+                    >
+                        O cliente possui deficiência ou necessidade especial?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-12"
+                id="grupo_cliente_descricao_deficiencia"
+            >
+
+                <label
+                    for="cliente_descricao_deficiencia"
+                    class="form-label"
+                >
+                    Descrição
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="cliente_descricao_deficiencia"
+                    name="cliente_descricao_deficiencia"
+                    rows="4"
+                    maxlength="3000"
+                    placeholder="Descreva a condição, as limitações e os cuidados necessários."
+                >{{ ficha.cliente_descricao_deficiencia or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         BENEFÍCIOS
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-wallet2"></i>
+            </span>
+
+            <div>
+                <h3>Benefícios recebidos</h3>
+                <p>Informe benefícios previdenciários, assistenciais ou sociais.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="cliente_recebe_beneficio"
+                        name="cliente_recebe_beneficio"
+                        {% if ficha.cliente_recebe_beneficio %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="cliente_recebe_beneficio"
+                    >
+                        O cliente recebe algum benefício?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-12"
+                id="grupo_cliente_beneficio_descricao"
+            >
+
+                <label
+                    for="cliente_beneficio_descricao"
+                    class="form-label"
+                >
+                    Qual benefício?
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="cliente_beneficio_descricao"
+                    name="cliente_beneficio_descricao"
+                    maxlength="200"
+                    value="{{ ficha.cliente_beneficio_descricao or '' }}"
+                    placeholder="Ex.: Bolsa Família, BPC, aposentadoria ou pensão"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         OBSERVAÇÕES
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-journal-text"></i>
+            </span>
+
+            <div>
+                <h3>Observações sobre o cliente</h3>
+                <p>Registre informações complementares relevantes para o caso.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label for="observacoes_cliente" class="form-label">
+                    Observações
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="observacoes_cliente"
+                    name="observacoes_cliente"
+                    rows="6"
+                    maxlength="5000"
+                    placeholder="Registre vulnerabilidades, dificuldades de comunicação, rede de apoio, pendências documentais ou outras informações relevantes."
+                >{{ ficha.observacoes_cliente or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const possuiDeficiencia = document.getElementById(
+                "cliente_possui_deficiencia"
+            );
+            const grupoDeficiencia = document.getElementById(
+                "grupo_cliente_descricao_deficiencia"
+            );
+            const descricaoDeficiencia = document.getElementById(
+                "cliente_descricao_deficiencia"
+            );
+
+            const recebeBeneficio = document.getElementById(
+                "cliente_recebe_beneficio"
+            );
+            const grupoBeneficio = document.getElementById(
+                "grupo_cliente_beneficio_descricao"
+            );
+            const descricaoBeneficio = document.getElementById(
+                "cliente_beneficio_descricao"
+            );
+
+            function atualizarDeficiencia() {
+                const mostrar = possuiDeficiencia.checked;
+
+                grupoDeficiencia.classList.toggle("d-none", !mostrar);
+                descricaoDeficiencia.disabled = !mostrar;
+
+                if (!mostrar) {
+                    descricaoDeficiencia.value = "";
+                }
+            }
+
+            function atualizarBeneficio() {
+                const mostrar = recebeBeneficio.checked;
+
+                grupoBeneficio.classList.toggle("d-none", !mostrar);
+                descricaoBeneficio.disabled = !mostrar;
+
+                if (!mostrar) {
+                    descricaoBeneficio.value = "";
+                }
+            }
+
+            possuiDeficiencia.addEventListener(
+                "change",
+                atualizarDeficiencia
+            );
+
+            recebeBeneficio.addEventListener(
+                "change",
+                atualizarBeneficio
+            );
+
+            atualizarDeficiencia();
+            atualizarBeneficio();
+        });
+    </script>
+
+{% endblock %}

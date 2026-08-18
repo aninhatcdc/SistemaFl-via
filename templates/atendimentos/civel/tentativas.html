@@ -1,0 +1,490 @@
+{% extends "atendimentos/civel/layout.html" %}
+
+{% block titulo %}
+Tentativas de solução | Ficha Cível
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_tentativas_civel",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Tentativas de solução
+{% endblock %}
+
+{% block etapa_descricao %}
+Registre os contatos, propostas, reclamações e demais providências
+adotadas antes do possível ajuizamento da ação.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 7 de 9
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="civel-info-box">
+    <i class="bi bi-info-circle"></i>
+    <div>
+        Informe protocolos, datas, números de ocorrências e processos
+        anteriores sempre que esses dados estiverem disponíveis.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-chat-dots"></i>
+        </span>
+
+        <div>
+            <h3>Contato e proposta de acordo</h3>
+            <p>
+                Registre as tentativas diretas de diálogo e negociação
+                com a parte contrária.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="houve_contato_parte_contraria" class="form-label">
+                Houve contato com a parte contrária?
+            </label>
+
+            <select class="form-select"
+                    id="houve_contato_parte_contraria"
+                    name="houve_contato_parte_contraria">
+                <option value="">Selecione</option>
+
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.houve_contato_parte_contraria == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="houve_proposta_acordo" class="form-label">
+                Houve proposta de acordo?
+            </label>
+
+            <select class="form-select"
+                    id="houve_proposta_acordo"
+                    name="houve_proposta_acordo">
+                <option value="">Selecione</option>
+
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.houve_proposta_acordo == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6 campo-condicional"
+             data-condicional="houve_contato_parte_contraria">
+            <label for="descricao_contatos" class="form-label">
+                Descrição dos contatos
+            </label>
+
+            <textarea class="form-control"
+                      id="descricao_contatos"
+                      name="descricao_contatos"
+                      rows="5"
+                      placeholder="Informe datas, meios utilizados e o conteúdo principal das conversas.">{{ ficha.descricao_contatos or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6 campo-condicional"
+             data-condicional="houve_proposta_acordo">
+            <label for="descricao_proposta_acordo" class="form-label">
+                Descrição da proposta de acordo
+            </label>
+
+            <textarea class="form-control"
+                      id="descricao_proposta_acordo"
+                      name="descricao_proposta_acordo"
+                      rows="5"
+                      placeholder="Informe valores, condições, prazos e o resultado da proposta.">{{ ficha.descricao_proposta_acordo or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-envelope-paper"></i>
+        </span>
+
+        <div>
+            <h3>Notificação extrajudicial</h3>
+            <p>
+                Informe se houve notificação formal e se a parte
+                contrária apresentou resposta.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="enviou_notificacao_extrajudicial" class="form-label">
+                Enviou notificação extrajudicial?
+            </label>
+
+            <select class="form-select"
+                    id="enviou_notificacao_extrajudicial"
+                    name="enviou_notificacao_extrajudicial">
+                <option value="">Selecione</option>
+
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.enviou_notificacao_extrajudicial == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4 campo-condicional"
+             data-condicional="enviou_notificacao_extrajudicial">
+            <label for="data_notificacao_extrajudicial" class="form-label">
+                Data da notificação
+            </label>
+
+            <input type="date"
+                   class="form-control"
+                   id="data_notificacao_extrajudicial"
+                   name="data_notificacao_extrajudicial"
+                   value="{{ ficha.data_notificacao_extrajudicial.strftime('%Y-%m-%d') if ficha.data_notificacao_extrajudicial else '' }}">
+        </div>
+
+        <div class="col-md-4 campo-condicional"
+             data-condicional="enviou_notificacao_extrajudicial">
+            <label for="houve_resposta_notificacao" class="form-label">
+                Houve resposta?
+            </label>
+
+            <select class="form-select"
+                    id="houve_resposta_notificacao"
+                    name="houve_resposta_notificacao">
+                <option value="">Selecione</option>
+
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.houve_resposta_notificacao == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12 campo-condicional"
+             data-condicional="houve_resposta_notificacao">
+            <label for="descricao_resposta_notificacao" class="form-label">
+                Descrição da resposta
+            </label>
+
+            <textarea class="form-control"
+                      id="descricao_resposta_notificacao"
+                      name="descricao_resposta_notificacao"
+                      rows="4">{{ ficha.descricao_resposta_notificacao or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-building-check"></i>
+        </span>
+
+        <div>
+            <h3>Reclamação administrativa</h3>
+            <p>
+                Registre reclamações feitas em órgãos públicos,
+                agências reguladoras ou plataformas administrativas.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="fez_reclamacao_administrativa" class="form-label">
+                Fez reclamação administrativa?
+            </label>
+
+            <select class="form-select"
+                    id="fez_reclamacao_administrativa"
+                    name="fez_reclamacao_administrativa">
+                <option value="">Selecione</option>
+
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.fez_reclamacao_administrativa == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4 campo-condicional"
+             data-condicional="fez_reclamacao_administrativa">
+            <label for="orgao_reclamacao" class="form-label">
+                Órgão ou plataforma
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   id="orgao_reclamacao"
+                   name="orgao_reclamacao"
+                   value="{{ ficha.orgao_reclamacao or '' }}"
+                   placeholder="Ex.: Procon, Banco Central, consumidor.gov.br">
+        </div>
+
+        <div class="col-md-4 campo-condicional"
+             data-condicional="fez_reclamacao_administrativa">
+            <label for="protocolo_reclamacao" class="form-label">
+                Número do protocolo
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   id="protocolo_reclamacao"
+                   name="protocolo_reclamacao"
+                   value="{{ ficha.protocolo_reclamacao or '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-shield-exclamation"></i>
+        </span>
+
+        <div>
+            <h3>Boletim de ocorrência</h3>
+            <p>
+                Informe o registro policial relacionado aos fatos,
+                quando houver.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="registrou_boletim_ocorrencia" class="form-label">
+                Registrou boletim de ocorrência?
+            </label>
+
+            <select class="form-select"
+                    id="registrou_boletim_ocorrencia"
+                    name="registrou_boletim_ocorrencia">
+                <option value="">Selecione</option>
+
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.registrou_boletim_ocorrencia == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4 campo-condicional"
+             data-condicional="registrou_boletim_ocorrencia">
+            <label for="numero_boletim_ocorrencia" class="form-label">
+                Número do boletim
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   id="numero_boletim_ocorrencia"
+                   name="numero_boletim_ocorrencia"
+                   value="{{ ficha.numero_boletim_ocorrencia or '' }}">
+        </div>
+
+        <div class="col-md-4 campo-condicional"
+             data-condicional="registrou_boletim_ocorrencia">
+            <label for="data_boletim_ocorrencia" class="form-label">
+                Data do boletim
+            </label>
+
+            <input type="date"
+                   class="form-control"
+                   id="data_boletim_ocorrencia"
+                   name="data_boletim_ocorrencia"
+                   value="{{ ficha.data_boletim_ocorrencia.strftime('%Y-%m-%d') if ficha.data_boletim_ocorrencia else '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-journal-check"></i>
+        </span>
+
+        <div>
+            <h3>Processo anterior</h3>
+            <p>
+                Registre ações judiciais anteriores relacionadas
+                aos mesmos fatos ou às mesmas partes.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="existe_processo_anterior" class="form-label">
+                Existe processo anterior?
+            </label>
+
+            <select class="form-select"
+                    id="existe_processo_anterior"
+                    name="existe_processo_anterior">
+                <option value="">Selecione</option>
+
+                {% for codigo, nome in respostas.items() %}
+                    <option value="{{ codigo }}"
+                        {% if ficha.existe_processo_anterior == codigo %}selected{% endif %}>
+                        {{ nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-8 campo-condicional"
+             data-condicional="existe_processo_anterior">
+            <label for="numero_processo_anterior" class="form-label">
+                Número do processo anterior
+            </label>
+
+            <input type="text"
+                   class="form-control"
+                   id="numero_processo_anterior"
+                   name="numero_processo_anterior"
+                   value="{{ ficha.numero_processo_anterior or '' }}">
+        </div>
+
+        <div class="col-12 campo-condicional"
+             data-condicional="existe_processo_anterior">
+            <label for="resultado_processo_anterior" class="form-label">
+                Resultado ou situação do processo anterior
+            </label>
+
+            <textarea class="form-control"
+                      id="resultado_processo_anterior"
+                      name="resultado_processo_anterior"
+                      rows="4">{{ ficha.resultado_processo_anterior or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon">
+            <i class="bi bi-card-text"></i>
+        </span>
+
+        <div>
+            <h3>Observações</h3>
+            <p>
+                Acrescente informações relevantes sobre as medidas
+                já adotadas pelo cliente.
+            </p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="observacoes_tentativas" class="form-label">
+                Observações sobre as tentativas de solução
+            </label>
+
+            <textarea class="form-control"
+                      id="observacoes_tentativas"
+                      name="observacoes_tentativas"
+                      rows="5">{{ ficha.observacoes_tentativas or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const regras = [
+        "houve_contato_parte_contraria",
+        "houve_proposta_acordo",
+        "enviou_notificacao_extrajudicial",
+        "houve_resposta_notificacao",
+        "fez_reclamacao_administrativa",
+        "registrou_boletim_ocorrencia",
+        "existe_processo_anterior"
+    ];
+
+    function atualizarCampo(nome) {
+        const seletor = document.getElementById(nome);
+        const dependentes = document.querySelectorAll(
+            '[data-condicional="' + nome + '"]'
+        );
+
+        if (!seletor) {
+            return;
+        }
+
+        const mostrar = seletor.value === "SIM";
+
+        dependentes.forEach(function (elemento) {
+            elemento.classList.toggle(
+                "campo-condicional-visivel",
+                mostrar
+            );
+
+            elemento.querySelectorAll("input, textarea, select")
+                .forEach(function (campo) {
+                    campo.disabled = !mostrar;
+
+                    if (!mostrar) {
+                        campo.value = "";
+                    }
+                });
+        });
+    }
+
+    regras.forEach(function (nome) {
+        const seletor = document.getElementById(nome);
+
+        if (seletor) {
+            seletor.addEventListener("change", function () {
+                atualizarCampo(nome);
+
+                if (nome === "enviou_notificacao_extrajudicial") {
+                    atualizarCampo("houve_resposta_notificacao");
+                }
+            });
+        }
+
+        atualizarCampo(nome);
+    });
+});
+</script>
+
+{% endblock %}

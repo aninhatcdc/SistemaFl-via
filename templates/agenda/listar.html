@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+{% from "components/agenda_section.html" import agenda_section %}
+
+{% block titulo %}
+Agenda
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+
+    {{ page_header(
+        "📅 Agenda",
+        "Compromissos, audiências, reuniões, tarefas e prazos."
+    ) }}
+
+    <a href="{{ url_for('agenda.novo_evento') }}"
+       class="btn btn-primary">
+        + Novo Evento
+    </a>
+
+</div>
+
+{{ agenda_section(
+    "🔴 Atrasados",
+    eventos_atrasados,
+    "danger"
+) }}
+
+{{ agenda_section(
+    "📅 Hoje",
+    eventos_hoje,
+    "primary"
+) }}
+
+{{ agenda_section(
+    "🟠 Amanhã",
+    eventos_amanha,
+    "warning"
+) }}
+
+{{ agenda_section(
+    "🟢 Próximos 7 dias",
+    eventos_semana,
+    "success"
+) }}
+
+{{ agenda_section(
+    "📆 Eventos Futuros",
+    eventos_futuros,
+    "secondary"
+) }}
+
+{{ agenda_section(
+    "✅ Concluídos",
+    eventos_concluidos,
+    "dark"
+) }}
+
+{% if not eventos_atrasados
+   and not eventos_hoje
+   and not eventos_amanha
+   and not eventos_semana
+   and not eventos_futuros
+   and not eventos_concluidos %}
+
+    <div class="card shadow-sm">
+
+        <div class="card-body text-center py-5">
+
+            <h5 class="text-muted">
+                📅 Nenhum evento cadastrado
+            </h5>
+
+            <p class="text-muted">
+                Cadastre uma audiência, reunião, tarefa, prazo ou outro compromisso.
+            </p>
+
+            <a href="{{ url_for('agenda.novo_evento') }}"
+               class="btn btn-primary">
+                + Novo Evento
+            </a>
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

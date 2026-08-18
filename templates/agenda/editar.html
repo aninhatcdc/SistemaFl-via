@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Editar Evento
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "✏ Editar Evento",
+    "Atualize as informações do compromisso."
+) }}
+
+<form method="POST">
+
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-warning">
+            Dados do Evento
+        </div>
+
+        <div class="card-body">
+
+            <div class="row">
+
+                <div class="col-md-8 mb-3">
+                    <label class="form-label">Título</label>
+
+                    <input
+                        type="text"
+                        name="titulo"
+                        class="form-control"
+                        value="{{ evento.titulo }}"
+                        required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">Tipo</label>
+
+                    <select
+                        name="tipo"
+                        class="form-select"
+                        required>
+
+                        {% for tipo in [
+                            "Audiência",
+                            "Reunião",
+                            "Prazo",
+                            "Tarefa",
+                            "Compromisso"
+                        ] %}
+
+                        <option
+                            value="{{ tipo }}"
+                            {% if evento.tipo == tipo %}selected{% endif %}>
+                            {{ tipo }}
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">Data</label>
+
+                    <input
+                        type="date"
+                        name="data"
+                        class="form-control"
+                        value="{{ evento.data.strftime('%Y-%m-%d') }}"
+                        required>
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">Horário</label>
+
+                    <input
+                        type="time"
+                        name="horario"
+                        class="form-control"
+                        value="{% if evento.horario %}{{ evento.horario.strftime('%H:%M') }}{% endif %}">
+
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label class="form-label">Local</label>
+
+                    <input
+                        type="text"
+                        name="local"
+                        class="form-control"
+                        value="{{ evento.local or '' }}">
+
+                </div>
+
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">Cliente</label>
+
+                    <select
+                        name="cliente_id"
+                        class="form-select">
+
+                        <option value="">Nenhum</option>
+
+                        {% for cliente in clientes %}
+
+                        <option
+                            value="{{ cliente.id }}"
+                            {% if evento.cliente_id == cliente.id %}selected{% endif %}>
+
+                            {{ cliente.nome }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6 mb-3">
+
+                    <label class="form-label">Processo</label>
+
+                    <select
+                        name="processo_id"
+                        class="form-select">
+
+                        <option value="">Nenhum</option>
+
+                        {% for processo in processos %}
+
+                        <option
+                            value="{{ processo.id }}"
+                            {% if evento.processo_id == processo.id %}selected{% endif %}>
+
+                            {{ processo.numero }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">Descrição</label>
+
+                <textarea
+                    name="descricao"
+                    rows="4"
+                    class="form-control">{{ evento.descricao or "" }}</textarea>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+
+        <a href="{{ url_for('agenda.listar_eventos') }}"
+           class="btn btn-secondary">
+
+            Cancelar
+
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-warning">
+
+            💾 Salvar Alterações
+
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

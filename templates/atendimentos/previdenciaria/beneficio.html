@@ -1,0 +1,348 @@
+{% extends "atendimentos/previdenciaria/layout.html" %}
+
+{% block title %}
+Benefício - Ficha Previdenciária
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_beneficio_previdenciario",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Benefício pretendido
+{% endblock %}
+
+{% block etapa_descricao %}
+Defina o benefício principal, alternativas possíveis e a análise preliminar dos requisitos.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 4 de 8
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="previdenciaria-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        O benefício alternativo pode ser usado quando houver mais de uma
+        estratégia possível para o caso.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-shield-check"></i>
+        </span>
+        <div>
+            <h3>Benefícios analisados</h3>
+            <p>Selecione o pedido principal e uma alternativa, quando aplicável.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="beneficio_principal" class="form-label">
+                Benefício principal
+            </label>
+            <select
+                class="form-select"
+                id="beneficio_principal"
+                name="beneficio_principal"
+                data-controla="grupo-beneficio-principal-outro"
+                data-exibir-quando="OUTRO"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in tipos_beneficio.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.beneficio_principal == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-beneficio-principal-outro"
+            class="col-lg-6 campo-condicional"
+        >
+            <label for="beneficio_principal_outro" class="form-label">
+                Outro benefício principal
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="beneficio_principal_outro"
+                name="beneficio_principal_outro"
+                maxlength="180"
+                value="{{ ficha.beneficio_principal_outro or '' }}"
+            >
+        </div>
+
+        <div class="col-lg-6">
+            <label for="beneficio_alternativo" class="form-label">
+                Benefício alternativo
+            </label>
+            <select
+                class="form-select"
+                id="beneficio_alternativo"
+                name="beneficio_alternativo"
+                data-controla="grupo-beneficio-alternativo-outro"
+                data-exibir-quando="OUTRO"
+            >
+                <option value="">Nenhum</option>
+                {% for valor, rotulo in tipos_beneficio.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.beneficio_alternativo == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-beneficio-alternativo-outro"
+            class="col-lg-6 campo-condicional"
+        >
+            <label for="beneficio_alternativo_outro" class="form-label">
+                Outro benefício alternativo
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="beneficio_alternativo_outro"
+                name="beneficio_alternativo_outro"
+                maxlength="180"
+                value="{{ ficha.beneficio_alternativo_outro or '' }}"
+            >
+        </div>
+
+        <div class="col-12">
+            <label for="objetivo_cliente" class="form-label">
+                Objetivo do cliente
+            </label>
+            <textarea
+                class="form-control"
+                id="objetivo_cliente"
+                name="objetivo_cliente"
+                rows="3"
+                placeholder="Descreva o que o cliente espera alcançar."
+            >{{ ficha.objetivo_cliente or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="motivo_pedido" class="form-label">
+                Motivo do pedido
+            </label>
+            <textarea
+                class="form-control"
+                id="motivo_pedido"
+                name="motivo_pedido"
+                rows="3"
+                placeholder="Explique os fatos que fundamentam o pedido previdenciário."
+            >{{ ficha.motivo_pedido or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-clipboard2-check"></i>
+        </span>
+        <div>
+            <h3>Análise dos requisitos</h3>
+            <p>Registre a situação preliminar dos principais requisitos previdenciários.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% set requisitos = [
+            (
+                "possui_qualidade_segurado",
+                "Possui qualidade de segurado?",
+                "qualidade_segurado_observacoes",
+                "Observações sobre a qualidade de segurado"
+            ),
+            (
+                "carencia_cumprida",
+                "A carência está cumprida?",
+                "carencia_observacoes",
+                "Observações sobre a carência"
+            ),
+            (
+                "possui_direito_adquirido",
+                "Possui direito adquirido?",
+                "direito_adquirido_observacoes",
+                "Fundamento e data do possível direito adquirido"
+            ),
+            (
+                "aplica_regra_transicao",
+                "Aplica-se alguma regra de transição?",
+                "regra_transicao_descricao",
+                "Descreva a regra de transição aplicável"
+            )
+        ] %}
+
+        {% for campo, pergunta, observacao, rotulo_observacao in requisitos %}
+        <div class="col-12">
+            <label for="{{ campo }}" class="form-label">
+                {{ pergunta }}
+            </label>
+            <select
+                class="form-select"
+                id="{{ campo }}"
+                name="{{ campo }}"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha|attr(campo) == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <div class="mt-3">
+                <label for="{{ observacao }}" class="form-label">
+                    {{ rotulo_observacao }}
+                </label>
+                <textarea
+                    class="form-control"
+                    id="{{ observacao }}"
+                    name="{{ observacao }}"
+                    rows="3"
+                >{{ ficha|attr(observacao) or '' }}</textarea>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-calendar-check"></i>
+        </span>
+        <div>
+            <h3>Previsão e estimativa</h3>
+            <p>Informe a previsão de concessão e a renda mensal estimada.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="data_prevista_beneficio" class="form-label">
+                Data prevista para o benefício
+            </label>
+            <input
+                type="date"
+                class="form-control"
+                id="data_prevista_beneficio"
+                name="data_prevista_beneficio"
+                value="{{ ficha.data_prevista_beneficio.strftime('%Y-%m-%d') if ficha.data_prevista_beneficio else '' }}"
+            >
+        </div>
+
+        <div class="col-lg-6">
+            <label for="renda_mensal_estimada" class="form-label">
+                Renda mensal estimada
+            </label>
+            <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input
+                    type="text"
+                    class="form-control"
+                    id="renda_mensal_estimada"
+                    name="renda_mensal_estimada"
+                    value="{{ ('%.2f'|format(ficha.renda_mensal_estimada)) if ficha.renda_mensal_estimada is not none else '' }}"
+                    placeholder="0,00"
+                >
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+        <div>
+            <h3>Observações</h3>
+            <p>Registre conclusões, riscos e pontos que ainda precisam de análise.</p>
+        </div>
+    </div>
+
+    <label for="observacoes_beneficio" class="form-label">
+        Observações sobre o benefício
+    </label>
+    <textarea
+        class="form-control"
+        id="observacoes_beneficio"
+        name="observacoes_beneficio"
+        rows="5"
+        placeholder="Registre requisitos pendentes, documentos necessários e estratégias possíveis."
+    >{{ ficha.observacoes_beneficio or '' }}</textarea>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function atualizarCampoCondicional(controle) {
+            const alvoId = controle.dataset.controla;
+            const valorExibicao = controle.dataset.exibirQuando;
+            const alvo = document.getElementById(alvoId);
+
+            if (!alvo) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorExibicao;
+
+            alvo.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            alvo.querySelectorAll("input, select, textarea").forEach(
+                function (campo) {
+                    campo.disabled = !deveExibir;
+                }
+            );
+        }
+
+        document.querySelectorAll("[data-controla]").forEach(
+            function (controle) {
+                atualizarCampoCondicional(controle);
+
+                controle.addEventListener("change", function () {
+                    atualizarCampoCondicional(controle);
+                });
+            }
+        );
+    });
+</script>
+
+{% endblock %}

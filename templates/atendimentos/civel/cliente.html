@@ -1,0 +1,722 @@
+{% extends "atendimentos/civel/layout.html" %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .civel-section .civel-section-kicker {
+        display: block !important;
+        margin-bottom: 4px !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        line-height: 1.2 !important;
+        color: #64748b !important;
+    }
+
+    .civel-section .civel-section-title {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 0 16px 0 !important;
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        line-height: 1.25 !important;
+    }
+
+    .civel-section .civel-section-title i {
+        font-size: 22px !important;
+        line-height: 1 !important;
+    }
+
+    .civel-section-header {
+        margin-bottom: 16px !important;
+    }
+
+    .civel-section .form-label {
+        font-size: 14px !important;
+    }
+
+    .civel-section .form-control,
+    .civel-section .form-select,
+    .civel-section .input-group-text {
+        min-height: 42px !important;
+        font-size: 15px !important;
+    }
+
+    .civel-section .badge {
+        font-size: 12px !important;
+    }
+</style>
+
+<form method="POST">
+
+    <!-- ====================================================== -->
+    <!-- DADOS CADASTRAIS -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section mb-4">
+
+        <div class="civel-section-header">
+            <div>
+                <span class="civel-section-kicker">
+                    Identificação
+                </span>
+
+                <h2 class="civel-section-title">
+                    <i class="bi bi-person-vcard"></i>
+                    Dados cadastrais
+                </h2>
+            </div>
+
+            <span class="badge rounded-pill text-bg-light">
+                Somente leitura
+            </span>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label class="form-label">Nome completo</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.nome or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">CPF</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.cpf or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">RG</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.rg or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">
+                    Data de nascimento
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{
+                        cliente.data_nascimento.strftime('%d/%m/%Y')
+                        if cliente.data_nascimento
+                        else ''
+                    }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">
+                    Estado civil cadastrado
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.estado_civil or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">
+                    Profissão cadastrada
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.profissao or '' }}"
+                    readonly
+                >
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ====================================================== -->
+    <!-- CONTATO -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section mb-4">
+
+        <div class="civel-section-header">
+            <div>
+                <span class="civel-section-kicker">
+                    Comunicação
+                </span>
+
+                <h2 class="civel-section-title">
+                    <i class="bi bi-telephone"></i>
+                    Dados de contato
+                </h2>
+            </div>
+
+            <span class="badge rounded-pill text-bg-light">
+                Somente leitura
+            </span>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label class="form-label">Telefone</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.telefone or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">WhatsApp</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.whatsapp or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">E-mail</label>
+
+                <input
+                    type="email"
+                    class="form-control"
+                    value="{{ cliente.email or '' }}"
+                    readonly
+                >
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ====================================================== -->
+    <!-- ENDEREÇO -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section mb-4">
+
+        <div class="civel-section-header">
+            <div>
+                <span class="civel-section-kicker">
+                    Localização
+                </span>
+
+                <h2 class="civel-section-title">
+                    <i class="bi bi-geo-alt"></i>
+                    Endereço
+                </h2>
+            </div>
+
+            <span class="badge rounded-pill text-bg-light">
+                Somente leitura
+            </span>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+                <label class="form-label">CEP</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.cep or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Rua</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.rua or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Número</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.numero or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Complemento</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.complemento or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Bairro</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.bairro or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Cidade</label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    value="{{ cliente.cidade or '' }}"
+                    readonly
+                >
+            </div>
+
+            <div class="col-md-1">
+                <label class="form-label">UF</label>
+
+                <input
+                    type="text"
+                    class="form-control text-uppercase"
+                    value="{{ cliente.estado or '' }}"
+                    readonly
+                >
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ====================================================== -->
+    <!-- INFORMAÇÕES ATUAIS -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section mb-4">
+
+        <div class="civel-section-header">
+            <div>
+                <span class="civel-section-kicker">
+                    Informações complementares
+                </span>
+
+                <h2 class="civel-section-title">
+                    <i class="bi bi-person-lines-fill"></i>
+                    Situação atual do cliente
+                </h2>
+            </div>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label
+                    for="estado_civil_atual"
+                    class="form-label"
+                >
+                    Estado civil atual
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="estado_civil_atual"
+                    name="estado_civil_atual"
+                    maxlength="50"
+                    value="{{ ficha.estado_civil_atual or '' }}"
+                    placeholder="Ex.: solteiro, casado, divorciado"
+                >
+            </div>
+
+            <div class="col-md-6">
+                <label
+                    for="profissao_atual"
+                    class="form-label"
+                >
+                    Profissão atual
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="profissao_atual"
+                    name="profissao_atual"
+                    maxlength="150"
+                    value="{{ ficha.profissao_atual or '' }}"
+                    placeholder="Informe a ocupação atual"
+                >
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ====================================================== -->
+    <!-- SITUAÇÃO FINANCEIRA -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section mb-4">
+
+        <div class="civel-section-header">
+            <div>
+                <span class="civel-section-kicker">
+                    Capacidade econômica
+                </span>
+
+                <h2 class="civel-section-title">
+                    <i class="bi bi-cash-stack"></i>
+                    Situação financeira
+                </h2>
+            </div>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label
+                    for="renda_mensal_aproximada"
+                    class="form-label"
+                >
+                    Renda mensal aproximada
+                </label>
+
+                <div class="input-group">
+                    <span class="input-group-text">R$</span>
+
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="renda_mensal_aproximada"
+                        name="renda_mensal_aproximada"
+                        value="{{
+                            ficha.renda_mensal_aproximada
+                            if ficha.renda_mensal_aproximada is not none
+                            else ''
+                        }}"
+                        placeholder="0,00"
+                    >
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label
+                    for="possui_beneficio_justica_gratuita"
+                    class="form-label"
+                >
+                    Pretende solicitar justiça gratuita?
+                </label>
+
+                <select
+                    class="form-select"
+                    id="possui_beneficio_justica_gratuita"
+                    name="possui_beneficio_justica_gratuita"
+                >
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, rotulo in respostas.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if
+                                ficha.possui_beneficio_justica_gratuita
+                                == valor
+                            %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label
+                    for="motivo_justica_gratuita"
+                    class="form-label"
+                >
+                    Motivo do pedido de justiça gratuita
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="motivo_justica_gratuita"
+                    name="motivo_justica_gratuita"
+                    rows="3"
+                    placeholder="Descreva a situação econômica do cliente"
+                >{{ ficha.motivo_justica_gratuita or '' }}</textarea>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ====================================================== -->
+    <!-- CONTATO ALTERNATIVO -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section mb-4">
+
+        <div class="civel-section-header">
+            <div>
+                <span class="civel-section-kicker">
+                    Comunicação complementar
+                </span>
+
+                <h2 class="civel-section-title">
+                    <i class="bi bi-person-rolodex"></i>
+                    Contato alternativo
+                </h2>
+            </div>
+        </div>
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+                <label
+                    for="contato_alternativo_nome"
+                    class="form-label"
+                >
+                    Nome
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="contato_alternativo_nome"
+                    name="contato_alternativo_nome"
+                    maxlength="150"
+                    value="{{ ficha.contato_alternativo_nome or '' }}"
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label
+                    for="contato_alternativo_telefone"
+                    class="form-label"
+                >
+                    Telefone
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="contato_alternativo_telefone"
+                    name="contato_alternativo_telefone"
+                    maxlength="20"
+                    value="{{
+                        ficha.contato_alternativo_telefone or ''
+                    }}"
+                >
+            </div>
+
+            <div class="col-md-4">
+                <label
+                    for="contato_alternativo_relacao"
+                    class="form-label"
+                >
+                    Relação com o cliente
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="contato_alternativo_relacao"
+                    name="contato_alternativo_relacao"
+                    maxlength="100"
+                    value="{{
+                        ficha.contato_alternativo_relacao or ''
+                    }}"
+                    placeholder="Ex.: mãe, irmão, cônjuge"
+                >
+            </div>
+
+            <div class="col-md-6">
+                <label
+                    for="melhor_horario_contato"
+                    class="form-label"
+                >
+                    Melhor horário para contato
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="melhor_horario_contato"
+                    name="melhor_horario_contato"
+                    maxlength="100"
+                    value="{{ ficha.melhor_horario_contato or '' }}"
+                    placeholder="Ex.: após as 18h"
+                >
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ====================================================== -->
+    <!-- OBSERVAÇÕES -->
+    <!-- ====================================================== -->
+
+    <section class="civel-section mb-4">
+
+        <div class="civel-section-header">
+            <div>
+                <span class="civel-section-kicker">
+                    Registro complementar
+                </span>
+
+                <h2 class="civel-section-title">
+                    <i class="bi bi-card-text"></i>
+                    Observações
+                </h2>
+            </div>
+        </div>
+
+        <div>
+            <label
+                for="observacoes_cliente"
+                class="form-label"
+            >
+                Observações sobre o cliente
+            </label>
+
+            <textarea
+                class="form-control"
+                id="observacoes_cliente"
+                name="observacoes_cliente"
+                rows="5"
+                placeholder="Registre informações relevantes para o caso"
+            >{{ ficha.observacoes_cliente or '' }}</textarea>
+        </div>
+
+    </section>
+
+
+    <!-- ====================================================== -->
+    <!-- BOTÕES -->
+    <!-- ====================================================== -->
+
+    <div
+        class="
+            d-flex
+            flex-column
+            flex-md-row
+            justify-content-between
+            gap-2
+            mt-4
+        "
+    >
+
+        <div>
+            {% if url_anterior %}
+                <a
+                    href="{{ url_anterior }}"
+                    class="btn btn-outline-secondary"
+                >
+                    <i class="bi bi-arrow-left"></i>
+                    Voltar
+                </a>
+            {% endif %}
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row gap-2">
+
+            <button
+                type="submit"
+                name="acao"
+                value="salvar"
+                class="btn btn-outline-primary"
+            >
+                <i class="bi bi-floppy"></i>
+                Salvar
+            </button>
+
+            <button
+                type="submit"
+                name="acao"
+                value="salvar_proxima"
+                class="btn btn-primary"
+            >
+                Salvar e continuar
+                <i class="bi bi-arrow-right"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const campoJusticaGratuita = document.getElementById(
+        "possui_beneficio_justica_gratuita"
+    );
+
+    const campoMotivo = document.getElementById(
+        "motivo_justica_gratuita"
+    );
+
+    function atualizarCampoMotivo() {
+        const solicitaraJusticaGratuita =
+            campoJusticaGratuita.value === "SIM";
+
+        campoMotivo.disabled = !solicitaraJusticaGratuita;
+
+        if (!solicitaraJusticaGratuita) {
+            campoMotivo.value = "";
+        }
+    }
+
+    campoJusticaGratuita.addEventListener(
+        "change",
+        atualizarCampoMotivo
+    );
+
+    atualizarCampoMotivo();
+});
+</script>
+
+{% endblock %}

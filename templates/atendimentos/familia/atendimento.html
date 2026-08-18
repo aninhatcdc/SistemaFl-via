@@ -1,0 +1,1064 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+    Atendimento de Família #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_atendimento_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+    Dados do atendimento
+{% endblock %}
+
+{% block etapa_descricao %}
+    Registre as informações gerais e identifique a demanda de Direito de Família.
+{% endblock %}
+
+{% block etapa_identificacao %}
+    Etapa 1 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+    <div class="civel-info-box">
+
+        <i class="bi bi-info-circle-fill"></i>
+
+        <div>
+            Esta etapa reúne os dados administrativos e a identificação inicial
+            da demanda familiar. As informações detalhadas sobre relação familiar,
+            parte contrária, filhos, guarda, alimentos e patrimônio serão
+            preenchidas nas próximas etapas.
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+    <!-- =====================================================
+         IDENTIFICAÇÃO DO ATENDIMENTO
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-clipboard2-check"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Identificação
+                </h3>
+
+                <p>
+                    Informações principais para localizar e organizar o atendimento.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-lg-8">
+
+                <label
+                    for="titulo"
+                    class="form-label"
+                >
+                    Título do atendimento
+                    <span class="civel-required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="titulo"
+                    name="titulo"
+                    maxlength="180"
+                    required
+                    value="{{ atendimento.titulo or 'Atendimento de Família' }}"
+                    placeholder="Ex.: Divórcio consensual com guarda e alimentos"
+                >
+
+                <div class="form-text">
+                    Utilize um título curto que facilite a identificação do caso.
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-4">
+
+                <label
+                    for="status"
+                    class="form-label"
+                >
+                    Status
+                    <span class="civel-required">*</span>
+                </label>
+
+                <select
+                    class="form-select"
+                    id="status"
+                    name="status"
+                    required
+                >
+
+                    {% for valor, rotulo in status_atendimento.items() %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if atendimento.status == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="numero_atendimento"
+                    class="form-label"
+                >
+                    Número do atendimento
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control civel-readonly-field"
+                    id="numero_atendimento"
+                    value="#{{ atendimento.id }}"
+                    readonly
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="area_atendimento"
+                    class="form-label"
+                >
+                    Área jurídica
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control civel-readonly-field"
+                    id="area_atendimento"
+                    value="Família"
+                    readonly
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DATA, HORÁRIO E RESPONSÁVEL
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-calendar2-check"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Data e responsável
+                </h3>
+
+                <p>
+                    Informe quando o atendimento aconteceu e quem ficou responsável.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-md-6 col-xl-4">
+
+                <label
+                    for="data_atendimento"
+                    class="form-label"
+                >
+                    Data do atendimento
+                    <span class="civel-required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_atendimento"
+                    name="data_atendimento"
+                    required
+                    value="{% if atendimento.data_atendimento %}{{ atendimento.data_atendimento.strftime('%Y-%m-%d') }}{% endif %}"
+                >
+
+            </div>
+
+
+            <div class="col-md-6 col-xl-4">
+
+                <label
+                    for="horario_atendimento"
+                    class="form-label"
+                >
+                    Horário
+                </label>
+
+                <input
+                    type="time"
+                    class="form-control"
+                    id="horario_atendimento"
+                    name="horario_atendimento"
+                    value="{% if atendimento.horario_atendimento %}{{ atendimento.horario_atendimento.strftime('%H:%M') }}{% endif %}"
+                >
+
+            </div>
+
+
+            <div class="col-xl-4">
+
+                <label
+                    for="responsavel_atendimento"
+                    class="form-label"
+                >
+                    Responsável
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control civel-readonly-field"
+                    id="responsavel_atendimento"
+                    value="{% if atendimento.responsavel %}{{ atendimento.responsavel.nome }}{% elif current_user %}{{ current_user.nome }}{% else %}Não informado{% endif %}"
+                    readonly
+                >
+
+                <div class="form-text">
+                    O responsável é definido pelo sistema ao iniciar o atendimento.
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CLIENTE VINCULADO
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-person-vcard"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Cliente vinculado
+                </h3>
+
+                <p>
+                    Confirme se o atendimento está associado ao cliente correto.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if atendimento.cliente %}
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="cliente_nome"
+                        class="form-label"
+                    >
+                        Nome completo
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_nome"
+                        value="{{ atendimento.cliente.nome }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <label
+                        for="cliente_cpf"
+                        class="form-label"
+                    >
+                        CPF
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_cpf"
+                        value="{{ atendimento.cliente.cpf or 'Não informado' }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <label
+                        for="cliente_contato"
+                        class="form-label"
+                    >
+                        Telefone ou WhatsApp
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control civel-readonly-field"
+                        id="cliente_contato"
+                        value="{{ atendimento.cliente.whatsapp or atendimento.cliente.telefone or 'Não informado' }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <a
+                        href="{{ url_for(
+                            'clientes.detalhes_cliente',
+                            id=atendimento.cliente.id
+                        ) }}"
+                        class="btn btn-sm btn-outline-secondary"
+                        target="_blank"
+                    >
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        Abrir cadastro completo do cliente
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-warning mb-0">
+
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+
+                Não foi encontrado um cliente vinculado a este atendimento.
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         IDENTIFICAÇÃO DA DEMANDA FAMILIAR
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-people-fill"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Identificação da demanda familiar
+                </h3>
+
+                <p>
+                    Informe a natureza principal da solicitação apresentada pelo cliente.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-lg-6">
+
+                <label
+                    for="tipo_demanda"
+                    class="form-label"
+                >
+                    Tipo de demanda
+                </label>
+
+                <select
+                    class="form-select"
+                    id="tipo_demanda"
+                    name="tipo_demanda"
+                >
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, rotulo in tipos_demanda.items() %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.tipo_demanda == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div
+                class="col-lg-6"
+                id="grupo_outro_tipo_demanda"
+            >
+
+                <label
+                    for="outro_tipo_demanda"
+                    class="form-label"
+                >
+                    Outro tipo de demanda
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="outro_tipo_demanda"
+                    name="outro_tipo_demanda"
+                    maxlength="150"
+                    value="{{ ficha.outro_tipo_demanda or '' }}"
+                    placeholder="Informe qual é a demanda"
+                >
+
+            </div>
+
+
+            <div class="col-12">
+
+                <label
+                    for="motivo_principal"
+                    class="form-label"
+                >
+                    Motivo principal do atendimento
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="motivo_principal"
+                    name="motivo_principal"
+                    rows="4"
+                    maxlength="3000"
+                    placeholder="Descreva objetivamente o motivo que levou o cliente a procurar o escritório."
+                >{{ ficha.motivo_principal or "" }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         URGÊNCIA
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-exclamation-triangle"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Urgência
+                </h3>
+
+                <p>
+                    Identifique situações que exijam atuação imediata ou prioritária.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="existe_urgencia"
+                        name="existe_urgencia"
+                        {% if ficha.existe_urgencia %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="existe_urgencia"
+                    >
+                        Existe alguma situação urgente?
+                    </label>
+
+                </div>
+
+                <div class="form-text">
+                    Exemplos: risco à criança ou adolescente, violência, retirada
+                    indevida do lar, descumprimento de visitas, necessidade imediata
+                    de alimentos ou prazo processual próximo.
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-12"
+                id="grupo_descricao_urgencia"
+            >
+
+                <label
+                    for="descricao_urgencia"
+                    class="form-label"
+                >
+                    Descrição da urgência
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="descricao_urgencia"
+                    name="descricao_urgencia"
+                    rows="4"
+                    maxlength="3000"
+                    placeholder="Explique a situação urgente, os riscos existentes e as providências necessárias."
+                >{{ ficha.descricao_urgencia or "" }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PROCESSO ANTERIOR
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-folder2-open"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Processo anterior ou em andamento
+                </h3>
+
+                <p>
+                    Informe se já existe processo judicial relacionado à família ou à demanda.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="existe_processo_anterior"
+                        name="existe_processo_anterior"
+                        {% if ficha.existe_processo_anterior %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="existe_processo_anterior"
+                    >
+                        Existe processo anterior ou atualmente em andamento?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-12"
+                id="grupo_processo_anterior"
+            >
+
+                <div class="row g-3">
+
+                    <div class="col-lg-5">
+
+                        <label
+                            for="numero_processo_anterior"
+                            class="form-label"
+                        >
+                            Número do processo
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="numero_processo_anterior"
+                            name="numero_processo_anterior"
+                            maxlength="50"
+                            value="{{ ficha.numero_processo_anterior or '' }}"
+                            placeholder="Ex.: 0000000-00.0000.0.00.0000"
+                        >
+
+                    </div>
+
+
+                    <div class="col-lg-3">
+
+                        <label
+                            for="vara_processo_anterior"
+                            class="form-label"
+                        >
+                            Vara
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="vara_processo_anterior"
+                            name="vara_processo_anterior"
+                            maxlength="150"
+                            value="{{ ficha.vara_processo_anterior or '' }}"
+                            placeholder="Ex.: 2ª Vara de Família"
+                        >
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <label
+                            for="comarca_processo_anterior"
+                            class="form-label"
+                        >
+                            Comarca
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="comarca_processo_anterior"
+                            name="comarca_processo_anterior"
+                            maxlength="150"
+                            value="{{ ficha.comarca_processo_anterior or '' }}"
+                            placeholder="Ex.: João Pessoa/PB"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         RESUMO INICIAL
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-card-text"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Resumo inicial do caso
+                </h3>
+
+                <p>
+                    Faça uma descrição breve da situação apresentada pelo cliente.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="resumo_caso"
+                    class="form-label"
+                >
+                    Resumo do caso
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="resumo_caso"
+                    name="resumo_caso"
+                    rows="6"
+                    maxlength="5000"
+                    placeholder="Descreva resumidamente a composição familiar, os fatos, as principais datas, as pessoas envolvidas e o objetivo do cliente."
+                >{{ atendimento.resumo_caso or "" }}</textarea>
+
+                <div class="form-text">
+                    Este campo poderá ser utilizado futuramente na geração do
+                    resumo jurídico e de documentos.
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         OBSERVAÇÕES DA ETAPA
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-journal-text"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Observações do atendimento familiar
+                </h3>
+
+                <p>
+                    Registre informações complementares específicas desta etapa.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="observacoes_atendimento"
+                    class="form-label"
+                >
+                    Observações complementares
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="observacoes_atendimento"
+                    name="observacoes_atendimento"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="Registre informações familiares relevantes que ainda não foram incluídas nos demais campos."
+                >{{ ficha.observacoes_atendimento or "" }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         OBSERVAÇÕES INTERNAS
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-shield-lock"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Observações internas
+                </h3>
+
+                <p>
+                    Anotações restritas à equipe do escritório.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="observacoes_internas"
+                    class="form-label"
+                >
+                    Observações internas
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="observacoes_internas"
+                    name="observacoes_internas"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="Registre orientações internas, pendências, documentos solicitados ou observações sobre o atendimento."
+                >{{ atendimento.observacoes_internas or "" }}</textarea>
+
+                <div class="form-text">
+                    Esse conteúdo não deve aparecer em documentos entregues ao cliente.
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         INFORMAÇÕES DE CONTROLE
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-clock-history"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Controle do registro
+                </h3>
+
+                <p>
+                    Informações preenchidas automaticamente pelo sistema.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label
+                    for="criado_em"
+                    class="form-label"
+                >
+                    Criado em
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control civel-readonly-field"
+                    id="criado_em"
+                    value="{% if atendimento.criado_em %}{{ atendimento.criado_em.strftime('%d/%m/%Y às %H:%M') }}{% else %}Não informado{% endif %}"
+                    readonly
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="atualizado_em"
+                    class="form-label"
+                >
+                    Última atualização
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control civel-readonly-field"
+                    id="atualizado_em"
+                    value="{% if atendimento.atualizado_em %}{{ atendimento.atualizado_em.strftime('%d/%m/%Y às %H:%M') }}{% else %}Ainda não atualizado{% endif %}"
+                    readonly
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tipoDemanda = document.getElementById("tipo_demanda");
+            const grupoOutroTipo = document.getElementById(
+                "grupo_outro_tipo_demanda"
+            );
+            const outroTipo = document.getElementById("outro_tipo_demanda");
+
+            const existeUrgencia = document.getElementById("existe_urgencia");
+            const grupoUrgencia = document.getElementById(
+                "grupo_descricao_urgencia"
+            );
+            const descricaoUrgencia = document.getElementById(
+                "descricao_urgencia"
+            );
+
+            const existeProcesso = document.getElementById(
+                "existe_processo_anterior"
+            );
+            const grupoProcesso = document.getElementById(
+                "grupo_processo_anterior"
+            );
+
+            function atualizarOutroTipo() {
+                const mostrar = tipoDemanda.value === "OUTRA";
+
+                grupoOutroTipo.classList.toggle("d-none", !mostrar);
+                outroTipo.disabled = !mostrar;
+
+                if (!mostrar) {
+                    outroTipo.value = "";
+                }
+            }
+
+            function atualizarUrgencia() {
+                const mostrar = existeUrgencia.checked;
+
+                grupoUrgencia.classList.toggle("d-none", !mostrar);
+                descricaoUrgencia.disabled = !mostrar;
+
+                if (!mostrar) {
+                    descricaoUrgencia.value = "";
+                }
+            }
+
+            function atualizarProcesso() {
+                const mostrar = existeProcesso.checked;
+
+                grupoProcesso.classList.toggle("d-none", !mostrar);
+
+                grupoProcesso
+                    .querySelectorAll("input")
+                    .forEach(function (campo) {
+                        campo.disabled = !mostrar;
+
+                        if (!mostrar) {
+                            campo.value = "";
+                        }
+                    });
+            }
+
+            tipoDemanda.addEventListener("change", atualizarOutroTipo);
+            existeUrgencia.addEventListener("change", atualizarUrgencia);
+            existeProcesso.addEventListener("change", atualizarProcesso);
+
+            atualizarOutroTipo();
+            atualizarUrgencia();
+            atualizarProcesso();
+        });
+    </script>
+
+{% endblock %}

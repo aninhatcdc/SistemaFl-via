@@ -1,0 +1,577 @@
+{% extends "atendimentos/previdenciaria/layout.html" %}
+
+{% block title %}
+Processo no INSS - Ficha Previdenciária
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_inss_previdenciario",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Processo no INSS
+{% endblock %}
+
+{% block etapa_descricao %}
+Registre requerimentos, exigências, perícias, decisões e recursos administrativos.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 7 de 8
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="previdenciaria-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        Confira números de protocolo, datas e prazos diretamente nos
+        documentos ou sistemas oficiais do INSS.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-building"></i>
+        </span>
+        <div>
+            <h3>Requerimento administrativo</h3>
+            <p>Dados gerais do pedido apresentado ao INSS.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <label for="possui_requerimento_inss" class="form-label">
+                Possui requerimento no INSS?
+            </label>
+            <select
+                class="form-select"
+                id="possui_requerimento_inss"
+                name="possui_requerimento_inss"
+                data-controla="grupo-requerimento"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_requerimento_inss == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-requerimento"
+            class="col-12 campo-condicional"
+        >
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <label for="numero_protocolo" class="form-label">
+                        Número do protocolo
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="numero_protocolo"
+                        name="numero_protocolo"
+                        maxlength="100"
+                        value="{{ ficha.numero_protocolo or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="numero_beneficio" class="form-label">
+                        Número do benefício (NB)
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="numero_beneficio"
+                        name="numero_beneficio"
+                        maxlength="100"
+                        value="{{ ficha.numero_beneficio or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-6">
+                    <label
+                        for="data_entrada_requerimento"
+                        class="form-label"
+                    >
+                        Data de entrada do requerimento
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_entrada_requerimento"
+                        name="data_entrada_requerimento"
+                        value="{{ ficha.data_entrada_requerimento.strftime('%Y-%m-%d') if ficha.data_entrada_requerimento else '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-6">
+                    <label
+                        for="data_inicio_beneficio"
+                        class="form-label"
+                    >
+                        Data de início do benefício
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_inicio_beneficio"
+                        name="data_inicio_beneficio"
+                        value="{{ ficha.data_inicio_beneficio.strftime('%Y-%m-%d') if ficha.data_inicio_beneficio else '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-7">
+                    <label
+                        for="agencia_previdencia_social"
+                        class="form-label"
+                    >
+                        Agência da Previdência Social
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="agencia_previdencia_social"
+                        name="agencia_previdencia_social"
+                        maxlength="200"
+                        value="{{ ficha.agencia_previdencia_social or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-5">
+                    <label for="cidade_agencia" class="form-label">
+                        Cidade da agência
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="cidade_agencia"
+                        name="cidade_agencia"
+                        maxlength="120"
+                        value="{{ ficha.cidade_agencia or '' }}"
+                    >
+                </div>
+
+                <div class="col-12">
+                    <label
+                        for="situacao_requerimento"
+                        class="form-label"
+                    >
+                        Situação atual do requerimento
+                    </label>
+                    <select
+                        class="form-select"
+                        id="situacao_requerimento"
+                        name="situacao_requerimento"
+                    >
+                        <option value="">Selecione</option>
+                        {% for valor, rotulo in situacoes_requerimento.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.situacao_requerimento == valor %}selected{% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-exclamation-circle"></i>
+        </span>
+        <div>
+            <h3>Exigência</h3>
+            <p>Controle de exigências e do prazo para cumprimento.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <label for="possui_exigencia" class="form-label">
+                Existe exigência pendente?
+            </label>
+            <select
+                class="form-select"
+                id="possui_exigencia"
+                name="possui_exigencia"
+                data-controla="grupo-exigencia"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_exigencia == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="grupo-exigencia" class="col-12 campo-condicional">
+            <div class="row g-3">
+                <div class="col-lg-5">
+                    <label
+                        for="data_limite_exigencia"
+                        class="form-label"
+                    >
+                        Data limite da exigência
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_limite_exigencia"
+                        name="data_limite_exigencia"
+                        value="{{ ficha.data_limite_exigencia.strftime('%Y-%m-%d') if ficha.data_limite_exigencia else '' }}"
+                    >
+                </div>
+
+                <div class="col-12">
+                    <label
+                        for="exigencia_descricao"
+                        class="form-label"
+                    >
+                        Descrição da exigência
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="exigencia_descricao"
+                        name="exigencia_descricao"
+                        rows="4"
+                        placeholder="Informe os documentos ou esclarecimentos solicitados pelo INSS."
+                    >{{ ficha.exigencia_descricao or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-clipboard2-pulse"></i>
+        </span>
+        <div>
+            <h3>Perícia</h3>
+            <p>Agendamento, local e resultado da perícia administrativa.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <label for="possui_pericia" class="form-label">
+                Possui perícia?
+            </label>
+            <select
+                class="form-select"
+                id="possui_pericia"
+                name="possui_pericia"
+                data-controla="grupo-pericia"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_pericia == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="grupo-pericia" class="col-12 campo-condicional">
+            <div class="row g-3">
+                <div class="col-lg-4">
+                    <label for="data_pericia" class="form-label">
+                        Data da perícia
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_pericia"
+                        name="data_pericia"
+                        value="{{ ficha.data_pericia.strftime('%Y-%m-%d') if ficha.data_pericia else '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-3">
+                    <label for="horario_pericia" class="form-label">
+                        Horário
+                    </label>
+                    <input
+                        type="time"
+                        class="form-control"
+                        id="horario_pericia"
+                        name="horario_pericia"
+                        value="{{ ficha.horario_pericia.strftime('%H:%M') if ficha.horario_pericia else '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-5">
+                    <label for="local_pericia" class="form-label">
+                        Local da perícia
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="local_pericia"
+                        name="local_pericia"
+                        maxlength="200"
+                        value="{{ ficha.local_pericia or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="resultado_pericia" class="form-label">
+                        Resultado da perícia
+                    </label>
+                    <select
+                        class="form-select"
+                        id="resultado_pericia"
+                        name="resultado_pericia"
+                    >
+                        <option value="">Selecione</option>
+                        {% for valor, rotulo in resultados_pericia.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.resultado_pericia == valor %}selected{% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label
+                        for="resultado_pericia_descricao"
+                        class="form-label"
+                    >
+                        Detalhes do resultado
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="resultado_pericia_descricao"
+                        name="resultado_pericia_descricao"
+                        rows="4"
+                    >{{ ficha.resultado_pericia_descricao or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-file-earmark-check"></i>
+        </span>
+        <div>
+            <h3>Decisão do INSS</h3>
+            <p>Registre a data da decisão e eventual motivo de indeferimento.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <label for="data_decisao_inss" class="form-label">
+                Data da decisão
+            </label>
+            <input
+                type="date"
+                class="form-control"
+                id="data_decisao_inss"
+                name="data_decisao_inss"
+                value="{{ ficha.data_decisao_inss.strftime('%Y-%m-%d') if ficha.data_decisao_inss else '' }}"
+            >
+        </div>
+
+        <div class="col-12">
+            <label for="motivo_indeferimento" class="form-label">
+                Motivo do indeferimento
+            </label>
+            <textarea
+                class="form-control"
+                id="motivo_indeferimento"
+                name="motivo_indeferimento"
+                rows="4"
+                placeholder="Preencha quando o benefício tiver sido indeferido."
+            >{{ ficha.motivo_indeferimento or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-arrow-repeat"></i>
+        </span>
+        <div>
+            <h3>Recurso administrativo</h3>
+            <p>Dados do recurso apresentado contra a decisão do INSS.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-5">
+            <label for="possui_recurso" class="form-label">
+                Possui recurso administrativo?
+            </label>
+            <select
+                class="form-select"
+                id="possui_recurso"
+                name="possui_recurso"
+                data-controla="grupo-recurso"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_recurso == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="grupo-recurso" class="col-12 campo-condicional">
+            <div class="row g-3">
+                <div class="col-lg-7">
+                    <label for="numero_recurso" class="form-label">
+                        Número do recurso
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="numero_recurso"
+                        name="numero_recurso"
+                        maxlength="100"
+                        value="{{ ficha.numero_recurso or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-5">
+                    <label for="data_recurso" class="form-label">
+                        Data do recurso
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_recurso"
+                        name="data_recurso"
+                        value="{{ ficha.data_recurso.strftime('%Y-%m-%d') if ficha.data_recurso else '' }}"
+                    >
+                </div>
+
+                <div class="col-12">
+                    <label for="resultado_recurso" class="form-label">
+                        Resultado ou andamento do recurso
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="resultado_recurso"
+                        name="resultado_recurso"
+                        rows="4"
+                    >{{ ficha.resultado_recurso or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+        <div>
+            <h3>Observações</h3>
+            <p>Registre prazos, pendências e providências relacionadas ao INSS.</p>
+        </div>
+    </div>
+
+    <label for="observacoes_inss" class="form-label">
+        Observações sobre o processo administrativo
+    </label>
+    <textarea
+        class="form-control"
+        id="observacoes_inss"
+        name="observacoes_inss"
+        rows="5"
+        placeholder="Registre movimentações, contatos, prazos e providências necessárias."
+    >{{ ficha.observacoes_inss or '' }}</textarea>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function atualizarCampoCondicional(controle) {
+            const alvoId = controle.dataset.controla;
+            const valorExibicao = controle.dataset.exibirQuando;
+            const alvo = document.getElementById(alvoId);
+
+            if (!alvo) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorExibicao;
+
+            alvo.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            alvo.querySelectorAll("input, select, textarea").forEach(
+                function (campo) {
+                    campo.disabled = !deveExibir;
+                }
+            );
+        }
+
+        document.querySelectorAll("[data-controla]").forEach(
+            function (controle) {
+                atualizarCampoCondicional(controle);
+
+                controle.addEventListener("change", function () {
+                    atualizarCampoCondicional(controle);
+                });
+            }
+        );
+    });
+</script>
+
+{% endblock %}

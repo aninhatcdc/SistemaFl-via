@@ -1,0 +1,72 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+    Alimentos — Atendimento #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_alimentos_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+    Alimentos
+{% endblock %}
+
+{% block etapa_descricao %}
+    Registre a pensão atual, eventuais atrasos, necessidades do alimentando
+    e capacidade financeira do alimentante.
+{% endblock %}
+
+{% block etapa_identificacao %}
+    Etapa 7 de 10
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="civel-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>Informe valor e percentual apenas quando aplicáveis. Os campos podem ser usados em pedidos de fixação, revisão, exoneração ou execução de alimentos.</div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+<section class="civel-section">
+<div class="civel-section-title"><span class="civel-section-title-icon"><i class="bi bi-cash-coin"></i></span><div><h3>Pensão atual</h3><p>Informe se existe obrigação alimentar em vigor.</p></div></div>
+<div class="row g-3">
+<div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="existe_pensao_atual" name="existe_pensao_atual" {% if ficha.existe_pensao_atual %}checked{% endif %}><label class="form-check-label" for="existe_pensao_atual">Existe pensão alimentícia atualmente?</label></div></div>
+<div id="grupo_pensao_atual" class="row g-3 m-0 p-0">
+<div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="pensao_fixada_judicialmente" name="pensao_fixada_judicialmente" {% if ficha.pensao_fixada_judicialmente %}checked{% endif %}><label class="form-check-label" for="pensao_fixada_judicialmente">A pensão foi fixada judicialmente ou homologada?</label></div></div>
+<div class="col-md-6" id="grupo_numero_processo"><label class="form-label" for="numero_processo_alimentos">Número do processo de alimentos</label><input class="form-control" id="numero_processo_alimentos" name="numero_processo_alimentos" maxlength="80" value="{{ ficha.numero_processo_alimentos or '' }}" placeholder="0000000-00.0000.0.00.0000"></div>
+<div class="col-md-3"><label class="form-label" for="valor_pensao_atual">Valor mensal atual</label><div class="input-group"><span class="input-group-text">R$</span><input class="form-control moeda" id="valor_pensao_atual" name="valor_pensao_atual" value="{% if ficha.valor_pensao_atual is not none %}{{ ficha.valor_pensao_atual|string|replace('.', ',') }}{% endif %}" placeholder="0,00"></div></div>
+<div class="col-md-3"><label class="form-label" for="percentual_pensao_atual">Percentual atual</label><div class="input-group"><input class="form-control percentual" id="percentual_pensao_atual" name="percentual_pensao_atual" value="{% if ficha.percentual_pensao_atual is not none %}{{ ficha.percentual_pensao_atual|string|replace('.', ',') }}{% endif %}" placeholder="0,00"><span class="input-group-text">%</span></div></div>
+<div class="col-12"><label class="form-label" for="forma_pagamento_pensao">Forma de pagamento</label><input class="form-control" id="forma_pagamento_pensao" name="forma_pagamento_pensao" maxlength="150" value="{{ ficha.forma_pagamento_pensao or '' }}" placeholder="Ex.: desconto em folha, PIX, depósito ou pagamento direto de despesas"></div>
+</div></div></section>
+
+<section class="civel-section" id="secao_atraso"><div class="civel-section-title"><span class="civel-section-title-icon"><i class="bi bi-exclamation-triangle"></i></span><div><h3>Inadimplência</h3><p>Registre atrasos e o débito aproximado.</p></div></div><div class="row g-3"><div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="pensao_esta_em_atraso" name="pensao_esta_em_atraso" {% if ficha.pensao_esta_em_atraso %}checked{% endif %}><label class="form-check-label" for="pensao_esta_em_atraso">A pensão está em atraso?</label></div></div><div id="grupo_atraso" class="row g-3 m-0 p-0"><div class="col-md-4"><label class="form-label" for="meses_em_atraso">Meses em atraso</label><input type="number" min="0" class="form-control" id="meses_em_atraso" name="meses_em_atraso" value="{% if ficha.meses_em_atraso is not none %}{{ ficha.meses_em_atraso }}{% endif %}"></div><div class="col-md-4"><label class="form-label" for="valor_debito_estimado">Débito estimado</label><div class="input-group"><span class="input-group-text">R$</span><input class="form-control moeda" id="valor_debito_estimado" name="valor_debito_estimado" value="{% if ficha.valor_debito_estimado is not none %}{{ ficha.valor_debito_estimado|string|replace('.', ',') }}{% endif %}" placeholder="0,00"></div></div></div></div></section>
+
+<section class="civel-section"><div class="civel-section-title"><span class="civel-section-title-icon"><i class="bi bi-bullseye"></i></span><div><h3>Pretensão do cliente</h3><p>Informe o valor ou percentual pretendido.</p></div></div><div class="row g-3"><div class="col-md-4"><label class="form-label" for="valor_pretendido_alimentos">Valor pretendido</label><div class="input-group"><span class="input-group-text">R$</span><input class="form-control moeda" id="valor_pretendido_alimentos" name="valor_pretendido_alimentos" value="{% if ficha.valor_pretendido_alimentos is not none %}{{ ficha.valor_pretendido_alimentos|string|replace('.', ',') }}{% endif %}" placeholder="0,00"></div></div><div class="col-md-4"><label class="form-label" for="percentual_pretendido_alimentos">Percentual pretendido</label><div class="input-group"><input class="form-control percentual" id="percentual_pretendido_alimentos" name="percentual_pretendido_alimentos" value="{% if ficha.percentual_pretendido_alimentos is not none %}{{ ficha.percentual_pretendido_alimentos|string|replace('.', ',') }}{% endif %}" placeholder="0,00"><span class="input-group-text">%</span></div></div><div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="pretende_alimentos_provisorios" name="pretende_alimentos_provisorios" {% if ficha.pretende_alimentos_provisorios %}checked{% endif %}><label class="form-check-label" for="pretende_alimentos_provisorios">Pretende requerer alimentos provisórios?</label></div></div></div></section>
+
+<section class="civel-section"><div class="civel-section-title"><span class="civel-section-title-icon"><i class="bi bi-clipboard-data"></i></span><div><h3>Necessidade e possibilidade</h3><p>Descreva as despesas e a capacidade financeira das partes.</p></div></div><div class="row g-3"><div class="col-md-6"><label class="form-label" for="despesas_alimentando">Despesas do alimentando</label><textarea class="form-control" id="despesas_alimentando" name="despesas_alimentando" rows="8" maxlength="7000" placeholder="Alimentação, moradia, escola, saúde, transporte, vestuário, lazer e outras despesas.">{{ ficha.despesas_alimentando or '' }}</textarea></div><div class="col-md-6"><label class="form-label" for="capacidade_financeira_alimentante">Capacidade financeira do alimentante</label><textarea class="form-control" id="capacidade_financeira_alimentante" name="capacidade_financeira_alimentante" rows="8" maxlength="7000" placeholder="Profissão, renda conhecida ou estimada, empresa, patrimônio, padrão de vida e provas disponíveis.">{{ ficha.capacidade_financeira_alimentante or '' }}</textarea></div></div></section>
+
+<section class="civel-section"><div class="civel-section-title"><span class="civel-section-title-icon"><i class="bi bi-people"></i></span><div><h3>Outros dependentes</h3><p>Informe outras obrigações familiares do alimentante.</p></div></div><div class="row g-3"><div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="existem_outros_dependentes" name="existem_outros_dependentes" {% if ficha.existem_outros_dependentes %}checked{% endif %}><label class="form-check-label" for="existem_outros_dependentes">O alimentante possui outros dependentes?</label></div></div><div class="col-12" id="grupo_outros_dependentes"><label class="form-label" for="descricao_outros_dependentes">Descrição dos dependentes</label><textarea class="form-control" id="descricao_outros_dependentes" name="descricao_outros_dependentes" rows="4" maxlength="4000" placeholder="Informe quantidade, idade, vínculo e eventual pensão paga.">{{ ficha.descricao_outros_dependentes or '' }}</textarea></div></div></section>
+
+<section class="civel-section"><div class="civel-section-title"><span class="civel-section-title-icon"><i class="bi bi-journal-text"></i></span><div><h3>Observações</h3><p>Registre informações complementares sobre alimentos.</p></div></div><textarea class="form-control" id="observacoes_alimentos" name="observacoes_alimentos" rows="6" maxlength="5000" placeholder="Registre acordos verbais, pagamentos in natura, documentos pendentes e outras informações relevantes.">{{ ficha.observacoes_alimentos or '' }}</textarea></section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+ const pensao=document.getElementById('existe_pensao_atual'), grupoPensao=document.getElementById('grupo_pensao_atual'), secaoAtraso=document.getElementById('secao_atraso');
+ const judicial=document.getElementById('pensao_fixada_judicialmente'), grupoProcesso=document.getElementById('grupo_numero_processo');
+ const atraso=document.getElementById('pensao_esta_em_atraso'), grupoAtraso=document.getElementById('grupo_atraso');
+ const dependentes=document.getElementById('existem_outros_dependentes'), grupoDependentes=document.getElementById('grupo_outros_dependentes');
+ function alternar(campo, grupo){grupo.classList.toggle('d-none', !campo.checked); grupo.querySelectorAll('input,textarea,select').forEach(el=>el.disabled=!campo.checked);}
+ function atualizarPensao(){alternar(pensao,grupoPensao); secaoAtraso.classList.toggle('d-none',!pensao.checked); atraso.disabled=!pensao.checked; if(!pensao.checked) atraso.checked=false; atualizarAtraso(); atualizarJudicial();}
+ function atualizarJudicial(){grupoProcesso.classList.toggle('d-none',!(pensao.checked&&judicial.checked)); document.getElementById('numero_processo_alimentos').disabled=!(pensao.checked&&judicial.checked);}
+ function atualizarAtraso(){alternar(atraso,grupoAtraso);}
+ pensao.addEventListener('change',atualizarPensao); judicial.addEventListener('change',atualizarJudicial); atraso.addEventListener('change',atualizarAtraso); dependentes.addEventListener('change',()=>alternar(dependentes,grupoDependentes));
+ document.querySelectorAll('.moeda,.percentual').forEach(el=>el.addEventListener('input',()=>el.value=el.value.replace(/[^0-9,\.]/g,'')));
+ atualizarPensao(); alternar(dependentes,grupoDependentes);
+});
+</script>
+{% endblock %}

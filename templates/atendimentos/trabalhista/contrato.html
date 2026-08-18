@@ -1,0 +1,606 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+{% block title %}Contrato - Ficha Trabalhista{% endblock %}
+
+{% block form_action %}
+{{ url_for("atendimentos.etapa_contrato", atendimento_id=atendimento.id) }}
+{% endblock %}
+
+{% block etapa_titulo %}Contrato de trabalho{% endblock %}
+
+{% block etapa_descricao %}
+Registre o tipo de contrato, funções exercidas, promoções, transferências e substituições.
+{% endblock %}
+
+{% block etapa_identificacao %}Etapa 5 de 10{% endblock %}
+
+{% block etapa_alertas %}
+<div class="trabalhista-info-box">
+    <i class="bi bi-file-earmark-text-fill"></i>
+    <div>
+        Compare o cargo registrado com a função realmente exercida.
+        Campos complementares aparecem quando a resposta selecionada for “Sim”.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-file-earmark-check"></i>
+        </span>
+        <div>
+            <h3>Tipo de contrato</h3>
+            <p>Modalidade contratual e prorrogações.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="tipo_contrato" class="form-label">
+                Tipo de contrato
+            </label>
+            <select class="form-select" id="tipo_contrato" name="tipo_contrato">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in tipos_contrato.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.tipo_contrato == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="tipo_contrato_outro" class="form-label">
+                Outro tipo de contrato
+            </label>
+            <input type="text" class="form-control"
+                   id="tipo_contrato_outro"
+                   name="tipo_contrato_outro"
+                   maxlength="150"
+                   value="{{ ficha.tipo_contrato_outro or '' }}">
+        </div>
+
+        <div class="col-md-6">
+            <label for="contrato_experiencia_prorrogado" class="form-label">
+                O contrato de experiência foi prorrogado?
+            </label>
+            <select class="form-select"
+                    id="contrato_experiencia_prorrogado"
+                    name="contrato_experiencia_prorrogado">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.contrato_experiencia_prorrogado == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="quantidade_prorrogacoes_experiencia" class="form-label">
+                Quantidade de prorrogações
+            </label>
+            <input type="number" class="form-control"
+                   id="quantidade_prorrogacoes_experiencia"
+                   name="quantidade_prorrogacoes_experiencia"
+                   min="0"
+                   value="{{ ficha.quantidade_prorrogacoes_experiencia if ficha.quantidade_prorrogacoes_experiencia is not none else '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-person-workspace"></i>
+        </span>
+        <div>
+            <h3>Cargo e função</h3>
+            <p>Diferenças entre o registro formal e o trabalho realizado.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="cargo_registrado_carteira" class="form-label">
+                Cargo registrado na carteira
+            </label>
+            <input type="text" class="form-control"
+                   id="cargo_registrado_carteira"
+                   name="cargo_registrado_carteira"
+                   maxlength="150"
+                   value="{{ ficha.cargo_registrado_carteira or '' }}">
+        </div>
+
+        <div class="col-md-6">
+            <label for="exercia_mais_uma_funcao" class="form-label">
+                Exercia mais de uma função?
+            </label>
+            <select class="form-select"
+                    id="exercia_mais_uma_funcao"
+                    name="exercia_mais_uma_funcao">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.exercia_mais_uma_funcao == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label for="funcao_real_exercida" class="form-label">
+                Função realmente exercida
+            </label>
+            <textarea class="form-control"
+                      id="funcao_real_exercida"
+                      name="funcao_real_exercida"
+                      rows="3">{{ ficha.funcao_real_exercida or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="funcoes_acumuladas" class="form-label">
+                Quais funções eram acumuladas?
+            </label>
+            <textarea class="form-control"
+                      id="funcoes_acumuladas"
+                      name="funcoes_acumuladas"
+                      rows="3">{{ ficha.funcoes_acumuladas or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <label for="descricao_rotina_trabalho" class="form-label">
+                Descrição da rotina de trabalho
+            </label>
+            <textarea class="form-control"
+                      id="descricao_rotina_trabalho"
+                      name="descricao_rotina_trabalho"
+                      rows="5">{{ ficha.descricao_rotina_trabalho or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-graph-up-arrow"></i>
+        </span>
+        <div>
+            <h3>Promoções e função superior</h3>
+            <p>Alterações de função e reconhecimento salarial.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="recebeu_promocao" class="form-label">
+                Recebeu promoção?
+            </label>
+            <select class="form-select"
+                    id="recebeu_promocao"
+                    name="recebeu_promocao">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_promocao == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-8">
+            <label for="promocao_qual" class="form-label">
+                Qual promoção?
+            </label>
+            <input type="text" class="form-control"
+                   id="promocao_qual"
+                   name="promocao_qual"
+                   maxlength="150"
+                   value="{{ ficha.promocao_qual or '' }}">
+        </div>
+
+        <div class="col-md-6">
+            <label for="possui_documento_promocao" class="form-label">
+                Possui documento da promoção?
+            </label>
+            <select class="form-select"
+                    id="possui_documento_promocao"
+                    name="possui_documento_promocao">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.possui_documento_promocao == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="recebeu_aumento_promocao" class="form-label">
+                Recebeu aumento com a promoção?
+            </label>
+            <select class="form-select"
+                    id="recebeu_aumento_promocao"
+                    name="recebeu_aumento_promocao">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_aumento_promocao == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-5">
+            <label for="exerceu_funcao_superior_sem_aumento" class="form-label">
+                Exerceu função superior sem aumento?
+            </label>
+            <select class="form-select"
+                    id="exerceu_funcao_superior_sem_aumento"
+                    name="exerceu_funcao_superior_sem_aumento">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.exerceu_funcao_superior_sem_aumento == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-7">
+            <label for="funcao_superior_exercida" class="form-label">
+                Qual função superior?
+            </label>
+            <input type="text" class="form-control"
+                   id="funcao_superior_exercida"
+                   name="funcao_superior_exercida"
+                   maxlength="150"
+                   value="{{ ficha.funcao_superior_exercida or '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-arrow-left-right"></i>
+        </span>
+        <div>
+            <h3>Mudanças de setor e cidade</h3>
+            <p>Transferências ocorridas durante o vínculo.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="mudou_setor" class="form-label">
+                Mudou de setor?
+            </label>
+            <select class="form-select" id="mudou_setor" name="mudou_setor">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.mudou_setor == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="quantidade_mudancas_setor" class="form-label">
+                Quantas mudanças?
+            </label>
+            <input type="number" class="form-control"
+                   id="quantidade_mudancas_setor"
+                   name="quantidade_mudancas_setor"
+                   min="0"
+                   value="{{ ficha.quantidade_mudancas_setor if ficha.quantidade_mudancas_setor is not none else '' }}">
+        </div>
+
+        <div class="col-md-4">
+            <label for="mudou_cidade" class="form-label">
+                Mudou de cidade?
+            </label>
+            <select class="form-select" id="mudou_cidade" name="mudou_cidade">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.mudou_cidade == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label for="setores_trabalhados" class="form-label">
+                Setores em que trabalhou
+            </label>
+            <textarea class="form-control"
+                      id="setores_trabalhados"
+                      name="setores_trabalhados"
+                      rows="3">{{ ficha.setores_trabalhados or '' }}</textarea>
+        </div>
+
+        <div class="col-md-7">
+            <label for="cidades_trabalhadas" class="form-label">
+                Cidades em que trabalhou
+            </label>
+            <textarea class="form-control"
+                      id="cidades_trabalhadas"
+                      name="cidades_trabalhadas"
+                      rows="3">{{ ficha.cidades_trabalhadas or '' }}</textarea>
+        </div>
+
+        <div class="col-md-5">
+            <label for="recebeu_adicional_transferencia" class="form-label">
+                Recebeu adicional de transferência?
+            </label>
+            <select class="form-select"
+                    id="recebeu_adicional_transferencia"
+                    name="recebeu_adicional_transferencia">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_adicional_transferencia == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-people-fill"></i>
+        </span>
+        <div>
+            <h3>Substituições</h3>
+            <p>Substituição de superiores ou colegas afastados.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-5">
+            <label for="substituia_gerente_superior" class="form-label">
+                Substituía gerente ou superior?
+            </label>
+            <select class="form-select"
+                    id="substituia_gerente_superior"
+                    name="substituia_gerente_superior">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.substituia_gerente_superior == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-7">
+            <label for="substituia_gerente_detalhes" class="form-label">
+                Detalhes da substituição
+            </label>
+            <textarea class="form-control"
+                      id="substituia_gerente_detalhes"
+                      name="substituia_gerente_detalhes"
+                      rows="3">{{ ficha.substituia_gerente_detalhes or '' }}</textarea>
+        </div>
+
+        <div class="col-md-5">
+            <label for="substituia_colegas_afastados" class="form-label">
+                Substituía colegas afastados?
+            </label>
+            <select class="form-select"
+                    id="substituia_colegas_afastados"
+                    name="substituia_colegas_afastados">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.substituia_colegas_afastados == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-7">
+            <label for="substituicao_colegas_tempo" class="form-label">
+                Por quanto tempo?
+            </label>
+            <input type="text" class="form-control"
+                   id="substituicao_colegas_tempo"
+                   name="substituicao_colegas_tempo"
+                   maxlength="100"
+                   value="{{ ficha.substituicao_colegas_tempo or '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-pen"></i>
+        </span>
+        <div>
+            <h3>Outros documentos</h3>
+            <p>Documentos ou contratos adicionais assinados.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="assinou_outro_contrato_admissao" class="form-label">
+                Assinou outro contrato na admissão?
+            </label>
+            <select class="form-select"
+                    id="assinou_outro_contrato_admissao"
+                    name="assinou_outro_contrato_admissao">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.assinou_outro_contrato_admissao == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="recebeu_copia_outro_contrato" class="form-label">
+                Recebeu cópia?
+            </label>
+            <select class="form-select"
+                    id="recebeu_copia_outro_contrato"
+                    name="recebeu_copia_outro_contrato">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_copia_outro_contrato == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="assinou_outros_documentos_branco" class="form-label">
+                Assinou outros documentos em branco?
+            </label>
+            <select class="form-select"
+                    id="assinou_outros_documentos_branco"
+                    name="assinou_outros_documentos_branco">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.assinou_outros_documentos_branco == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label for="observacoes_contrato" class="form-label">
+                Observações sobre o contrato
+            </label>
+            <textarea class="form-control"
+                      id="observacoes_contrato"
+                      name="observacoes_contrato"
+                      rows="4">{{ ficha.observacoes_contrato or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const regras = [
+        ["contrato_experiencia_prorrogado", [
+            "quantidade_prorrogacoes_experiencia"
+        ]],
+        ["exercia_mais_uma_funcao", ["funcoes_acumuladas"]],
+        ["recebeu_promocao", [
+            "promocao_qual",
+            "possui_documento_promocao",
+            "recebeu_aumento_promocao"
+        ]],
+        ["mudou_setor", [
+            "quantidade_mudancas_setor",
+            "setores_trabalhados"
+        ]],
+        ["mudou_cidade", [
+            "cidades_trabalhadas",
+            "recebeu_adicional_transferencia"
+        ]],
+        ["exerceu_funcao_superior_sem_aumento", [
+            "funcao_superior_exercida"
+        ]],
+        ["substituia_gerente_superior", [
+            "substituia_gerente_detalhes"
+        ]],
+        ["substituia_colegas_afastados", [
+            "substituicao_colegas_tempo"
+        ]]
+    ];
+
+    function aplicarRegra(seletorId, camposIds) {
+        const seletor = document.getElementById(seletorId);
+
+        if (!seletor) {
+            return;
+        }
+
+        const habilitado = seletor.value === "SIM";
+
+        camposIds.forEach(function (campoId) {
+            const campo = document.getElementById(campoId);
+
+            if (!campo) {
+                return;
+            }
+
+            campo.disabled = !habilitado;
+
+            if (!habilitado) {
+                campo.value = "";
+            }
+        });
+    }
+
+    function atualizarTipoContrato() {
+        const seletor = document.getElementById("tipo_contrato");
+        const outro = document.getElementById("tipo_contrato_outro");
+
+        if (!seletor || !outro) {
+            return;
+        }
+
+        const habilitado = seletor.value === "OUTRO";
+        outro.disabled = !habilitado;
+
+        if (!habilitado) {
+            outro.value = "";
+        }
+    }
+
+    function atualizarTudo() {
+        regras.forEach(function (regra) {
+            aplicarRegra(regra[0], regra[1]);
+        });
+
+        atualizarTipoContrato();
+    }
+
+    regras.forEach(function (regra) {
+        const seletor = document.getElementById(regra[0]);
+
+        if (seletor) {
+            seletor.addEventListener("change", atualizarTudo);
+        }
+    });
+
+    const tipoContrato = document.getElementById("tipo_contrato");
+
+    if (tipoContrato) {
+        tipoContrato.addEventListener("change", atualizarTudo);
+    }
+
+    atualizarTudo();
+});
+</script>
+
+{% endblock %}

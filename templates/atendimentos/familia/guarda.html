@@ -1,0 +1,318 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+Guarda e convivência — Atendimento #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_guarda_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Guarda e convivência
+{% endblock %}
+
+{% block etapa_descricao %}
+Registre a guarda atual, a pretensão do cliente, a convivência familiar e eventuais situações de risco.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 6 de 10
+{% endblock %}
+
+{% block etapa_alertas %}
+    {% if not ficha.possui_filhos %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>
+        Na etapa anterior foi informado que não existem filhos relacionados à demanda.
+        Preencha esta etapa somente quando ela for necessária ao caso.
+    </div>
+    {% endif %}
+
+    <div class="civel-info-box">
+        <i class="bi bi-info-circle-fill"></i>
+        <div>
+            Descreva a rotina real da criança ou do adolescente, mesmo quando não
+            existir decisão judicial ou acordo formal.
+        </div>
+    </div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-shield-check"></i></span>
+        <div>
+            <h3>Situação atual da guarda</h3>
+            <p>Informe como a guarda está estabelecida atualmente.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                       id="existe_acordo_guarda" name="existe_acordo_guarda"
+                       {% if ficha.existe_acordo_guarda %}checked{% endif %}>
+                <label class="form-check-label" for="existe_acordo_guarda">
+                    Existe acordo ou decisão sobre a guarda?
+                </label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label for="tipo_guarda_atual" class="form-label">Tipo de guarda atual</label>
+            <select class="form-select" id="tipo_guarda_atual" name="tipo_guarda_atual">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in tipos_guarda.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.tipo_guarda_atual == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="guarda_de_fato_com" class="form-label">
+                Guarda de fato atualmente com quem?
+            </label>
+            <input type="text" class="form-control" id="guarda_de_fato_com"
+                   name="guarda_de_fato_com" maxlength="150"
+                   value="{{ ficha.guarda_de_fato_com or '' }}"
+                   placeholder="Ex.: mãe, pai, avó materna ou outro responsável">
+        </div>
+
+        <div class="col-12">
+            <label for="residencia_referencia_filhos" class="form-label">
+                Residência de referência dos filhos
+            </label>
+            <input type="text" class="form-control" id="residencia_referencia_filhos"
+                   name="residencia_referencia_filhos" maxlength="200"
+                   value="{{ ficha.residencia_referencia_filhos or '' }}"
+                   placeholder="Informe onde os filhos permanecem durante a maior parte da rotina">
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-bullseye"></i></span>
+        <div>
+            <h3>Guarda pretendida</h3>
+            <p>Informe a modalidade de guarda buscada pelo cliente.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="tipo_guarda_pretendida" class="form-label">
+                Tipo de guarda pretendida
+            </label>
+            <select class="form-select" id="tipo_guarda_pretendida"
+                    name="tipo_guarda_pretendida">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in tipos_guarda.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.tipo_guarda_pretendida == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-calendar-heart"></i></span>
+        <div>
+            <h3>Convivência familiar</h3>
+            <p>Descreva a convivência atual e a forma pretendida.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="regime_convivencia_atual" class="form-label">
+                Regime de convivência atual
+            </label>
+            <textarea class="form-control" id="regime_convivencia_atual"
+                      name="regime_convivencia_atual" rows="7" maxlength="6000"
+                      placeholder="Informe dias, horários, finais de semana, férias, feriados, pernoites, retiradas e devoluções.">{{ ficha.regime_convivencia_atual or '' }}</textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label for="regime_convivencia_pretendido" class="form-label">
+                Regime de convivência pretendido
+            </label>
+            <textarea class="form-control" id="regime_convivencia_pretendido"
+                      name="regime_convivencia_pretendido" rows="7" maxlength="6000"
+                      placeholder="Descreva como o cliente pretende organizar a convivência.">{{ ficha.regime_convivencia_pretendido or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-chat-square-dots"></i></span>
+        <div>
+            <h3>Dificuldades de convivência</h3>
+            <p>Registre impedimentos, descumprimentos ou conflitos recorrentes.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                       id="existe_dificuldade_convivencia"
+                       name="existe_dificuldade_convivencia"
+                       {% if ficha.existe_dificuldade_convivencia %}checked{% endif %}>
+                <label class="form-check-label" for="existe_dificuldade_convivencia">
+                    Existem dificuldades ou descumprimentos na convivência?
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12" id="grupo_dificuldade_convivencia">
+            <label for="descricao_dificuldade_convivencia" class="form-label">
+                Descrição das dificuldades
+            </label>
+            <textarea class="form-control" id="descricao_dificuldade_convivencia"
+                      name="descricao_dificuldade_convivencia" rows="5" maxlength="5000"
+                      placeholder="Informe impedimentos de contato, atrasos, faltas, mudanças unilaterais e provas existentes.">{{ ficha.descricao_dificuldade_convivencia or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-exclamation-octagon"></i></span>
+        <div>
+            <h3>Risco à criança ou ao adolescente</h3>
+            <p>Registre fatos que possam afetar a segurança ou o desenvolvimento dos filhos.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                       id="existe_risco_crianca_adolescente"
+                       name="existe_risco_crianca_adolescente"
+                       {% if ficha.existe_risco_crianca_adolescente %}checked{% endif %}>
+                <label class="form-check-label" for="existe_risco_crianca_adolescente">
+                    Existe situação de risco para a criança ou adolescente?
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12" id="grupo_risco_crianca">
+            <label for="descricao_risco_crianca_adolescente" class="form-label">
+                Descrição da situação de risco
+            </label>
+            <textarea class="form-control" id="descricao_risco_crianca_adolescente"
+                      name="descricao_risco_crianca_adolescente" rows="5" maxlength="5000"
+                      placeholder="Descreva os fatos, a frequência, as pessoas envolvidas, testemunhas e documentos disponíveis.">{{ ficha.descricao_risco_crianca_adolescente or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-person-exclamation"></i></span>
+        <div>
+            <h3>Alienação parental</h3>
+            <p>Registre comportamentos que possam prejudicar o vínculo com o outro responsável.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                       id="existe_alienacao_parental" name="existe_alienacao_parental"
+                       {% if ficha.existe_alienacao_parental %}checked{% endif %}>
+                <label class="form-check-label" for="existe_alienacao_parental">
+                    Existem indícios de alienação parental?
+                </label>
+            </div>
+        </div>
+
+        <div class="col-12" id="grupo_alienacao_parental">
+            <label for="indicios_alienacao_parental" class="form-label">
+                Indícios relatados
+            </label>
+            <textarea class="form-control" id="indicios_alienacao_parental"
+                      name="indicios_alienacao_parental" rows="5" maxlength="5000"
+                      placeholder="Descreva falas, interferências, impedimentos de contato, falsas acusações ou outras condutas relatadas.">{{ ficha.indicios_alienacao_parental or '' }}</textarea>
+        </div>
+
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch"
+                       id="necessita_estudo_psicossocial"
+                       name="necessita_estudo_psicossocial"
+                       {% if ficha.necessita_estudo_psicossocial %}checked{% endif %}>
+                <label class="form-check-label" for="necessita_estudo_psicossocial">
+                    Há necessidade preliminar de estudo psicossocial?
+                </label>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="civel-section">
+    <div class="civel-section-title">
+        <span class="civel-section-title-icon"><i class="bi bi-journal-text"></i></span>
+        <div>
+            <h3>Observações sobre guarda e convivência</h3>
+            <p>Registre informações complementares relevantes para a análise.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-12">
+            <label for="observacoes_guarda" class="form-label">Observações</label>
+            <textarea class="form-control" id="observacoes_guarda"
+                      name="observacoes_guarda" rows="6" maxlength="5000"
+                      placeholder="Registre rotina dos filhos, rede de apoio, distância entre residências e outras particularidades.">{{ ficha.observacoes_guarda or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const controles = [
+        ["existe_dificuldade_convivencia", "grupo_dificuldade_convivencia", "descricao_dificuldade_convivencia"],
+        ["existe_risco_crianca_adolescente", "grupo_risco_crianca", "descricao_risco_crianca_adolescente"],
+        ["existe_alienacao_parental", "grupo_alienacao_parental", "indicios_alienacao_parental"]
+    ];
+
+    controles.forEach(function (config) {
+        const campo = document.getElementById(config[0]);
+        const grupo = document.getElementById(config[1]);
+        const detalhe = document.getElementById(config[2]);
+
+        function atualizar() {
+            const mostrar = campo.checked;
+            grupo.classList.toggle("d-none", !mostrar);
+            detalhe.disabled = !mostrar;
+
+            if (!mostrar) {
+                detalhe.value = "";
+            }
+        }
+
+        campo.addEventListener("change", atualizar);
+        atualizar();
+    });
+});
+</script>
+
+{% endblock %}

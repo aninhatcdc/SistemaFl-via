@@ -1,0 +1,589 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+
+{% block title %}
+    Atendimento Trabalhista #{{ atendimento.id }}
+{% endblock %}
+
+
+{% block form_action %}
+{% endblock %}
+
+
+{% block etapa_titulo %}
+    Dados do atendimento
+{% endblock %}
+
+
+{% block etapa_descricao %}
+    Registre as informações gerais, o status e o resumo inicial deste atendimento.
+{% endblock %}
+
+
+{% block etapa_identificacao %}
+    Etapa 1 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+    <div class="trabalhista-info-box">
+
+        <i class="bi bi-info-circle-fill"></i>
+
+        <div>
+            Esta etapa reúne as informações administrativas do atendimento.
+            Os fatos detalhados e os dados trabalhistas serão preenchidos nas
+            próximas etapas.
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+    <!-- =====================================================
+         IDENTIFICAÇÃO DO ATENDIMENTO
+         ===================================================== -->
+    <section class="trabalhista-section">
+
+        <div class="trabalhista-section-title">
+
+            <span class="trabalhista-section-title-icon">
+                <i class="bi bi-clipboard2-check"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Identificação
+                </h3>
+
+                <p>
+                    Informações principais para localizar e organizar o atendimento.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-lg-8">
+
+                <label
+                    for="titulo"
+                    class="form-label"
+                >
+                    Título do atendimento
+                    <span class="trabalhista-required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="titulo"
+                    name="titulo"
+                    maxlength="180"
+                    required
+                    value="{{ atendimento.titulo or 'Atendimento trabalhista' }}"
+                    placeholder="Ex.: Reclamação trabalhista contra Empresa Exemplo"
+                >
+
+                <div class="form-text">
+                    Utilize um título curto que facilite a identificação do caso.
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-4">
+
+                <label
+                    for="status"
+                    class="form-label"
+                >
+                    Status
+                    <span class="trabalhista-required">*</span>
+                </label>
+
+                <select
+                    class="form-select"
+                    id="status"
+                    name="status"
+                    required
+                >
+
+                    {% for valor, rotulo in status_atendimento.items() %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if atendimento.status == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="numero_atendimento"
+                    class="form-label"
+                >
+                    Número do atendimento
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control trabalhista-readonly-field"
+                    id="numero_atendimento"
+                    value="#{{ atendimento.id }}"
+                    readonly
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="area_atendimento"
+                    class="form-label"
+                >
+                    Área jurídica
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control trabalhista-readonly-field"
+                    id="area_atendimento"
+                    value="Trabalhista"
+                    readonly
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DATA, HORÁRIO E RESPONSÁVEL
+         ===================================================== -->
+    <section class="trabalhista-section">
+
+        <div class="trabalhista-section-title">
+
+            <span class="trabalhista-section-title-icon">
+                <i class="bi bi-calendar2-check"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Data e responsável
+                </h3>
+
+                <p>
+                    Informe quando o atendimento aconteceu e quem ficou responsável.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-md-6 col-xl-4">
+
+                <label
+                    for="data_atendimento"
+                    class="form-label"
+                >
+                    Data do atendimento
+                    <span class="trabalhista-required">*</span>
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_atendimento"
+                    name="data_atendimento"
+                    required
+                    value="{% if atendimento.data_atendimento %}{{ atendimento.data_atendimento.strftime('%Y-%m-%d') }}{% endif %}"
+                >
+
+            </div>
+
+
+            <div class="col-md-6 col-xl-4">
+
+                <label
+                    for="horario_atendimento"
+                    class="form-label"
+                >
+                    Horário
+                </label>
+
+                <input
+                    type="time"
+                    class="form-control"
+                    id="horario_atendimento"
+                    name="horario_atendimento"
+                    value="{% if atendimento.horario_atendimento %}{{ atendimento.horario_atendimento.strftime('%H:%M') }}{% endif %}"
+                >
+
+            </div>
+
+
+            <div class="col-xl-4">
+
+                <label
+                    for="responsavel_atendimento"
+                    class="form-label"
+                >
+                    Responsável
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control trabalhista-readonly-field"
+                    id="responsavel_atendimento"
+                    value="{% if atendimento.responsavel %}{{ atendimento.responsavel.nome }}{% elif current_user %}{{ current_user.nome }}{% else %}Não informado{% endif %}"
+                    readonly
+                >
+
+                <div class="form-text">
+                    O responsável é definido pelo sistema ao iniciar o atendimento.
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CLIENTE VINCULADO
+         ===================================================== -->
+    <section class="trabalhista-section">
+
+        <div class="trabalhista-section-title">
+
+            <span class="trabalhista-section-title-icon">
+                <i class="bi bi-person-vcard"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Cliente vinculado
+                </h3>
+
+                <p>
+                    Confirme se o atendimento está associado ao cliente correto.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if atendimento.cliente %}
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="cliente_nome"
+                        class="form-label"
+                    >
+                        Nome completo
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control trabalhista-readonly-field"
+                        id="cliente_nome"
+                        value="{{ atendimento.cliente.nome }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <label
+                        for="cliente_cpf"
+                        class="form-label"
+                    >
+                        CPF
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control trabalhista-readonly-field"
+                        id="cliente_cpf"
+                        value="{{ atendimento.cliente.cpf or 'Não informado' }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-md-6 col-lg-3">
+
+                    <label
+                        for="cliente_contato"
+                        class="form-label"
+                    >
+                        Telefone ou WhatsApp
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control trabalhista-readonly-field"
+                        id="cliente_contato"
+                        value="{{ atendimento.cliente.whatsapp or atendimento.cliente.telefone or 'Não informado' }}"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="col-12">
+
+                    <a
+                        href="{{ url_for(
+                            'clientes.detalhes_cliente',
+                            id=atendimento.cliente.id
+                        ) }}"
+                        class="btn btn-sm btn-outline-secondary"
+                        target="_blank"
+                    >
+                        <i class="bi bi-box-arrow-up-right"></i>
+                        Abrir cadastro completo do cliente
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-warning mb-0">
+
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+
+                Não foi encontrado um cliente vinculado a este atendimento.
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         RESUMO INICIAL
+         ===================================================== -->
+    <section class="trabalhista-section">
+
+        <div class="trabalhista-section-title">
+
+            <span class="trabalhista-section-title-icon">
+                <i class="bi bi-card-text"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Resumo inicial do caso
+                </h3>
+
+                <p>
+                    Faça uma descrição breve da situação apresentada pelo cliente.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="resumo_caso"
+                    class="form-label"
+                >
+                    Resumo do caso
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="resumo_caso"
+                    name="resumo_caso"
+                    rows="6"
+                    maxlength="5000"
+                    placeholder="Descreva resumidamente o vínculo de emprego, o problema relatado, as principais datas e o objetivo do cliente."
+                >{{ atendimento.resumo_caso or "" }}</textarea>
+
+                <div class="form-text">
+                    Este campo poderá ser utilizado futuramente na geração do
+                    resumo jurídico e de documentos.
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         OBSERVAÇÕES INTERNAS
+         ===================================================== -->
+    <section class="trabalhista-section">
+
+        <div class="trabalhista-section-title">
+
+            <span class="trabalhista-section-title-icon">
+                <i class="bi bi-shield-lock"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Observações internas
+                </h3>
+
+                <p>
+                    Anotações restritas à equipe do escritório.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="observacoes_internas"
+                    class="form-label"
+                >
+                    Observações internas
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="observacoes_internas"
+                    name="observacoes_internas"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="Registre orientações internas, pendências, documentos solicitados ou observações sobre o atendimento."
+                >{{ atendimento.observacoes_internas or "" }}</textarea>
+
+                <div class="form-text">
+                    Esse conteúdo não deve aparecer em documentos entregues ao cliente.
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         INFORMAÇÕES DE CONTROLE
+         ===================================================== -->
+    <section class="trabalhista-section">
+
+        <div class="trabalhista-section-title">
+
+            <span class="trabalhista-section-title-icon">
+                <i class="bi bi-clock-history"></i>
+            </span>
+
+            <div>
+
+                <h3>
+                    Controle do registro
+                </h3>
+
+                <p>
+                    Informações preenchidas automaticamente pelo sistema.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label
+                    for="criado_em"
+                    class="form-label"
+                >
+                    Criado em
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control trabalhista-readonly-field"
+                    id="criado_em"
+                    value="{% if atendimento.criado_em %}{{ atendimento.criado_em.strftime('%d/%m/%Y às %H:%M') }}{% else %}Não informado{% endif %}"
+                    readonly
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="atualizado_em"
+                    class="form-label"
+                >
+                    Última atualização
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control trabalhista-readonly-field"
+                    id="atualizado_em"
+                    value="{% if atendimento.atualizado_em %}{{ atendimento.atualizado_em.strftime('%d/%m/%Y às %H:%M') }}{% else %}Ainda não atualizado{% endif %}"
+                    readonly
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Processo {{ processo.numero }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">⚖ Processo {{ processo.numero }}</h2>
+
+        {% if processo.situacao == "Em andamento" %}
+            <span class="badge bg-success">{{ processo.situacao }}</span>
+        {% elif processo.situacao == "Aguardando documentos" %}
+            <span class="badge bg-warning text-dark">{{ processo.situacao }}</span>
+        {% elif processo.situacao == "Aguardando audiência" %}
+            <span class="badge bg-info">{{ processo.situacao }}</span>
+        {% elif processo.situacao == "Arquivado" %}
+            <span class="badge bg-secondary">{{ processo.situacao }}</span>
+        {% elif processo.situacao == "Suspenso" %}
+            <span class="badge bg-danger">{{ processo.situacao }}</span>
+        {% else %}
+            <span class="badge bg-light text-dark">{{ processo.situacao or "Sem situação" }}</span>
+        {% endif %}
+    </div>
+
+    <div>
+        <a href="{{ url_for('processos.editar_processo', id=processo.id) }}" class="btn btn-warning">
+            ✏ Editar
+        </a>
+
+        <a href="{{ url_for('processos.listar_processos') }}" class="btn btn-secondary">
+            ← Voltar
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        👤 Cliente
+    </div>
+
+    <div class="card-body">
+        <p>
+            <strong>Nome:</strong>
+            <a href="{{ url_for('clientes.detalhes_cliente', id=cliente.id) }}" class="fw-bold text-decoration-none">
+                {{ cliente.nome }}
+            </a>
+        </p>
+
+        <p class="mb-0">
+            <strong>WhatsApp:</strong> {{ cliente.whatsapp }}
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                ⚖ Informações do Processo
+            </div>
+
+            <div class="card-body">
+                <p><strong>Número:</strong> {{ processo.numero }}</p>
+                <p><strong>Área:</strong> {{ processo.area or "-" }}</p>
+                <p><strong>Tribunal:</strong> {{ processo.tribunal or "-" }}</p>
+                <p><strong>Comarca:</strong> {{ processo.comarca or "-" }}</p>
+                <p><strong>Vara:</strong> {{ processo.vara or "-" }}</p>
+                <p><strong>Advogado:</strong> {{ processo.advogado or "-" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                📅 Datas e Prazos
+            </div>
+
+            <div class="card-body">
+                <p>
+                    <strong>Data de Entrada:</strong>
+                    {% if processo.data_entrada %}
+                        {{ processo.data_entrada.strftime("%d/%m/%Y") }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </p>
+
+                <p>
+                    <strong>Próximo Prazo:</strong>
+                    {% if processo.proximo_prazo %}
+                        {{ processo.proximo_prazo.strftime("%d/%m/%Y") }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </p>
+
+                <p>
+                    <strong>Cadastrado em:</strong>
+                    {{ processo.criado_em.strftime("%d/%m/%Y") }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-secondary text-white">
+        📝 Observações
+    </div>
+
+    <div class="card-body">
+        <div class="border rounded p-3 bg-light">
+            {{ processo.observacoes or "Nenhuma observação cadastrada." }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

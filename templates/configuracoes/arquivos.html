@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Configurações de Arquivos
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "📂 Configurações de Arquivos",
+    "Defina limites, formatos permitidos e regras de organização dos documentos."
+) }}
+
+<form
+    method="POST"
+    action="{{ url_for(
+        'configuracao_arquivos.configuracoes_arquivos'
+    ) }}">
+
+    <div class="row g-4">
+
+        <!-- =====================================
+             LIMITES DE UPLOAD
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-dark text-white py-3">
+
+                    <h5 class="mb-0">
+                        📦 Limites de upload
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <label
+                        for="tamanho_maximo_mb"
+                        class="form-label fw-semibold">
+
+                        Tamanho máximo por arquivo
+
+                    </label>
+
+                    <select
+                        id="tamanho_maximo_mb"
+                        name="tamanho_maximo_mb"
+                        class="form-select">
+
+                        {% for tamanho in [5, 10, 20, 30, 50, 100] %}
+
+                            <option
+                                value="{{ tamanho }}"
+                                {% if configuracao.tamanho_maximo_mb == tamanho %}
+                                    selected
+                                {% endif %}>
+
+                                {{ tamanho }} MB
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <div class="form-text">
+
+                        Arquivos acima desse limite serão recusados
+                        antes de serem armazenados.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             EXTENSÕES
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-primary text-white py-3">
+
+                    <h5 class="mb-0">
+                        🧩 Extensões permitidas
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <label
+                        for="extensoes_permitidas"
+                        class="form-label fw-semibold">
+
+                        Formatos autorizados
+
+                    </label>
+
+                    <textarea
+                        id="extensoes_permitidas"
+                        name="extensoes_permitidas"
+                        class="form-control"
+                        rows="5"
+                        required>{{ configuracao.extensoes_permitidas or '' }}</textarea>
+
+                    <div class="form-text">
+
+                        Informe as extensões separadas por vírgula.
+                        Exemplo: pdf, docx, jpg, png, xlsx
+
+                    </div>
+
+                    {% if configuracao.lista_extensoes %}
+
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+
+                            {% for extensao in configuracao.lista_extensoes %}
+
+                                <span class="badge bg-light text-dark border">
+
+                                    .{{ extensao }}
+
+                                </span>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             ORGANIZAÇÃO
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-info text-white py-3">
+
+                    <h5 class="mb-0">
+                        🗂 Organização
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="form-check form-switch mb-4">
+
+                        <input
+                            type="checkbox"
+                            id="organizar_por_cliente"
+                            name="organizar_por_cliente"
+                            class="form-check-input"
+                            {% if configuracao.organizar_por_cliente %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="organizar_por_cliente"
+                            class="form-check-label fw-semibold">
+
+                            Organizar arquivos por cliente
+
+                        </label>
+
+                        <div class="form-text">
+
+                            Cada cliente terá uma pasta própria para
+                            armazenar seus documentos.
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-check form-switch">
+
+                        <input
+                            type="checkbox"
+                            id="organizar_por_processo"
+                            name="organizar_por_processo"
+                            class="form-check-input"
+                            {% if configuracao.organizar_por_processo %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="organizar_por_processo"
+                            class="form-check-label fw-semibold">
+
+                            Organizar arquivos por processo
+
+                        </label>
+
+                        <div class="form-text">
+
+                            Quando existir processo relacionado, poderá
+                            ser criada uma subpasta específica.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- =====================================
+             COMPORTAMENTO
+        ====================================== -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header bg-warning py-3">
+
+                    <h5 class="mb-0">
+                        ⚙ Comportamento
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="form-check form-switch mb-4">
+
+                        <input
+                            type="checkbox"
+                            id="renomear_automaticamente"
+                            name="renomear_automaticamente"
+                            class="form-check-input"
+                            {% if configuracao.renomear_automaticamente %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="renomear_automaticamente"
+                            class="form-check-label fw-semibold">
+
+                            Renomear arquivos automaticamente
+
+                        </label>
+
+                        <div class="form-text">
+
+                            Evita conflitos de nomes e reduz o risco
+                            de substituição acidental.
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-check form-switch">
+
+                        <input
+                            type="checkbox"
+                            id="permitir_substituir"
+                            name="permitir_substituir"
+                            class="form-check-input"
+                            {% if configuracao.permitir_substituir %}
+                                checked
+                            {% endif %}>
+
+                        <label
+                            for="permitir_substituir"
+                            class="form-check-label fw-semibold">
+
+                            Permitir substituir arquivos existentes
+
+                        </label>
+
+                        <div class="form-text">
+
+                            Use com cuidado. Quando ativado, um arquivo
+                            com o mesmo nome poderá substituir o anterior.
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="alert alert-light border mt-4 mb-0">
+
+        <strong class="d-block mb-1">
+            ℹ️ Observação
+        </strong>
+
+        <small class="text-muted">
+
+            Estas preferências serão conectadas ao upload de documentos
+            na próxima etapa. Até lá, a tela já salvará corretamente
+            todas as regras definidas.
+
+        </small>
+
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+
+        <a
+            href="{{ url_for(
+                'configuracoes.pagina_configuracoes'
+            ) }}"
+            class="btn btn-outline-secondary">
+
+            ← Voltar
+
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-success btn-lg">
+
+            💾 Salvar configurações
+
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

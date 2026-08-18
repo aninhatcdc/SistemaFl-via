@@ -1,0 +1,37 @@
+{% macro file_icon(nome_arquivo) %}
+
+    {% set ext = nome_arquivo.split('.')[-1].lower() %}
+
+    {% if ext == "pdf" %}
+        📄
+
+    {% elif ext in ["doc", "docx"] %}
+        📝
+
+    {% elif ext in ["xls", "xlsx", "csv"] %}
+        📊
+
+    {% elif ext in ["ppt", "pptx"] %}
+        📈
+
+    {% elif ext in ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"] %}
+        🖼️
+
+    {% elif ext in ["mp3", "wav", "ogg", "aac", "flac"] %}
+        🎵
+
+    {% elif ext in ["mp4", "avi", "mov", "mkv", "wmv", "webm"] %}
+        🎥
+
+    {% elif ext in ["zip", "rar", "7z", "tar", "gz"] %}
+        🗜️
+
+    {% elif ext in ["txt"] %}
+        📃
+
+    {% else %}
+        📁
+
+    {% endif %}
+
+{% endmacro %}

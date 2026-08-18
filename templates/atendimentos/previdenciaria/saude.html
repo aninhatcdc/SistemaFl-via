@@ -1,0 +1,533 @@
+{% extends "atendimentos/previdenciaria/layout.html" %}
+
+{% block title %}
+Saúde e Incapacidade - Ficha Previdenciária
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_saude_previdenciario",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Saúde e incapacidade
+{% endblock %}
+
+{% block etapa_descricao %}
+Registre diagnósticos, limitações, tratamentos e documentos médicos do segurado.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 5 de 8
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="previdenciaria-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        Registre as informações conforme os documentos apresentados.
+        A análise jurídica não substitui a avaliação médica.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-heart-pulse"></i>
+        </span>
+        <div>
+            <h3>Doença ou incapacidade</h3>
+            <p>Identifique o quadro de saúde que fundamenta o atendimento.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="possui_doenca_incapacidade" class="form-label">
+                Possui doença ou incapacidade?
+            </label>
+            <select
+                class="form-select"
+                id="possui_doenca_incapacidade"
+                name="possui_doenca_incapacidade"
+                data-controla="grupo-doenca-incapacidade"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_doenca_incapacidade == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-doenca-incapacidade"
+            class="col-12 campo-condicional"
+        >
+            <div class="row g-3">
+                <div class="col-lg-8">
+                    <label for="diagnostico_principal" class="form-label">
+                        Diagnóstico principal
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="diagnostico_principal"
+                        name="diagnostico_principal"
+                        maxlength="255"
+                        value="{{ ficha.diagnostico_principal or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-4">
+                    <label for="cid_principal" class="form-label">
+                        CID principal
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="cid_principal"
+                        name="cid_principal"
+                        maxlength="30"
+                        value="{{ ficha.cid_principal or '' }}"
+                        placeholder="Ex.: M54.5"
+                    >
+                </div>
+
+                <div class="col-12">
+                    <label for="outros_diagnosticos" class="form-label">
+                        Outros diagnósticos
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="outros_diagnosticos"
+                        name="outros_diagnosticos"
+                        rows="3"
+                    >{{ ficha.outros_diagnosticos or '' }}</textarea>
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="data_inicio_doenca" class="form-label">
+                        Data de início da doença
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_inicio_doenca"
+                        name="data_inicio_doenca"
+                        value="{{ ficha.data_inicio_doenca.strftime('%Y-%m-%d') if ficha.data_inicio_doenca else '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-6">
+                    <label
+                        for="data_inicio_incapacidade"
+                        class="form-label"
+                    >
+                        Data de início da incapacidade
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_inicio_incapacidade"
+                        name="data_inicio_incapacidade"
+                        value="{{ ficha.data_inicio_incapacidade.strftime('%Y-%m-%d') if ficha.data_inicio_incapacidade else '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="tipo_incapacidade" class="form-label">
+                        Tipo de incapacidade
+                    </label>
+                    <select
+                        class="form-select"
+                        id="tipo_incapacidade"
+                        name="tipo_incapacidade"
+                    >
+                        <option value="">Selecione</option>
+                        {% for valor, rotulo in tipos_incapacidade.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.tipo_incapacidade == valor %}selected{% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="origem_incapacidade" class="form-label">
+                        Origem da doença ou incapacidade
+                    </label>
+                    <select
+                        class="form-select"
+                        id="origem_incapacidade"
+                        name="origem_incapacidade"
+                        data-controla="grupo-origem-outro"
+                        data-exibir-quando="OUTRA"
+                    >
+                        <option value="">Selecione</option>
+                        {% for valor, rotulo in origens_incapacidade.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.origem_incapacidade == valor %}selected{% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div
+                    id="grupo-origem-outro"
+                    class="col-12 campo-condicional"
+                >
+                    <label
+                        for="origem_incapacidade_outro"
+                        class="form-label"
+                    >
+                        Outra origem
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="origem_incapacidade_outro"
+                        name="origem_incapacidade_outro"
+                        maxlength="180"
+                        value="{{ ficha.origem_incapacidade_outro or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="atividade_prejudicada" class="form-label">
+                        Atividade prejudicada
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="atividade_prejudicada"
+                        name="atividade_prejudicada"
+                        maxlength="180"
+                        value="{{ ficha.atividade_prejudicada or '' }}"
+                        placeholder="Ex.: atividade habitual ou profissão"
+                    >
+                </div>
+
+                <div class="col-12">
+                    <label for="limitacoes_funcionais" class="form-label">
+                        Limitações funcionais
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="limitacoes_funcionais"
+                        name="limitacoes_funcionais"
+                        rows="4"
+                        placeholder="Descreva dores, restrições de movimento, limitações cognitivas ou outras dificuldades."
+                    >{{ ficha.limitacoes_funcionais or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-capsule"></i>
+        </span>
+        <div>
+            <h3>Tratamento médico</h3>
+            <p>Informações sobre acompanhamento, profissionais e tratamento atual.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="realiza_tratamento" class="form-label">
+                Realiza tratamento atualmente?
+            </label>
+            <select
+                class="form-select"
+                id="realiza_tratamento"
+                name="realiza_tratamento"
+                data-controla="grupo-tratamento"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.realiza_tratamento == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="grupo-tratamento" class="col-12 campo-condicional">
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="tratamento_descricao" class="form-label">
+                        Tratamento realizado
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="tratamento_descricao"
+                        name="tratamento_descricao"
+                        rows="4"
+                        placeholder="Informe medicamentos, terapias, fisioterapia, cirurgias e frequência do acompanhamento."
+                    >{{ ficha.tratamento_descricao or '' }}</textarea>
+                </div>
+
+                <div class="col-lg-7">
+                    <label
+                        for="nome_medico_assistente"
+                        class="form-label"
+                    >
+                        Médico ou profissional assistente
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="nome_medico_assistente"
+                        name="nome_medico_assistente"
+                        maxlength="180"
+                        value="{{ ficha.nome_medico_assistente or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-5">
+                    <label
+                        for="especialidade_medico"
+                        class="form-label"
+                    >
+                        Especialidade
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="especialidade_medico"
+                        name="especialidade_medico"
+                        maxlength="120"
+                        value="{{ ficha.especialidade_medico or '' }}"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-file-earmark-medical"></i>
+        </span>
+        <div>
+            <h3>Documentação médica disponível</h3>
+            <p>Informe quais documentos foram apresentados pelo cliente.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        {% set documentos_medicos = [
+            ("possui_laudo_medico", "Possui laudo médico?"),
+            ("possui_exames", "Possui exames médicos?"),
+            ("possui_receitas", "Possui receitas médicas?")
+        ] %}
+
+        {% for campo, pergunta in documentos_medicos %}
+        <div class="col-lg-4">
+            <label for="{{ campo }}" class="form-label">
+                {{ pergunta }}
+            </label>
+            <select
+                class="form-select"
+                id="{{ campo }}"
+                name="{{ campo }}"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha|attr(campo) == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-exclamation-diamond"></i>
+        </span>
+        <div>
+            <h3>Acidente e CAT</h3>
+            <p>Registre eventual acidente relacionado ao quadro de saúde.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="houve_acidente" class="form-label">
+                Houve acidente?
+            </label>
+            <select
+                class="form-select"
+                id="houve_acidente"
+                name="houve_acidente"
+                data-controla="grupo-acidente"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.houve_acidente == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="grupo-acidente" class="col-12 campo-condicional">
+            <div class="row g-3">
+                <div class="col-lg-4">
+                    <label for="data_acidente" class="form-label">
+                        Data do acidente
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_acidente"
+                        name="data_acidente"
+                        value="{{ ficha.data_acidente.strftime('%Y-%m-%d') if ficha.data_acidente else '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-4">
+                    <label for="possui_cat" class="form-label">
+                        Possui CAT?
+                    </label>
+                    <select
+                        class="form-select"
+                        id="possui_cat"
+                        name="possui_cat"
+                    >
+                        <option value="">Selecione</option>
+                        {% for valor, rotulo in respostas.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.possui_cat == valor %}selected{% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label for="acidente_descricao" class="form-label">
+                        Descrição do acidente
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="acidente_descricao"
+                        name="acidente_descricao"
+                        rows="4"
+                        placeholder="Descreva como ocorreu, local, consequências e relação com o trabalho."
+                    >{{ ficha.acidente_descricao or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+        <div>
+            <h3>Observações</h3>
+            <p>Registre informações complementares sobre saúde e incapacidade.</p>
+        </div>
+    </div>
+
+    <label for="observacoes_saude" class="form-label">
+        Observações de saúde
+    </label>
+    <textarea
+        class="form-control"
+        id="observacoes_saude"
+        name="observacoes_saude"
+        rows="5"
+        placeholder="Registre pendências, necessidade de novos laudos, exames ou avaliação especializada."
+    >{{ ficha.observacoes_saude or '' }}</textarea>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function atualizarCampoCondicional(controle) {
+            const alvoId = controle.dataset.controla;
+            const valorExibicao = controle.dataset.exibirQuando;
+            const alvo = document.getElementById(alvoId);
+
+            if (!alvo) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorExibicao;
+
+            alvo.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            alvo.querySelectorAll("input, select, textarea").forEach(
+                function (campo) {
+                    campo.disabled = !deveExibir;
+                }
+            );
+        }
+
+        document.querySelectorAll("[data-controla]").forEach(
+            function (controle) {
+                atualizarCampoCondicional(controle);
+
+                controle.addEventListener("change", function () {
+                    atualizarCampoCondicional(controle);
+                });
+            }
+        );
+    });
+</script>
+
+{% endblock %}

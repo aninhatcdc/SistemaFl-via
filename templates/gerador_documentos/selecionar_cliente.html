@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Selecionar Cliente
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="mb-1">
+            Selecionar Cliente
+        </h2>
+
+        <p class="text-muted mb-0">
+            Modelo: <strong>{{ modelo.nome }}</strong>
+        </p>
+
+    </div>
+
+    <a href="{{ url_for('gerador_documentos.listar') }}"
+       class="btn btn-secondary">
+        ← Voltar
+    </a>
+
+</div>
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+
+                <div class="text-muted small">
+                    Documento selecionado
+                </div>
+
+                <h5 class="mb-1">
+                    {{ modelo.nome }}
+                </h5>
+
+                <span class="badge bg-primary">
+                    {{ modelo.categoria_nome }}
+                </span>
+
+                {% if modelo.area_juridica %}
+
+                    <span class="badge bg-secondary">
+                        {{ modelo.area_juridica }}
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+                <span class="text-muted">
+                    {{ clientes|length }}
+                    cliente(s) disponível(is)
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow-sm">
+
+    <div class="card-header bg-light">
+
+        <strong>
+            Clientes ativos
+        </strong>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if clientes %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead>
+
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>WhatsApp</th>
+                            <th>Área</th>
+                            <th class="text-center">
+                                Ação
+                            </th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for cliente in clientes %}
+
+                            <tr>
+
+                                <td class="fw-bold">
+                                    {{ cliente.nome }}
+                                </td>
+
+                                <td>
+                                    {{ cliente.cpf or "-" }}
+                                </td>
+
+                                <td>
+                                    {{ cliente.whatsapp or "-" }}
+                                </td>
+
+                                <td>
+                                    {{ cliente.area_juridica or "-" }}
+                                </td>
+
+                                <td class="text-center">
+
+                                    <a href="{{ url_for(
+                                        'gerador_documentos.preparar_documento',
+                                        modelo_id=modelo.id,
+                                        cliente_id=cliente.id
+                                    ) }}"
+                                       class="btn btn-primary btn-sm">
+
+                                        Selecionar
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <div class="fs-1 mb-3">
+                    👤
+                </div>
+
+                <h5>
+                    Nenhum cliente ativo
+                </h5>
+
+                <p class="text-muted">
+                    Cadastre ou reative um cliente antes de gerar o documento.
+                </p>
+
+                <a href="{{ url_for('clientes.novo_cliente') }}"
+                   class="btn btn-primary">
+
+                    + Novo Cliente
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

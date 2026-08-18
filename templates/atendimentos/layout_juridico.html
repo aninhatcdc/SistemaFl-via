@@ -1,0 +1,1652 @@
+{% extends "base.html" %}
+
+{% set area_nome = area_nome|default("Atendimento Jurídico") %}
+{% set area_icone = area_icone|default("bi-balance-scale") %}
+{% set area_slug = area_slug|default("juridico") %}
+
+{#
+    ============================================================
+    LAYOUT PRINCIPAL DA FICHA JURÍDICA
+    ============================================================
+
+    Este arquivo será herdado por todas as etapas:
+
+    - atendimento.html
+    - cliente.html
+    - empresa.html
+    - admissao.html
+    - contrato.html
+    - local_trabalho.html
+    - salario.html
+    - ferias.html
+    - decimo_terceiro.html
+    - rescisao.html
+
+    Variáveis esperadas:
+
+    atendimento
+    ficha
+    etapa_atual
+    progresso
+    etapas
+    url_anterior
+    url_proxima
+#}
+
+
+{% block titulo %}
+    {% block title %}
+        {{ area_nome }}
+        {% if atendimento %}
+            #{{ atendimento.id }}
+        {% endif %}
+    {% endblock %}
+{% endblock %}
+
+
+{% block conteudo %}
+
+<link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+>
+
+{% set etapa_selecionada = etapa_atual|default("atendimento") %}
+
+{% set percentual = progresso|default(
+    ficha.progresso_percentual
+    if ficha and ficha.progresso_percentual is defined
+    else 0
+) %}
+
+{% set lista_etapas = etapas|default([
+    {
+        "codigo": "atendimento",
+        "titulo": "Atendimento",
+        "icone": "bi-clipboard2-pulse",
+        "concluida": ficha.etapa_atendimento_concluida
+            if ficha and ficha.etapa_atendimento_concluida is defined
+            else false
+    },
+    {
+        "codigo": "partes",
+        "titulo": "Partes",
+        "icone": "bi-people",
+        "concluida": ficha.etapa_partes_concluida
+            if ficha and ficha.etapa_partes_concluida is defined
+            else false
+    },
+    {
+        "codigo": "fatos",
+        "titulo": "Fatos",
+        "icone": "bi-journal-text",
+        "concluida": ficha.etapa_fatos_concluida
+            if ficha and ficha.etapa_fatos_concluida is defined
+            else false
+    },
+    {
+        "codigo": "pedidos",
+        "titulo": "Pedidos",
+        "icone": "bi-list-check",
+        "concluida": ficha.etapa_pedidos_concluida
+            if ficha and ficha.etapa_pedidos_concluida is defined
+            else false
+    },
+    {
+        "codigo": "provas",
+        "titulo": "Provas",
+        "icone": "bi-search",
+        "concluida": ficha.etapa_provas_concluida
+            if ficha and ficha.etapa_provas_concluida is defined
+            else false
+    },
+    {
+        "codigo": "documentos",
+        "titulo": "Documentos",
+        "icone": "bi-folder2-open",
+        "concluida": ficha.etapa_documentos_concluida
+            if ficha and ficha.etapa_documentos_concluida is defined
+            else false
+    },
+    {
+        "codigo": "estrategia",
+        "titulo": "Estratégia",
+        "icone": "bi-diagram-3",
+        "concluida": ficha.etapa_estrategia_concluida
+            if ficha and ficha.etapa_estrategia_concluida is defined
+            else false
+    },
+    {
+        "codigo": "observacoes",
+        "titulo": "Observações",
+        "icone": "bi-chat-left-text",
+        "concluida": ficha.etapa_observacoes_concluida
+            if ficha and ficha.etapa_observacoes_concluida is defined
+            else false
+    },
+    {
+        "codigo": "revisao",
+        "titulo": "Revisão",
+        "icone": "bi-check2-circle",
+        "concluida": ficha.etapa_revisao_concluida
+            if ficha and ficha.etapa_revisao_concluida is defined
+            else false
+    }
+]) %}
+
+
+<style>
+    :root {
+        --juridico-primary: #111111;
+        --juridico-primary-dark: #000000;
+        --juridico-primary-light: #f7f0df;
+        --juridico-success: #b08d57;
+        --juridico-warning: #d4af37;
+        --juridico-danger: #9f2d2d;
+        --juridico-border: #d8c7a3;
+        --juridico-background: #f8f5ee;
+        --juridico-text: #1b1b1b;
+        --juridico-muted: #6f675b;
+        --juridico-sidebar-width: 285px;
+    }
+
+
+    .juridico-page {
+        color: var(--juridico-text);
+    }
+
+
+    .juridico-page .card {
+        border-color: var(--juridico-border);
+    }
+
+
+    .juridico-header {
+        background:
+            linear-gradient(
+                135deg,
+                var(--juridico-primary) 0%,
+                var(--juridico-primary-dark) 100%
+            );
+        border-radius: 18px;
+        color: #ffffff;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 10px 28px rgba(176, 141, 87, 0.22);
+    }
+
+
+    .juridico-header::after {
+        content: "";
+        position: absolute;
+        top: -90px;
+        right: -60px;
+        width: 270px;
+        height: 270px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        pointer-events: none;
+    }
+
+
+    .juridico-header-content {
+        position: relative;
+        z-index: 1;
+        padding: 26px 28px;
+    }
+
+
+    .juridico-header-icon {
+        width: 56px;
+        height: 56px;
+        flex: 0 0 56px;
+        border-radius: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.14);
+        font-size: 1.65rem;
+    }
+
+
+    .juridico-header-title {
+        font-size: 1.45rem;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+
+    .juridico-header-subtitle {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 0.93rem;
+    }
+
+
+    .juridico-header-meta {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+
+    .juridico-header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+        font-size: 0.82rem;
+        font-weight: 600;
+    }
+
+
+    .juridico-progress-area {
+        padding: 0 28px 26px;
+        position: relative;
+        z-index: 1;
+    }
+
+
+    .juridico-progress-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-bottom: 7px;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.88);
+    }
+
+
+    .juridico-progress {
+        height: 9px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.18);
+        overflow: hidden;
+    }
+
+
+    .juridico-progress .progress-bar {
+        border-radius: 999px;
+        background: #ffffff;
+        transition: width 0.3s ease;
+    }
+
+
+    .juridico-grid {
+        display: grid;
+        grid-template-columns: var(--juridico-sidebar-width) minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+
+    .juridico-sidebar {
+        position: sticky;
+        top: 18px;
+        border-radius: 18px;
+        overflow: hidden;
+        background: #ffffff;
+        border: 1px solid var(--juridico-border);
+        box-shadow: 0 8px 22px rgba(28, 43, 54, 0.06);
+    }
+
+
+    .juridico-sidebar-header {
+        padding: 18px;
+        background: #fcfaf5;
+        border-bottom: 1px solid var(--juridico-border);
+    }
+
+
+    .juridico-sidebar-header h2 {
+        margin: 0 0 4px;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+
+    .juridico-sidebar-header p {
+        margin: 0;
+        color: var(--juridico-muted);
+        font-size: 0.8rem;
+    }
+
+
+    .juridico-steps {
+        padding: 10px;
+    }
+
+
+    .juridico-step {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        min-height: 49px;
+        padding: 8px 10px;
+        margin-bottom: 4px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #4a4339;
+        transition:
+            background-color 0.18s ease,
+            color 0.18s ease,
+            transform 0.18s ease;
+    }
+
+
+    .juridico-step:last-child {
+        margin-bottom: 0;
+    }
+
+
+    .juridico-step:hover {
+        background: #faf6ed;
+        color: var(--juridico-primary);
+        transform: translateX(2px);
+    }
+
+
+    .juridico-step.active {
+        background: var(--juridico-primary-light);
+        color: var(--juridico-primary);
+        font-weight: 700;
+    }
+
+
+    .juridico-step.active::before {
+        content: "";
+        position: absolute;
+        left: -10px;
+        top: 11px;
+        bottom: 11px;
+        width: 4px;
+        border-radius: 0 6px 6px 0;
+        background: var(--juridico-primary);
+    }
+
+
+    .juridico-step-icon {
+        width: 31px;
+        height: 31px;
+        flex: 0 0 31px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #f3ead8;
+        font-size: 0.9rem;
+        transition:
+            background-color 0.18s ease,
+            color 0.18s ease;
+    }
+
+
+    .juridico-step.active .juridico-step-icon {
+        color: #ffffff;
+        background: var(--juridico-primary);
+    }
+
+
+    .juridico-step.completed .juridico-step-icon {
+        color: #ffffff;
+        background: var(--juridico-success);
+    }
+
+
+    .juridico-step-text {
+        min-width: 0;
+        flex: 1;
+    }
+
+
+    .juridico-step-title {
+        display: block;
+        line-height: 1.2;
+        font-size: 0.88rem;
+    }
+
+
+    .juridico-step-status {
+        display: block;
+        margin-top: 2px;
+        color: var(--juridico-muted);
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+
+    .juridico-step.active .juridico-step-status {
+        color: var(--juridico-primary);
+    }
+
+
+    .juridico-client-summary {
+        padding: 16px 18px;
+        background: #fcfaf5;
+        border-top: 1px solid var(--juridico-border);
+    }
+
+
+    .juridico-client-summary-label {
+        margin-bottom: 5px;
+        color: var(--juridico-muted);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+
+    .juridico-client-summary-name {
+        margin-bottom: 10px;
+        font-size: 0.94rem;
+        font-weight: 700;
+        line-height: 1.25;
+    }
+
+
+    .juridico-client-summary-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+        margin-top: 7px;
+        color: #5e6871;
+        font-size: 0.77rem;
+        line-height: 1.3;
+    }
+
+
+    .juridico-client-summary-item i {
+        width: 15px;
+        margin-top: 1px;
+        color: var(--juridico-primary);
+    }
+
+
+    .juridico-content-card {
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid var(--juridico-border);
+        background: #ffffff;
+        box-shadow: 0 8px 22px rgba(28, 43, 54, 0.06);
+    }
+
+
+    .juridico-content-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 22px 24px;
+        background: #fcfaf5;
+        border-bottom: 1px solid var(--juridico-border);
+    }
+
+
+    .juridico-content-title {
+        margin: 0 0 4px;
+        font-size: 1.16rem;
+        font-weight: 700;
+    }
+
+
+    .juridico-content-description {
+        margin: 0;
+        color: var(--juridico-muted);
+        font-size: 0.87rem;
+    }
+
+
+    .juridico-content-step-badge {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 10px;
+        border: 1px solid var(--juridico-border);
+        border-radius: 999px;
+        background: #ffffff;
+        color: var(--juridico-muted);
+        font-size: 0.76rem;
+        font-weight: 600;
+    }
+
+
+    .juridico-content-body {
+        padding: 24px;
+    }
+
+
+    .juridico-section {
+        margin-bottom: 26px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #eadfc9;
+    }
+
+
+    .juridico-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: 0;
+    }
+
+
+    .juridico-section-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 17px;
+    }
+
+
+    .juridico-section-title-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        color: var(--juridico-primary);
+        background: var(--juridico-primary-light);
+    }
+
+
+    .juridico-section-title h3 {
+        margin: 0;
+        font-size: 0.98rem;
+        font-weight: 700;
+    }
+
+
+    .juridico-section-title p {
+        margin: 2px 0 0;
+        color: var(--juridico-muted);
+        font-size: 0.76rem;
+    }
+
+
+    .juridico-content-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 18px 24px;
+        background: #fcfaf5;
+        border-top: 1px solid var(--juridico-border);
+    }
+
+
+    .juridico-footer-left,
+    .juridico-footer-right {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+    }
+
+
+    .juridico-content-footer .btn {
+        min-height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.86rem;
+    }
+
+
+    .juridico-content-footer .btn-primary {
+        border-color: var(--juridico-primary);
+        background: var(--juridico-primary);
+    }
+
+
+    .juridico-content-footer .btn-primary:hover,
+    .juridico-content-footer .btn-primary:focus {
+        border-color: var(--juridico-primary-dark);
+        background: var(--juridico-primary-dark);
+    }
+
+
+    .juridico-save-information {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--juridico-muted);
+        font-size: 0.75rem;
+    }
+
+
+    .juridico-save-information i {
+        color: var(--juridico-success);
+    }
+
+
+    .juridico-info-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        padding: 14px 16px;
+        margin-bottom: 20px;
+        border: 1px solid #e2d3b5;
+        border-radius: 12px;
+        background: #fbf7ee;
+        color: #5f4a27;
+        font-size: 0.84rem;
+    }
+
+
+    .juridico-info-box > i {
+        margin-top: 1px;
+        font-size: 1rem;
+    }
+
+
+    .juridico-page .form-label {
+        margin-bottom: 6px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #2a241c;
+    }
+
+
+    .juridico-page .form-control,
+    .juridico-page .form-select {
+        min-height: 42px;
+        border-radius: 10px;
+        border-color: #d8c7a3;
+        font-size: 0.88rem;
+    }
+
+
+    .juridico-page textarea.form-control {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+
+    .juridico-page .form-control:focus,
+    .juridico-page .form-select:focus {
+        border-color: #b08d57;
+        box-shadow: 0 0 0 0.2rem rgba(176, 141, 87, 0.20);
+    }
+
+
+    .juridico-page .form-text {
+        font-size: 0.73rem;
+    }
+
+
+    .juridico-required {
+        color: var(--juridico-danger);
+    }
+
+
+    .juridico-readonly-field {
+        background: #f5f0e6 !important;
+        color: #665f55;
+    }
+
+
+    @media (max-width: 1199.98px) {
+        .juridico-grid {
+            grid-template-columns: 245px minmax(0, 1fr);
+        }
+    }
+
+
+    @media (max-width: 991.98px) {
+        .juridico-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .juridico-sidebar {
+            position: static;
+        }
+
+
+        .juridico-steps {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 4px;
+        }
+
+
+        .juridico-step {
+            margin-bottom: 0;
+        }
+
+
+        .juridico-client-summary {
+            display: none;
+        }
+
+
+        .juridico-header-meta {
+            justify-content: flex-start;
+            margin-top: 14px;
+        }
+    }
+
+
+    @media (max-width: 767.98px) {
+        .juridico-header-content,
+        .juridico-progress-area {
+            padding-left: 18px;
+            padding-right: 18px;
+        }
+
+
+        .juridico-content-header,
+        .juridico-content-body,
+        .juridico-content-footer {
+            padding-left: 17px;
+            padding-right: 17px;
+        }
+
+
+        .juridico-content-header {
+            flex-direction: column;
+        }
+
+
+        .juridico-content-footer {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+
+        .juridico-footer-left,
+        .juridico-footer-right {
+            width: 100%;
+        }
+
+
+        .juridico-content-footer .btn {
+            flex: 1;
+        }
+
+
+        .juridico-steps {
+            grid-template-columns: 1fr;
+        }
+
+
+        .juridico-save-information {
+            display: none;
+        }
+    }
+
+
+    @media (max-width: 575.98px) {
+        .juridico-header-icon {
+            width: 46px;
+            height: 46px;
+            flex-basis: 46px;
+            border-radius: 13px;
+            font-size: 1.3rem;
+        }
+
+
+        .juridico-header-title {
+            font-size: 1.18rem;
+        }
+
+
+        .juridico-header-subtitle {
+            font-size: 0.8rem;
+        }
+
+
+        .juridico-header-badge {
+            font-size: 0.72rem;
+        }
+
+
+        .juridico-footer-left,
+        .juridico-footer-right {
+            flex-direction: column;
+        }
+
+
+        .juridico-content-footer .btn {
+            width: 100%;
+        }
+
+       /* =========================================================
+   AJUSTE DE TAMANHOS DAS SEÇÕES DA FICHA JURÍDICA
+   ========================================================= */
+
+        .juridico-section {
+            padding: 0;
+        }
+
+        .juridico-section-header {
+            margin-bottom: 18px;
+        }
+
+        .juridico-section-kicker {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.2;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .juridico-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 700;
+            line-height: 1.3;
+            color: #172033;
+        }
+
+        .juridico-section-title i {
+            font-size: 1.25rem;
+        }
+
+        .juridico-section .form-label {
+            margin-bottom: 6px;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .juridico-section .form-control,
+        .juridico-section .form-select,
+        .juridico-section .input-group-text {
+            min-height: 42px;
+            font-size: 0.92rem;
+        }
+
+        .juridico-section textarea.form-control {
+            min-height: auto;
+        }
+
+        .juridico-section .badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+        } 
+    }
+
+    /* =========================================================
+       TEMA INSTITUCIONAL — PRETO E DOURADO
+       ========================================================= */
+
+    .juridico-page {
+        background: #f8f5ee;
+    }
+
+    .juridico-header {
+        border: 1px solid #b08d57;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .juridico-header-icon {
+        background: rgba(176, 141, 87, 0.22);
+        color: #d4af37;
+        border: 1px solid rgba(212, 175, 55, 0.42);
+    }
+
+    .juridico-header-title {
+        color: #d4af37;
+    }
+
+    .juridico-header-badge {
+        background: rgba(176, 141, 87, 0.18);
+        border: 1px solid rgba(212, 175, 55, 0.34);
+        color: #ffffff;
+    }
+
+    .juridico-progress {
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    .juridico-progress .progress-bar {
+        background: linear-gradient(90deg, #b08d57, #d4af37);
+    }
+
+    .juridico-sidebar,
+    .juridico-content-card {
+        border-color: #d8c7a3;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07);
+    }
+
+    .juridico-sidebar-header,
+    .juridico-content-header,
+    .juridico-content-footer {
+        background: #fcfaf5;
+    }
+
+    .juridico-step:hover {
+        background: #faf3e4;
+        color: #7d622f;
+    }
+
+    .juridico-step.active {
+        background: #f7f0df;
+        color: #7d622f;
+    }
+
+    .juridico-step.active::before {
+        background: #b08d57;
+    }
+
+    .juridico-step.active .juridico-step-icon,
+    .juridico-step.completed .juridico-step-icon {
+        background: #111111;
+        color: #d4af37;
+    }
+
+    .juridico-section-title-icon {
+        color: #7d622f;
+        background: #f7f0df;
+        border: 1px solid #e2d3b5;
+    }
+
+    .juridico-content-title,
+    .juridico-section-title h3 {
+        color: #171717;
+    }
+
+    .juridico-content-step-badge {
+        border-color: #d8c7a3;
+        background: #fffdf8;
+        color: #7d622f;
+    }
+
+    .juridico-page .form-label {
+        color: #2a241c;
+    }
+
+    .juridico-page .form-control,
+    .juridico-page .form-select {
+        border-color: #d8c7a3;
+        background-color: #fffdf9;
+        color: #1b1b1b;
+    }
+
+    .juridico-page .form-control:focus,
+    .juridico-page .form-select:focus {
+        border-color: #b08d57;
+        box-shadow: 0 0 0 0.2rem rgba(176, 141, 87, 0.20);
+        background-color: #ffffff;
+    }
+
+    .juridico-page .form-check-input:checked {
+        background-color: #111111;
+        border-color: #111111;
+    }
+
+    .juridico-page .form-check-input:focus {
+        border-color: #b08d57;
+        box-shadow: 0 0 0 0.2rem rgba(176, 141, 87, 0.20);
+    }
+
+    .juridico-page .btn-primary {
+        color: #111111;
+        border-color: #b08d57;
+        background: linear-gradient(135deg, #b08d57, #d4af37);
+        font-weight: 700;
+    }
+
+    .juridico-page .btn-primary:hover,
+    .juridico-page .btn-primary:focus {
+        color: #ffffff;
+        border-color: #000000;
+        background: #111111;
+    }
+
+    .juridico-page .btn-outline-secondary {
+        color: #4a3b22;
+        border-color: #b08d57;
+        background: #ffffff;
+    }
+
+    .juridico-page .btn-outline-secondary:hover,
+    .juridico-page .btn-outline-secondary:focus {
+        color: #d4af37;
+        border-color: #111111;
+        background: #111111;
+    }
+
+    .juridico-page .btn-outline-danger {
+        color: #7d622f;
+        border-color: #b08d57;
+    }
+
+    .juridico-page .btn-outline-danger:hover {
+        color: #ffffff;
+        background: #111111;
+        border-color: #111111;
+    }
+
+    .juridico-info-box {
+        border-color: #e2d3b5;
+        background: #fbf7ee;
+        color: #5f4a27;
+    }
+
+    .juridico-readonly-field {
+        background: #f5f0e6 !important;
+        color: #665f55;
+    }
+
+
+    /* =========================================================
+       COMPATIBILIDADE COM AS ETAPAS EXISTENTES
+       ========================================================= */
+
+    .civel-section,
+    .trabalhista-section,
+    .previdenciaria-section,
+    .familia-section {
+        margin-bottom: 26px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #eadfc9;
+    }
+
+    .civel-section:last-child,
+    .trabalhista-section:last-child,
+    .previdenciaria-section:last-child,
+    .familia-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: 0;
+    }
+
+    .civel-section-title,
+    .trabalhista-section-title,
+    .previdenciaria-section-title,
+    .familia-section-title {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 17px;
+        color: #171717;
+        font-weight: 700;
+    }
+
+    .civel-section-title-icon,
+    .trabalhista-section-title-icon,
+    .previdenciaria-section-title-icon,
+    .familia-section-title-icon {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        color: #7d622f;
+        background: #f7f0df;
+        border: 1px solid #e2d3b5;
+    }
+
+    .civel-section-title h3,
+    .trabalhista-section-title h3,
+    .previdenciaria-section-title h3,
+    .familia-section-title h3 {
+        margin: 0;
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: #171717;
+    }
+
+    .civel-section-title p,
+    .trabalhista-section-title p,
+    .previdenciaria-section-title p,
+    .familia-section-title p {
+        margin: 2px 0 0;
+        color: #6f675b;
+        font-size: 0.76rem;
+    }
+
+    .familia-page .form-control,
+    .familia-page .form-select,
+    .juridico-page .form-control,
+    .juridico-page .form-select {
+        border-color: #d8c7a3;
+        background-color: #fffdf9;
+    }
+
+    .familia-page .form-control:focus,
+    .familia-page .form-select:focus,
+    .juridico-page .form-control:focus,
+    .juridico-page .form-select:focus {
+        border-color: #b08d57;
+        box-shadow: 0 0 0 0.2rem rgba(176, 141, 87, 0.20);
+    }
+
+</style>
+
+
+<div class="container-fluid py-3 py-lg-4 juridico-page">
+
+    <!-- =======================================================
+         CABEÇALHO PRINCIPAL
+         ======================================================= -->
+    <section class="juridico-header mb-4">
+
+        <div class="juridico-header-content">
+
+            <div class="row align-items-center">
+
+                <div class="col-lg-7">
+
+                    <div class="d-flex align-items-center gap-3">
+
+                        <div class="juridico-header-icon">
+                            <i class="bi bi-bank2"></i>
+                        </div>
+
+                        <div>
+
+                            <div class="juridico-header-title">
+                                Atendimento {{ area_nome }}
+                            </div>
+
+                            <p class="juridico-header-subtitle">
+
+                                {% if atendimento and atendimento.cliente %}
+
+                                    {{ atendimento.cliente.nome }}
+
+                                {% elif atendimento %}
+
+                                    Atendimento #{{ atendimento.id }}
+
+                                {% else %}
+
+                                    Ficha de atendimento jurídico
+
+                                {% endif %}
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-5">
+
+                    <div class="juridico-header-meta">
+
+                        {% if atendimento %}
+
+                            <span class="juridico-header-badge">
+                                <i class="bi bi-hash"></i>
+                                Atendimento {{ atendimento.id }}
+                            </span>
+
+                            <span class="juridico-header-badge">
+                                <i class="bi bi-circle-fill small"></i>
+                                {{ atendimento.status|default("Rascunho") }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="juridico-progress-area">
+
+            <div class="juridico-progress-label">
+
+                <span>
+                    Progresso da ficha
+                </span>
+
+                <strong>
+                    {{ percentual|int }}%
+                </strong>
+
+            </div>
+
+            <div
+                class="progress juridico-progress"
+                role="progressbar"
+                aria-label="Progresso da ficha de {{ area_nome }}"
+                aria-valuenow="{{ percentual|int }}"
+                aria-valuemin="0"
+                aria-valuemax="100"
+            >
+                <div
+                    class="progress-bar"
+                    style="width: {{ percentual|int }}%;"
+                ></div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         CONTEÚDO PRINCIPAL
+         ======================================================= -->
+    <div class="juridico-grid">
+
+        <!-- ===================================================
+             MENU LATERAL
+             =================================================== -->
+        <aside class="juridico-sidebar">
+
+            <div class="juridico-sidebar-header">
+
+                <h2>
+                    Etapas da ficha
+                </h2>
+
+                <p>
+                    Preencha e salve cada etapa.
+                </p>
+
+            </div>
+
+
+            <nav class="juridico-steps">
+
+                {% for etapa in lista_etapas %}
+
+                    {% set esta_ativa = etapa.codigo == etapa_selecionada %}
+
+                    {% set esta_concluida = etapa.concluida|default(false) %}
+
+                    {% set link_etapa = etapa.url|default("#") %}
+
+                    <a
+                        href="{{ link_etapa }}"
+                        class="
+                            juridico-step
+                            {% if esta_ativa %}active{% endif %}
+                            {% if esta_concluida %}completed{% endif %}
+                        "
+                        {% if esta_ativa %}
+                            aria-current="page"
+                        {% endif %}
+                    >
+
+                        <span class="juridico-step-icon">
+
+                            {% if esta_concluida and not esta_ativa %}
+
+                                <i class="bi bi-check-lg"></i>
+
+                            {% else %}
+
+                                <i class="bi {{ etapa.icone }}"></i>
+
+                            {% endif %}
+
+                        </span>
+
+
+                        <span class="juridico-step-text">
+
+                            <span class="juridico-step-title">
+                                {{ etapa.titulo }}
+                            </span>
+
+                            <span class="juridico-step-status">
+
+                                {% if esta_ativa %}
+
+                                    Etapa atual
+
+                                {% elif esta_concluida %}
+
+                                    Concluída
+
+                                {% else %}
+
+                                    Pendente
+
+                                {% endif %}
+
+                            </span>
+
+                        </span>
+
+
+                        {% if esta_ativa %}
+
+                            <i class="bi bi-chevron-right small"></i>
+
+                        {% endif %}
+
+                    </a>
+
+                {% endfor %}
+
+            </nav>
+
+
+            {% if atendimento and atendimento.cliente %}
+
+                <div class="juridico-client-summary">
+
+                    <div class="juridico-client-summary-label">
+                        Cliente
+                    </div>
+
+                    <div class="juridico-client-summary-name">
+                        {{ atendimento.cliente.nome }}
+                    </div>
+
+
+                    {% if atendimento.cliente.cpf %}
+
+                        <div class="juridico-client-summary-item">
+
+                            <i class="bi bi-person-vcard"></i>
+
+                            <span>
+                                CPF: {{ atendimento.cliente.cpf }}
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    {% if atendimento.cliente.whatsapp %}
+
+                        <div class="juridico-client-summary-item">
+
+                            <i class="bi bi-whatsapp"></i>
+
+                            <span>
+                                {{ atendimento.cliente.whatsapp }}
+                            </span>
+
+                        </div>
+
+                    {% elif atendimento.cliente.telefone %}
+
+                        <div class="juridico-client-summary-item">
+
+                            <i class="bi bi-telephone"></i>
+
+                            <span>
+                                {{ atendimento.cliente.telefone }}
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    {% if atendimento.responsavel %}
+
+                        <div class="juridico-client-summary-item">
+
+                            <i class="bi bi-person-badge"></i>
+
+                            <span>
+                                Responsável:
+                                {{ atendimento.responsavel.nome }}
+                            </span>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            {% endif %}
+
+        </aside>
+
+
+        <!-- ===================================================
+             FORMULÁRIO DA ETAPA
+             =================================================== -->
+        <main class="juridico-content-card">
+
+            <form
+                method="POST"
+                action="{% block form_action %}{% endblock %}"
+                enctype="{% block form_enctype %}application/x-www-form-urlencoded{% endblock %}"
+                id="form-etapa-civel"
+                novalidate
+            >
+
+                <div class="juridico-content-header">
+
+                    <div>
+
+                        <h1 class="juridico-content-title">
+                            {% block etapa_titulo %}
+                                {{ area_nome }}
+                            {% endblock %}
+                        </h1>
+
+                        <p class="juridico-content-description">
+                            {% block etapa_descricao %}
+                                Preencha os dados solicitados nesta etapa.
+                            {% endblock %}
+                        </p>
+
+                    </div>
+
+
+                    <span class="juridico-content-step-badge">
+
+                        <i class="bi bi-pencil-square"></i>
+
+                        {% block etapa_identificacao %}
+                            Etapa em preenchimento
+                        {% endblock %}
+
+                    </span>
+
+                </div>
+
+
+                <div class="juridico-content-body">
+
+                    {% block etapa_alertas %}
+                    {% endblock %}
+
+
+                    {% block etapa_conteudo %}
+                    {% endblock %}
+
+                </div>
+
+
+                <div class="juridico-content-footer">
+
+                    <div class="juridico-footer-left">
+
+                        {% if url_anterior|default(None) %}
+
+                            <a
+                                href="{{ url_anterior }}"
+                                class="btn btn-outline-secondary"
+                            >
+                                <i class="bi bi-arrow-left"></i>
+                                Anterior
+                            </a>
+
+                        {% elif atendimento and atendimento.cliente_id %}
+
+                            <a
+                                href="{{ url_for(
+                                    'clientes.detalhes_cliente',
+                                    id=atendimento.cliente_id
+                                ) }}"
+                                class="btn btn-outline-secondary"
+                            >
+                                <i class="bi bi-arrow-left"></i>
+                                Voltar ao cliente
+                            </a>
+
+                        {% endif %}
+
+
+                        <button
+                            type="submit"
+                            name="acao"
+                            value="salvar"
+                            class="btn btn-outline-primary"
+                        >
+                            <i class="bi bi-floppy"></i>
+                            Salvar
+                        </button>
+
+                    </div>
+
+
+                    <div class="juridico-footer-right">
+
+                        <span class="juridico-save-information">
+
+                            <i class="bi bi-shield-check"></i>
+
+                            Os dados serão salvos nesta ficha.
+
+                        </span>
+
+
+                        {% if url_proxima|default(None) %}
+
+                            <button
+                                type="submit"
+                                name="acao"
+                                value="salvar_proxima"
+                                class="btn btn-primary"
+                            >
+                                Salvar e continuar
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+
+                        {% else %}
+
+                            <button
+                                type="submit"
+                                name="acao"
+                                value="salvar_finalizar"
+                                class="btn btn-success"
+                            >
+                                <i class="bi bi-check-circle"></i>
+                                Salvar etapa
+                            </button>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </main>
+
+    </div>
+
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const formulario = document.getElementById(
+            "form-etapa-civel"
+        );
+
+        if (!formulario) {
+            return;
+        }
+
+        let formularioAlterado = false;
+        let formularioEnviado = false;
+
+        const campos = formulario.querySelectorAll(
+            "input, select, textarea"
+        );
+
+        campos.forEach(function (campo) {
+            campo.addEventListener("change", function () {
+                formularioAlterado = true;
+            });
+
+            campo.addEventListener("input", function () {
+                formularioAlterado = true;
+            });
+        });
+
+        formulario.addEventListener("submit", function () {
+            formularioEnviado = true;
+        });
+
+        window.addEventListener("beforeunload", function (evento) {
+            if (
+                formularioAlterado &&
+                !formularioEnviado
+            ) {
+                evento.preventDefault();
+                evento.returnValue = "";
+            }
+        });
+
+        const linksEtapas = document.querySelectorAll(
+            ".juridico-step"
+        );
+
+        linksEtapas.forEach(function (link) {
+            link.addEventListener("click", function (evento) {
+                const destino = link.getAttribute("href");
+
+                if (
+                    !destino ||
+                    destino === "#"
+                ) {
+                    evento.preventDefault();
+                    return;
+                }
+
+                if (
+                    formularioAlterado &&
+                    !formularioEnviado
+                ) {
+                    const podeSair = window.confirm(
+                        "Existem alterações que ainda não foram salvas. " +
+                        "Deseja sair desta etapa mesmo assim?"
+                    );
+
+                    if (!podeSair) {
+                        evento.preventDefault();
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

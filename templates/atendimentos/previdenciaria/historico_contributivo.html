@@ -1,0 +1,459 @@
+{% extends "atendimentos/previdenciaria/layout.html" %}
+
+{% block title %}
+Histórico Contributivo - Ficha Previdenciária
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_historico_contributivo_previdenciario",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Histórico contributivo
+{% endblock %}
+
+{% block etapa_descricao %}
+Analise o CNIS, os vínculos e os períodos que podem compor o tempo de contribuição.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 3 de 8
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="previdenciaria-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        Registre também períodos que não aparecem no CNIS, como atividade
+        rural, especial, serviço público ou tempo militar.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-file-earmark-person"></i>
+        </span>
+        <div>
+            <h3>CNIS</h3>
+            <p>Informações sobre o extrato previdenciário apresentado.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-4">
+            <label for="possui_cnis" class="form-label">
+                Possui CNIS?
+            </label>
+            <select
+                class="form-select"
+                id="possui_cnis"
+                name="possui_cnis"
+                data-controla="grupo-cnis"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_cnis == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="grupo-cnis" class="col-12 campo-condicional">
+            <div class="row g-3">
+                <div class="col-lg-6">
+                    <label for="cnis_atualizado" class="form-label">
+                        O CNIS está atualizado?
+                    </label>
+                    <select
+                        class="form-select"
+                        id="cnis_atualizado"
+                        name="cnis_atualizado"
+                    >
+                        <option value="">Selecione</option>
+                        {% for valor, rotulo in respostas.items() %}
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.cnis_atualizado == valor %}selected{% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-lg-6">
+                    <label for="data_emissao_cnis" class="form-label">
+                        Data de emissão do CNIS
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_emissao_cnis"
+                        name="data_emissao_cnis"
+                        value="{{ ficha.data_emissao_cnis.strftime('%Y-%m-%d') if ficha.data_emissao_cnis else '' }}"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+        </span>
+        <div>
+            <h3>Pendências do CNIS</h3>
+            <p>Identifique vínculos e contribuições que precisam de correção.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12">
+            <label for="possui_vinculos_ausentes_cnis" class="form-label">
+                Existem vínculos ausentes no CNIS?
+            </label>
+            <select
+                class="form-select"
+                id="possui_vinculos_ausentes_cnis"
+                name="possui_vinculos_ausentes_cnis"
+                data-controla="grupo-vinculos-ausentes"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_vinculos_ausentes_cnis == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <div
+                id="grupo-vinculos-ausentes"
+                class="campo-condicional mt-3"
+            >
+                <label for="vinculos_ausentes_descricao" class="form-label">
+                    Descreva os vínculos ausentes
+                </label>
+                <textarea
+                    class="form-control"
+                    id="vinculos_ausentes_descricao"
+                    name="vinculos_ausentes_descricao"
+                    rows="3"
+                >{{ ficha.vinculos_ausentes_descricao or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label
+                for="possui_contribuicoes_abaixo_minimo"
+                class="form-label"
+            >
+                Existem contribuições abaixo do salário mínimo?
+            </label>
+            <select
+                class="form-select"
+                id="possui_contribuicoes_abaixo_minimo"
+                name="possui_contribuicoes_abaixo_minimo"
+                data-controla="grupo-abaixo-minimo"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_contribuicoes_abaixo_minimo == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <div
+                id="grupo-abaixo-minimo"
+                class="campo-condicional mt-3"
+            >
+                <label
+                    for="contribuicoes_abaixo_minimo_descricao"
+                    class="form-label"
+                >
+                    Descreva as competências e os valores
+                </label>
+                <textarea
+                    class="form-control"
+                    id="contribuicoes_abaixo_minimo_descricao"
+                    name="contribuicoes_abaixo_minimo_descricao"
+                    rows="3"
+                >{{ ficha.contribuicoes_abaixo_minimo_descricao or '' }}</textarea>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label
+                for="possui_contribuicoes_em_atraso"
+                class="form-label"
+            >
+                Existem contribuições em atraso?
+            </label>
+            <select
+                class="form-select"
+                id="possui_contribuicoes_em_atraso"
+                name="possui_contribuicoes_em_atraso"
+                data-controla="grupo-contribuicoes-atraso"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_contribuicoes_em_atraso == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <div
+                id="grupo-contribuicoes-atraso"
+                class="campo-condicional mt-3"
+            >
+                <label
+                    for="contribuicoes_em_atraso_descricao"
+                    class="form-label"
+                >
+                    Descreva as contribuições em atraso
+                </label>
+                <textarea
+                    class="form-control"
+                    id="contribuicoes_em_atraso_descricao"
+                    name="contribuicoes_em_atraso_descricao"
+                    rows="3"
+                >{{ ficha.contribuicoes_em_atraso_descricao or '' }}</textarea>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-clock-history"></i>
+        </span>
+        <div>
+            <h3>Períodos especiais de contribuição</h3>
+            <p>Registre períodos que podem exigir documentação específica.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% set periodos = [
+            (
+                "possui_periodo_rural",
+                "Possui período de atividade rural?",
+                "grupo-periodo-rural",
+                "periodo_rural_descricao",
+                "Descreva o período rural, local, atividade e documentos disponíveis."
+            ),
+            (
+                "possui_atividade_especial",
+                "Possui atividade especial, insalubre ou perigosa?",
+                "grupo-atividade-especial",
+                "atividade_especial_descricao",
+                "Descreva empresas, funções, agentes nocivos e períodos."
+            ),
+            (
+                "possui_tempo_servico_publico",
+                "Possui tempo de serviço público?",
+                "grupo-servico-publico",
+                "tempo_servico_publico_descricao",
+                "Descreva órgão, cargo, regime e período."
+            ),
+            (
+                "possui_tempo_militar",
+                "Possui tempo de serviço militar?",
+                "grupo-tempo-militar",
+                "tempo_militar_descricao",
+                "Descreva corporação, tipo de serviço e período."
+            )
+        ] %}
+
+        {% for campo, pergunta, grupo, descricao, placeholder in periodos %}
+        <div class="col-12">
+            <label for="{{ campo }}" class="form-label">
+                {{ pergunta }}
+            </label>
+            <select
+                class="form-select"
+                id="{{ campo }}"
+                name="{{ campo }}"
+                data-controla="{{ grupo }}"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha|attr(campo) == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <div id="{{ grupo }}" class="campo-condicional mt-3">
+                <label for="{{ descricao }}" class="form-label">
+                    Detalhamento
+                </label>
+                <textarea
+                    class="form-control"
+                    id="{{ descricao }}"
+                    name="{{ descricao }}"
+                    rows="3"
+                    placeholder="{{ placeholder }}"
+                >{{ ficha|attr(descricao) or '' }}</textarea>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-calculator"></i>
+        </span>
+        <div>
+            <h3>Estimativas preliminares</h3>
+            <p>Registre a estimativa apurada até esta fase da análise.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <label
+                for="tempo_contribuicao_estimado"
+                class="form-label"
+            >
+                Tempo de contribuição estimado
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="tempo_contribuicao_estimado"
+                name="tempo_contribuicao_estimado"
+                maxlength="100"
+                value="{{ ficha.tempo_contribuicao_estimado or '' }}"
+                placeholder="Ex.: 31 anos, 4 meses e 12 dias"
+            >
+        </div>
+
+        <div class="col-lg-4">
+            <label for="carencia_estimada" class="form-label">
+                Carência estimada
+            </label>
+            <div class="input-group">
+                <input
+                    type="number"
+                    class="form-control"
+                    id="carencia_estimada"
+                    name="carencia_estimada"
+                    min="0"
+                    value="{{ ficha.carencia_estimada if ficha.carencia_estimada is not none else '' }}"
+                    placeholder="0"
+                >
+                <span class="input-group-text">meses</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+        <div>
+            <h3>Observações</h3>
+            <p>Registre conclusões e pendências da análise contributiva.</p>
+        </div>
+    </div>
+
+    <label
+        for="observacoes_historico_contributivo"
+        class="form-label"
+    >
+        Observações sobre o histórico contributivo
+    </label>
+    <textarea
+        class="form-control"
+        id="observacoes_historico_contributivo"
+        name="observacoes_historico_contributivo"
+        rows="5"
+        placeholder="Registre inconsistências, documentos necessários e providências recomendadas."
+    >{{ ficha.observacoes_historico_contributivo or '' }}</textarea>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function atualizarCampoCondicional(controle) {
+            const alvoId = controle.dataset.controla;
+            const valorExibicao = controle.dataset.exibirQuando;
+            const alvo = document.getElementById(alvoId);
+
+            if (!alvo) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorExibicao;
+
+            alvo.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            alvo.querySelectorAll("input, select, textarea").forEach(
+                function (campo) {
+                    campo.disabled = !deveExibir;
+                }
+            );
+        }
+
+        document.querySelectorAll("[data-controla]").forEach(
+            function (controle) {
+                atualizarCampoCondicional(controle);
+
+                controle.addEventListener("change", function () {
+                    atualizarCampoCondicional(controle);
+                });
+            }
+        );
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,1029 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Financeiro
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+
+    {{ page_header(
+        "💰 Financeiro",
+        "Controle anual de despesas e lançamentos do escritório."
+    ) }}
+
+    <div class="d-flex flex-wrap gap-2">
+
+        <button type="button"
+                class="btn btn-success"
+                data-bs-toggle="modal"
+                data-bs-target="#modalNovaDespesa">
+            + Nova Despesa
+        </button>
+
+        <a href="{{ url_for('financeiro.importar_excel') }}"
+           class="btn btn-outline-primary">
+            ⬆ Importar Excel
+        </a>
+
+        <a href="{{ url_for(
+            'financeiro.exportar_excel',
+            ano=ano_selecionado
+        ) }}"
+           class="btn btn-outline-success">
+            ⬇ Exportar Excel
+        </a>
+
+    </div>
+
+</div>
+
+<!-- Abas do módulo financeiro -->
+<ul class="nav nav-tabs mb-4">
+
+    <li class="nav-item">
+
+        <a class="nav-link active"
+           href="{{ url_for(
+               'financeiro.listar_financeiro',
+               ano=ano_selecionado
+           ) }}">
+            📋 Planilha
+        </a>
+
+    </li>
+
+    <li class="nav-item">
+
+        <a class="nav-link"
+           href="{{ url_for(
+               'financeiro.graficos_financeiros',
+               ano_a=ano_selecionado - 1,
+               ano_b=ano_selecionado
+           ) }}">
+            📊 Dashboard
+        </a>
+
+    </li>
+
+</ul>
+
+<div id="financeiro-alerta"></div>
+
+<!-- Filtros -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <form method="GET"
+              action="{{ url_for('financeiro.listar_financeiro') }}">
+
+            <div class="row align-items-end">
+
+                <div class="col-md-3 mb-3 mb-md-0">
+
+                    <label class="form-label">
+                        Ano
+                    </label>
+
+                    <select name="ano"
+                            class="form-select"
+                            onchange="this.form.submit()">
+
+                        {% for ano in anos_disponiveis %}
+
+                            <option value="{{ ano }}"
+                                    {% if ano == ano_selecionado %}selected{% endif %}>
+                                {{ ano }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6 mb-3 mb-md-0">
+
+                    <label class="form-label">
+                        Pesquisar
+                    </label>
+
+                    <input type="text"
+                           name="q"
+                           class="form-control"
+                           placeholder="Pesquisar por despesa ou categoria..."
+                           value="{{ termo }}">
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <div class="d-flex gap-2">
+
+                        <button type="submit"
+                                class="btn btn-dark w-100">
+                            🔍 Pesquisar
+                        </button>
+
+                        <a href="{{ url_for(
+                            'financeiro.listar_financeiro',
+                            ano=ano_selecionado
+                        ) }}"
+                           class="btn btn-secondary">
+                            Limpar
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Indicadores -->
+<div class="row mb-4">
+
+    <div class="col-md-4 mb-3">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h6 class="text-danger">
+                    💸 Total anual
+                </h6>
+
+                <h3 class="mb-1"
+                    id="financeiro-total-anual">
+
+                    R$ {{ "{:,.2f}".format(total_anual).replace(",", "X").replace(".", ",").replace("X", ".") }}
+
+                </h3>
+
+                <small class="text-muted">
+                    Despesas de {{ ano_selecionado }}
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4 mb-3">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h6 class="text-primary">
+                    📊 Média mensal
+                </h6>
+
+                <h3 class="mb-1"
+                    id="financeiro-media-mensal">
+
+                    R$ {{ "{:,.2f}".format(media_mensal).replace(",", "X").replace(".", ",").replace("X", ".") }}
+
+                </h3>
+
+                <small class="text-muted">
+                    Média considerando 12 meses
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4 mb-3">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h6 class="text-success">
+                    📋 Itens cadastrados
+                </h6>
+
+                <h3 class="mb-1">
+                    {{ linhas|length }}
+                </h3>
+
+                <small class="text-muted">
+                    Despesas diferentes no ano
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Planilha financeira -->
+<div class="card shadow-sm">
+
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+
+        <span>
+            📋 Planilha de Despesas — {{ ano_selecionado }}
+        </span>
+
+        <small class="text-white-50">
+            Dê dois cliques em uma célula para editar
+        </small>
+
+    </div>
+
+    <div class="card-body p-0">
+
+        {% if linhas %}
+
+            <div class="table-responsive financeiro-planilha">
+
+                <table class="table table-bordered table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="financeiro-coluna-descricao">
+                                Despesa
+                            </th>
+
+                            <th class="financeiro-coluna-categoria">
+                                Categoria
+                            </th>
+
+                            {% for numero, nome, sigla in meses %}
+
+                                <th class="text-center financeiro-coluna-mes
+                                           {% if ano_selecionado == ano_atual and numero == mes_atual %}
+                                               financeiro-mes-atual
+                                           {% endif %}"
+                                    title="{{ nome }}">
+
+                                    {{ sigla }}
+
+                                </th>
+
+                            {% endfor %}
+
+                            <th class="text-center financeiro-coluna-total">
+                                Total
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for linha in linhas %}
+
+                            <tr data-descricao-linha="{{ linha.descricao }}">
+
+                                <td class="financeiro-coluna-descricao">
+
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+
+                                        <span class="fw-bold">
+                                            {{ linha.descricao }}
+                                        </span>
+
+                                        <form method="POST"
+                                              action="{{ url_for('financeiro.excluir_despesa') }}"
+                                              class="m-0">
+
+                                            <input type="hidden"
+                                                   name="descricao"
+                                                   value="{{ linha.descricao }}">
+
+                                            <input type="hidden"
+                                                   name="ano"
+                                                   value="{{ ano_selecionado }}">
+
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger btn-sm"
+                                                    title="Excluir despesa"
+                                                    onclick="return confirm('Excluir a despesa {{ linha.descricao }} e todos os valores dela em {{ ano_selecionado }}?')">
+                                                🗑
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                                <td class="financeiro-coluna-categoria">
+                                    {{ linha.categoria or "-" }}
+                                </td>
+
+                                {% set total_linha = namespace(valor=0) %}
+
+                                {% for numero, nome, sigla in meses %}
+
+                                    {% set celula = linha.valores[numero] %}
+                                    {% set valor_mes = celula.valor %}
+                                    {% set total_linha.valor = total_linha.valor + valor_mes %}
+
+                                    <td class="text-end financeiro-celula
+                                               {% if ano_selecionado == ano_atual and numero == mes_atual %}
+                                                   financeiro-mes-atual
+                                               {% endif %}"
+                                        data-id="{{ celula.id or '' }}"
+                                        data-mes="{{ numero }}"
+                                        data-ano="{{ ano_selecionado }}"
+                                        data-descricao="{{ linha.descricao }}"
+                                        data-categoria="{{ linha.categoria or '' }}"
+                                        data-valor="{{ valor_mes }}">
+
+                                        <span class="financeiro-valor">
+
+                                            {% if valor_mes %}
+
+                                                {{ "{:,.2f}".format(valor_mes).replace(",", "X").replace(".", ",").replace("X", ".") }}
+
+                                            {% else %}
+
+                                                <span class="text-muted">
+                                                    -
+                                                </span>
+
+                                            {% endif %}
+
+                                        </span>
+
+                                    </td>
+
+                                {% endfor %}
+
+                                <td class="text-end fw-bold bg-light financeiro-total-linha">
+
+                                    {{ "{:,.2f}".format(total_linha.valor).replace(",", "X").replace(".", ",").replace("X", ".") }}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                    <tfoot>
+
+                        <tr class="financeiro-total-geral">
+
+                            <th colspan="2"
+                                class="text-start financeiro-total-label">
+
+                                TOTAL MENSAL
+
+                            </th>
+
+                            {% for numero, nome, sigla in meses %}
+
+                                <th class="text-end financeiro-total-mes
+                                           {% if ano_selecionado == ano_atual and numero == mes_atual %}
+                                               financeiro-total-mes-atual
+                                           {% endif %}"
+                                    data-total-mes="{{ numero }}">
+
+                                    {{ "{:,.2f}".format(totais_meses[numero]).replace(",", "X").replace(".", ",").replace("X", ".") }}
+
+                                </th>
+
+                            {% endfor %}
+
+                            <th class="text-end financeiro-total-anual"
+                                id="financeiro-total-rodape">
+
+                                {{ "{:,.2f}".format(total_anual).replace(",", "X").replace(".", ",").replace("X", ".") }}
+
+                            </th>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5 px-3">
+
+                <h5 class="text-muted">
+                    💰 Nenhum lançamento em {{ ano_selecionado }}
+                </h5>
+
+                <p class="text-muted mb-3">
+                    Importe uma planilha ou cadastre uma nova despesa.
+                </p>
+
+                <button type="button"
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalNovaDespesa">
+
+                    + Nova Despesa
+
+                </button>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- Modal Nova Despesa -->
+<div class="modal fade"
+     id="modalNovaDespesa"
+     tabindex="-1"
+     aria-labelledby="modalNovaDespesaLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <form method="POST"
+                  action="{{ url_for('financeiro.nova_despesa') }}">
+
+                <div class="modal-header bg-success text-white">
+
+                    <h5 class="modal-title"
+                        id="modalNovaDespesaLabel">
+
+                        💸 Nova Despesa
+
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="col-md-8 mb-3">
+
+                            <label class="form-label">
+                                Descrição
+                            </label>
+
+                            <input type="text"
+                                   name="descricao"
+                                   class="form-control"
+                                   placeholder="Ex.: Energia, aluguel ou salário"
+                                   required>
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                Categoria
+                            </label>
+
+                            <select name="categoria"
+                                    class="form-select">
+
+                                <option value="Outros">
+                                    Outros
+                                </option>
+
+                                <option value="Estrutura">
+                                    Estrutura
+                                </option>
+
+                                <option value="Pessoal">
+                                    Pessoal
+                                </option>
+
+                                <option value="Impostos">
+                                    Impostos
+                                </option>
+
+                                <option value="Marketing">
+                                    Marketing
+                                </option>
+
+                                <option value="Transporte">
+                                    Transporte
+                                </option>
+
+                                <option value="Material">
+                                    Material
+                                </option>
+
+                                <option value="Serviços">
+                                    Serviços
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-3 mb-3">
+
+                            <label class="form-label">
+                                Valor
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    R$
+                                </span>
+
+                                <input type="text"
+                                       name="valor"
+                                       class="form-control"
+                                       placeholder="0,00"
+                                       required>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <label class="form-label">
+                                Mês
+                            </label>
+
+                            <select name="mes"
+                                    class="form-select"
+                                    required>
+
+                                {% for numero, nome, sigla in meses %}
+
+                                    <option value="{{ numero }}"
+                                            {% if numero == mes_atual and ano_selecionado == ano_atual %}
+                                                selected
+                                            {% endif %}>
+
+                                        {{ nome }}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <label class="form-label">
+                                Ano
+                            </label>
+
+                            <input type="number"
+                                   name="ano"
+                                   class="form-control"
+                                   min="2000"
+                                   max="2100"
+                                   value="{{ ano_selecionado }}"
+                                   required>
+
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+
+                            <label class="form-label">
+                                Status
+                            </label>
+
+                            <select name="status"
+                                    class="form-select">
+
+                                <option value="Pago">
+                                    Pago
+                                </option>
+
+                                <option value="Pendente">
+                                    Pendente
+                                </option>
+
+                                <option value="Previsto">
+                                    Previsto
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Observações
+                        </label>
+
+                        <textarea name="observacoes"
+                                  class="form-control"
+                                  rows="3"
+                                  placeholder="Informações adicionais sobre a despesa."></textarea>
+
+                    </div>
+
+                    <div class="form-check">
+
+                        <input type="checkbox"
+                               class="form-check-input"
+                               name="recorrente"
+                               id="despesaRecorrente">
+
+                        <label class="form-check-label"
+                               for="despesaRecorrente">
+
+                            Esta é uma despesa recorrente
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success">
+
+                        💾 Salvar Despesa
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".financeiro-celula").forEach(
+        function (celula) {
+            celula.addEventListener(
+                "dblclick",
+                function () {
+                    iniciarEdicao(celula);
+                }
+            );
+        }
+    );
+});
+
+
+function formatarMoeda(valor) {
+    return Number(valor).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+
+function mostrarAlerta(mensagem, tipo) {
+    const area = document.getElementById(
+        "financeiro-alerta"
+    );
+
+    area.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show">
+            ${mensagem}
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    `;
+}
+
+
+function mostrarValorCelula(celula, valor) {
+    if (
+        valor === null
+        || valor === ""
+        || Number(valor) === 0
+    ) {
+        celula.innerHTML = `
+            <span class="financeiro-valor text-muted">
+                -
+            </span>
+        `;
+
+        return;
+    }
+
+    celula.innerHTML = `
+        <span class="financeiro-valor">
+            ${formatarMoeda(valor)}
+        </span>
+    `;
+}
+
+
+function iniciarEdicao(celula) {
+    if (celula.dataset.editando === "true") {
+        return;
+    }
+
+    celula.dataset.editando = "true";
+    celula.dataset.salvando = "false";
+
+    const valorOriginal = celula.dataset.valor || "";
+
+    const input = document.createElement(
+        "input"
+    );
+
+    input.type = "text";
+    input.className =
+        "form-control form-control-sm text-end";
+
+    input.value = (
+        valorOriginal
+        && Number(valorOriginal) !== 0
+    )
+        ? formatarMoeda(valorOriginal)
+        : "";
+
+    celula.innerHTML = "";
+    celula.appendChild(
+        input
+    );
+
+    input.focus();
+    input.select();
+
+    input.addEventListener(
+        "keydown",
+        async function (evento) {
+
+            if (evento.key === "Enter") {
+                evento.preventDefault();
+
+                if (
+                    celula.dataset.salvando
+                    === "true"
+                ) {
+                    return;
+                }
+
+                celula.dataset.salvando = "true";
+
+                await salvarCelula(
+                    celula,
+                    input.value,
+                    valorOriginal
+                );
+            }
+
+            if (evento.key === "Escape") {
+                evento.preventDefault();
+
+                celula.dataset.editando = "false";
+                celula.dataset.salvando = "false";
+
+                mostrarValorCelula(
+                    celula,
+                    valorOriginal
+                );
+            }
+
+        }
+    );
+
+    input.addEventListener(
+        "blur",
+        function () {
+
+            if (
+                celula.dataset.salvando
+                === "true"
+            ) {
+                return;
+            }
+
+            celula.dataset.editando = "false";
+
+            mostrarValorCelula(
+                celula,
+                valorOriginal
+            );
+        }
+    );
+}
+
+
+async function salvarCelula(
+    celula,
+    valorDigitado,
+    valorOriginal
+) {
+    const dados = {
+        descricao: celula.dataset.descricao,
+        categoria: celula.dataset.categoria,
+        mes: celula.dataset.mes,
+        ano: celula.dataset.ano,
+        valor: valorDigitado
+    };
+
+    celula.innerHTML = `
+        <span class="spinner-border spinner-border-sm"
+              role="status">
+        </span>
+    `;
+
+    try {
+        const resposta = await fetch(
+            "{{ url_for('financeiro.salvar_celula') }}",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dados)
+            }
+        );
+
+        const resultado = await resposta.json();
+
+        if (
+            !resposta.ok
+            || !resultado.sucesso
+        ) {
+            throw new Error(
+                resultado.mensagem
+                || "Não foi possível salvar o valor."
+            );
+        }
+
+        celula.dataset.id =
+            resultado.id || "";
+
+        celula.dataset.valor = (
+            resultado.valor === null
+                ? ""
+                : resultado.valor
+        );
+
+        celula.dataset.editando = "false";
+        celula.dataset.salvando = "false";
+
+        mostrarValorCelula(
+            celula,
+            resultado.valor
+        );
+
+        atualizarTotais(
+            celula,
+            resultado
+        );
+
+        mostrarAlerta(
+            resultado.removido
+                ? "🗑 Valor removido com sucesso!"
+                : "✅ Valor atualizado com sucesso!",
+            resultado.removido
+                ? "warning"
+                : "success"
+        );
+
+    } catch (erro) {
+        celula.dataset.valor =
+            valorOriginal;
+
+        celula.dataset.editando =
+            "false";
+
+        celula.dataset.salvando =
+            "false";
+
+        mostrarValorCelula(
+            celula,
+            valorOriginal
+        );
+
+        mostrarAlerta(
+            erro.message,
+            "danger"
+        );
+    }
+}
+
+
+function atualizarTotais(celula, resultado) {
+    const linha = celula.closest(
+        "tr"
+    );
+
+    const totalLinha = linha.querySelector(
+        ".financeiro-total-linha"
+    );
+
+    if (totalLinha) {
+        totalLinha.textContent = formatarMoeda(
+            resultado.total_linha
+        );
+    }
+
+    Object.entries(
+        resultado.totais_meses
+    ).forEach(
+        function ([mes, valor]) {
+
+            const totalMes = document.querySelector(
+                `[data-total-mes="${mes}"]`
+            );
+
+            if (totalMes) {
+                totalMes.textContent =
+                    formatarMoeda(valor);
+            }
+
+        }
+    );
+
+    const totalRodape =
+        document.getElementById(
+            "financeiro-total-rodape"
+        );
+
+    if (totalRodape) {
+        totalRodape.textContent =
+            formatarMoeda(
+                resultado.total_anual
+            );
+    }
+
+    const totalAnual =
+        document.getElementById(
+            "financeiro-total-anual"
+        );
+
+    if (totalAnual) {
+        totalAnual.textContent =
+            "R$ "
+            + formatarMoeda(
+                resultado.total_anual
+            );
+    }
+
+    const mediaMensal =
+        document.getElementById(
+            "financeiro-media-mensal"
+        );
+
+    if (mediaMensal) {
+        mediaMensal.textContent =
+            "R$ "
+            + formatarMoeda(
+                resultado.media_mensal
+            );
+    }
+}
+</script>
+
+{% endblock %}

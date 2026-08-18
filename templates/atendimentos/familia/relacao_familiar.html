@@ -1,0 +1,758 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+    Relação familiar — Atendimento #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_relacao_familiar",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+    Relação familiar
+{% endblock %}
+
+{% block etapa_descricao %}
+    Registre a formação, duração, encerramento e circunstâncias relevantes da relação.
+{% endblock %}
+
+{% block etapa_identificacao %}
+    Etapa 3 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+    <div class="civel-info-box">
+
+        <i class="bi bi-info-circle-fill"></i>
+
+        <div>
+            Preencha as informações de acordo com a realidade relatada pelo
+            cliente. Alguns campos poderão não se aplicar a relações sem
+            casamento ou sem convivência conjugal.
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+    <!-- =====================================================
+         IDENTIFICAÇÃO DA RELAÇÃO
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-heart"></i>
+            </span>
+
+            <div>
+                <h3>Identificação da relação</h3>
+                <p>Informe o tipo de vínculo familiar existente entre as partes.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-lg-6">
+
+                <label
+                    for="tipo_relacao"
+                    class="form-label"
+                >
+                    Tipo de relação
+                </label>
+
+                <select
+                    class="form-select"
+                    id="tipo_relacao"
+                    name="tipo_relacao"
+                >
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, rotulo in tipos_relacao.items() %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.tipo_relacao == valor %}selected{% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="col-lg-6">
+
+                <label
+                    for="data_inicio_relacao"
+                    class="form-label"
+                >
+                    Data de início da relação
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_inicio_relacao"
+                    name="data_inicio_relacao"
+                    value="{% if ficha.data_inicio_relacao %}{{ ficha.data_inicio_relacao.strftime('%Y-%m-%d') }}{% endif %}"
+                >
+
+                <div class="form-text">
+                    Quando não souber a data exata, deixe em branco e registre
+                    a estimativa nas observações.
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CASAMENTO E REGIME DE BENS
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-gem"></i>
+            </span>
+
+            <div>
+                <h3>Casamento e regime de bens</h3>
+                <p>Registre os dados formais da relação, quando aplicáveis.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label
+                    for="data_casamento"
+                    class="form-label"
+                >
+                    Data do casamento
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_casamento"
+                    name="data_casamento"
+                    value="{% if ficha.data_casamento %}{{ ficha.data_casamento.strftime('%Y-%m-%d') }}{% endif %}"
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="regime_bens"
+                    class="form-label"
+                >
+                    Regime de bens
+                </label>
+
+                <select
+                    class="form-select"
+                    id="regime_bens"
+                    name="regime_bens"
+                >
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    {% for valor, rotulo in regimes_bens.items() %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if ficha.regime_bens == valor %}selected{% endif %}
+                        >
+                            {{ rotulo }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="possui_pacto_antenupcial"
+                        name="possui_pacto_antenupcial"
+                        {% if ficha.possui_pacto_antenupcial %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="possui_pacto_antenupcial"
+                    >
+                        Existe pacto antenupcial?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-12"
+                id="grupo_descricao_pacto"
+            >
+
+                <label
+                    for="descricao_pacto_antenupcial"
+                    class="form-label"
+                >
+                    Descrição do pacto antenupcial
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="descricao_pacto_antenupcial"
+                    name="descricao_pacto_antenupcial"
+                    rows="4"
+                    maxlength="3000"
+                    placeholder="Informe as cláusulas relevantes, data, cartório e existência de escritura ou registro."
+                >{{ ficha.descricao_pacto_antenupcial or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CARACTERÍSTICAS DA CONVIVÊNCIA
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-house-heart"></i>
+            </span>
+
+            <div>
+                <h3>Características da convivência</h3>
+                <p>Registre elementos relevantes para casamento ou união estável.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-lg-6">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="convivencia_publica_continua"
+                        name="convivencia_publica_continua"
+                        {% if ficha.convivencia_publica_continua %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="convivencia_publica_continua"
+                    >
+                        A convivência era pública, contínua e duradoura?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-6">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="objetivo_constituir_familia"
+                        name="objetivo_constituir_familia"
+                        {% if ficha.objetivo_constituir_familia %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="objetivo_constituir_familia"
+                    >
+                        Existia objetivo de constituir família?
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ENCERRAMENTO DA RELAÇÃO
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-heartbreak"></i>
+            </span>
+
+            <div>
+                <h3>Encerramento da relação</h3>
+                <p>Informe se houve separação de fato ou término da convivência.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="relacao_encerrada"
+                        name="relacao_encerrada"
+                        {% if ficha.relacao_encerrada %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="relacao_encerrada"
+                    >
+                        A relação já foi encerrada?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-md-5"
+                id="grupo_data_separacao"
+            >
+
+                <label
+                    for="data_separacao_fato"
+                    class="form-label"
+                >
+                    Data da separação de fato
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="data_separacao_fato"
+                    name="data_separacao_fato"
+                    value="{% if ficha.data_separacao_fato %}{{ ficha.data_separacao_fato.strftime('%Y-%m-%d') }}{% endif %}"
+                >
+
+            </div>
+
+
+            <div
+                class="col-md-7"
+                id="grupo_motivo_termino"
+            >
+
+                <label
+                    for="motivo_termino_relacao"
+                    class="form-label"
+                >
+                    Motivo do término
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="motivo_termino_relacao"
+                    name="motivo_termino_relacao"
+                    rows="4"
+                    maxlength="3000"
+                    placeholder="Descreva de forma objetiva as circunstâncias do encerramento."
+                >{{ ficha.motivo_termino_relacao or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         VIOLÊNCIA DOMÉSTICA
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-shield-exclamation"></i>
+            </span>
+
+            <div>
+                <h3>Violência doméstica e proteção</h3>
+                <p>Registre situações de risco que possam exigir providências imediatas.</p>
+            </div>
+
+        </div>
+
+
+        <div class="alert alert-warning">
+
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+
+            Em situações de risco atual ou iminente, priorize as medidas de
+            proteção e os encaminhamentos de urgência adotados pelo escritório.
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="houve_violencia_domestica"
+                        name="houve_violencia_domestica"
+                        {% if ficha.houve_violencia_domestica %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="houve_violencia_domestica"
+                    >
+                        Houve relato de violência doméstica ou familiar?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-12"
+                id="grupo_descricao_violencia"
+            >
+
+                <label
+                    for="descricao_violencia_domestica"
+                    class="form-label"
+                >
+                    Descrição da violência
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="descricao_violencia_domestica"
+                    name="descricao_violencia_domestica"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="Registre os fatos relatados, datas aproximadas, formas de violência, testemunhas e documentos existentes."
+                >{{ ficha.descricao_violencia_domestica or '' }}</textarea>
+
+            </div>
+
+
+            <div
+                class="col-12"
+                id="grupo_medida_protetiva_switch"
+            >
+
+                <div class="form-check form-switch">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        role="switch"
+                        id="existe_medida_protetiva"
+                        name="existe_medida_protetiva"
+                        {% if ficha.existe_medida_protetiva %}checked{% endif %}
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="existe_medida_protetiva"
+                    >
+                        Existe medida protetiva?
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="col-md-6"
+                id="grupo_numero_medida"
+            >
+
+                <label
+                    for="numero_medida_protetiva"
+                    class="form-label"
+                >
+                    Número do processo ou da medida protetiva
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="numero_medida_protetiva"
+                    name="numero_medida_protetiva"
+                    maxlength="80"
+                    value="{{ ficha.numero_medida_protetiva or '' }}"
+                    placeholder="Ex.: 0000000-00.0000.0.00.0000"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         OBSERVAÇÕES
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-journal-text"></i>
+            </span>
+
+            <div>
+                <h3>Observações sobre a relação</h3>
+                <p>Registre informações complementares relevantes para a análise.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="observacoes_relacao"
+                    class="form-label"
+                >
+                    Observações
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="observacoes_relacao"
+                    name="observacoes_relacao"
+                    rows="6"
+                    maxlength="5000"
+                    placeholder="Registre datas aproximadas, particularidades da convivência, testemunhas, documentos ou outros elementos relevantes."
+                >{{ ficha.observacoes_relacao or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const pacto = document.getElementById(
+                "possui_pacto_antenupcial"
+            );
+            const grupoPacto = document.getElementById(
+                "grupo_descricao_pacto"
+            );
+            const descricaoPacto = document.getElementById(
+                "descricao_pacto_antenupcial"
+            );
+
+            const encerrada = document.getElementById(
+                "relacao_encerrada"
+            );
+            const grupoDataSeparacao = document.getElementById(
+                "grupo_data_separacao"
+            );
+            const grupoMotivoTermino = document.getElementById(
+                "grupo_motivo_termino"
+            );
+            const dataSeparacao = document.getElementById(
+                "data_separacao_fato"
+            );
+            const motivoTermino = document.getElementById(
+                "motivo_termino_relacao"
+            );
+
+            const violencia = document.getElementById(
+                "houve_violencia_domestica"
+            );
+            const grupoDescricaoViolencia = document.getElementById(
+                "grupo_descricao_violencia"
+            );
+            const descricaoViolencia = document.getElementById(
+                "descricao_violencia_domestica"
+            );
+            const grupoMedidaSwitch = document.getElementById(
+                "grupo_medida_protetiva_switch"
+            );
+            const medida = document.getElementById(
+                "existe_medida_protetiva"
+            );
+            const grupoNumeroMedida = document.getElementById(
+                "grupo_numero_medida"
+            );
+            const numeroMedida = document.getElementById(
+                "numero_medida_protetiva"
+            );
+
+            function atualizarPacto() {
+                const mostrar = pacto.checked;
+
+                grupoPacto.classList.toggle("d-none", !mostrar);
+                descricaoPacto.disabled = !mostrar;
+
+                if (!mostrar) {
+                    descricaoPacto.value = "";
+                }
+            }
+
+            function atualizarEncerramento() {
+                const mostrar = encerrada.checked;
+
+                grupoDataSeparacao.classList.toggle("d-none", !mostrar);
+                grupoMotivoTermino.classList.toggle("d-none", !mostrar);
+
+                dataSeparacao.disabled = !mostrar;
+                motivoTermino.disabled = !mostrar;
+
+                if (!mostrar) {
+                    dataSeparacao.value = "";
+                    motivoTermino.value = "";
+                }
+            }
+
+            function atualizarMedida() {
+                const mostrar = violencia.checked;
+
+                grupoDescricaoViolencia.classList.toggle(
+                    "d-none",
+                    !mostrar
+                );
+
+                grupoMedidaSwitch.classList.toggle(
+                    "d-none",
+                    !mostrar
+                );
+
+                descricaoViolencia.disabled = !mostrar;
+                medida.disabled = !mostrar;
+
+                if (!mostrar) {
+                    descricaoViolencia.value = "";
+                    medida.checked = false;
+                }
+
+                const mostrarNumero = mostrar && medida.checked;
+
+                grupoNumeroMedida.classList.toggle(
+                    "d-none",
+                    !mostrarNumero
+                );
+
+                numeroMedida.disabled = !mostrarNumero;
+
+                if (!mostrarNumero) {
+                    numeroMedida.value = "";
+                }
+            }
+
+            pacto.addEventListener(
+                "change",
+                atualizarPacto
+            );
+
+            encerrada.addEventListener(
+                "change",
+                atualizarEncerramento
+            );
+
+            violencia.addEventListener(
+                "change",
+                atualizarMedida
+            );
+
+            medida.addEventListener(
+                "change",
+                atualizarMedida
+            );
+
+            atualizarPacto();
+            atualizarEncerramento();
+            atualizarMedida();
+        });
+    </script>
+
+{% endblock %}

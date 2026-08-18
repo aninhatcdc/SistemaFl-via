@@ -1,0 +1,41 @@
+{% macro prazo_badge(data, dias) %}
+
+    {% if not data %}
+
+        <span class="text-muted">
+            -
+        </span>
+
+    {% elif dias < 0 %}
+
+        <span class="badge bg-dark">
+            ⚫ Vencido — {{ data.strftime("%d/%m/%Y") }}
+        </span>
+
+    {% elif dias == 0 %}
+
+        <span class="badge bg-danger">
+            🔴 Hoje — {{ data.strftime("%d/%m/%Y") }}
+        </span>
+
+    {% elif dias == 1 %}
+
+        <span class="badge bg-warning text-dark">
+            🟠 Amanhã — {{ data.strftime("%d/%m/%Y") }}
+        </span>
+
+    {% elif dias <= 7 %}
+
+        <span class="badge bg-warning text-dark">
+            🟡 Em {{ dias }} dias — {{ data.strftime("%d/%m/%Y") }}
+        </span>
+
+    {% else %}
+
+        <span class="badge bg-success">
+            🟢 {{ data.strftime("%d/%m/%Y") }}
+        </span>
+
+    {% endif %}
+
+{% endmacro %}

@@ -1,0 +1,585 @@
+{% extends "atendimentos/layout_juridico.html" %}
+
+{% block title %}
+    Parte contrária — Atendimento #{{ atendimento.id }}
+{% endblock %}
+
+{% block form_action %}
+    {{ url_for(
+        "atendimentos.etapa_parte_contraria_familia",
+        atendimento_id=atendimento.id
+    ) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+    Parte contrária
+{% endblock %}
+
+{% block etapa_descricao %}
+    Registre os dados pessoais, profissionais, de contato e localização da outra parte.
+{% endblock %}
+
+{% block etapa_identificacao %}
+    Etapa 4 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+    <div class="civel-info-box">
+
+        <i class="bi bi-info-circle-fill"></i>
+
+        <div>
+            Preencha somente as informações conhecidas pelo cliente. Quando algum
+            dado não estiver disponível, o campo poderá permanecer em branco para
+            ser complementado posteriormente.
+        </div>
+
+    </div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+    <!-- =====================================================
+         IDENTIFICAÇÃO
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-person-badge"></i>
+            </span>
+
+            <div>
+                <h3>Identificação</h3>
+                <p>Informe os dados básicos da pessoa relacionada à demanda.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-lg-6">
+
+                <label
+                    for="parte_contraria_nome"
+                    class="form-label"
+                >
+                    Nome completo
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="parte_contraria_nome"
+                    name="parte_contraria_nome"
+                    maxlength="150"
+                    value="{{ ficha.parte_contraria_nome or '' }}"
+                    placeholder="Nome completo da parte contrária"
+                >
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <label
+                    for="parte_contraria_cpf"
+                    class="form-label"
+                >
+                    CPF
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="parte_contraria_cpf"
+                    name="parte_contraria_cpf"
+                    maxlength="14"
+                    value="{{ ficha.parte_contraria_cpf or '' }}"
+                    placeholder="000.000.000-00"
+                >
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <label
+                    for="parte_contraria_rg"
+                    class="form-label"
+                >
+                    RG
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="parte_contraria_rg"
+                    name="parte_contraria_rg"
+                    maxlength="30"
+                    value="{{ ficha.parte_contraria_rg or '' }}"
+                    placeholder="Número e órgão expedidor"
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="parte_contraria_data_nascimento"
+                    class="form-label"
+                >
+                    Data de nascimento
+                </label>
+
+                <input
+                    type="date"
+                    class="form-control"
+                    id="parte_contraria_data_nascimento"
+                    name="parte_contraria_data_nascimento"
+                    value="{% if ficha.parte_contraria_data_nascimento %}{{ ficha.parte_contraria_data_nascimento.strftime('%Y-%m-%d') }}{% endif %}"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         SITUAÇÃO PROFISSIONAL E ECONÔMICA
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-briefcase"></i>
+            </span>
+
+            <div>
+                <h3>Situação profissional e econômica</h3>
+                <p>Registre profissão, renda aproximada e local de trabalho.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-lg-5">
+
+                <label
+                    for="parte_contraria_profissao"
+                    class="form-label"
+                >
+                    Profissão ou ocupação
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="parte_contraria_profissao"
+                    name="parte_contraria_profissao"
+                    maxlength="120"
+                    value="{{ ficha.parte_contraria_profissao or '' }}"
+                    placeholder="Ex.: Comerciante, servidor público ou autônomo"
+                >
+
+            </div>
+
+
+            <div class="col-lg-3">
+
+                <label
+                    for="parte_contraria_renda_mensal"
+                    class="form-label"
+                >
+                    Renda mensal aproximada
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">R$</span>
+
+                    <input
+                        type="text"
+                        inputmode="decimal"
+                        class="form-control"
+                        id="parte_contraria_renda_mensal"
+                        name="parte_contraria_renda_mensal"
+                        value="{% if ficha.parte_contraria_renda_mensal is not none %}{{ '%.2f'|format(ficha.parte_contraria_renda_mensal)|replace('.', ',') }}{% endif %}"
+                        placeholder="0,00"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="col-lg-4">
+
+                <label
+                    for="parte_contraria_local_trabalho"
+                    class="form-label"
+                >
+                    Local de trabalho
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="parte_contraria_local_trabalho"
+                    name="parte_contraria_local_trabalho"
+                    maxlength="200"
+                    value="{{ ficha.parte_contraria_local_trabalho or '' }}"
+                    placeholder="Empresa, órgão ou endereço profissional"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CONTATO
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-telephone"></i>
+            </span>
+
+            <div>
+                <h3>Contato</h3>
+                <p>Informe os meios de contato conhecidos.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label
+                    for="parte_contraria_telefone"
+                    class="form-label"
+                >
+                    Telefone ou WhatsApp
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="parte_contraria_telefone"
+                    name="parte_contraria_telefone"
+                    maxlength="30"
+                    value="{{ ficha.parte_contraria_telefone or '' }}"
+                    placeholder="(00) 00000-0000"
+                >
+
+            </div>
+
+
+            <div class="col-md-6">
+
+                <label
+                    for="parte_contraria_email"
+                    class="form-label"
+                >
+                    E-mail
+                </label>
+
+                <input
+                    type="email"
+                    class="form-control"
+                    id="parte_contraria_email"
+                    name="parte_contraria_email"
+                    maxlength="150"
+                    value="{{ ficha.parte_contraria_email or '' }}"
+                    placeholder="email@exemplo.com"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ENDEREÇO
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-geo-alt"></i>
+            </span>
+
+            <div>
+                <h3>Endereço e localização</h3>
+                <p>Registre os dados conhecidos para localização da parte contrária.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="parte_contraria_endereco"
+                    class="form-label"
+                >
+                    Endereço
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="parte_contraria_endereco"
+                    name="parte_contraria_endereco"
+                    maxlength="255"
+                    value="{{ ficha.parte_contraria_endereco or '' }}"
+                    placeholder="Rua, número, complemento e bairro"
+                >
+
+            </div>
+
+
+            <div class="col-md-8">
+
+                <label
+                    for="parte_contraria_cidade"
+                    class="form-label"
+                >
+                    Cidade
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="parte_contraria_cidade"
+                    name="parte_contraria_cidade"
+                    maxlength="120"
+                    value="{{ ficha.parte_contraria_cidade or '' }}"
+                    placeholder="Cidade"
+                >
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <label
+                    for="parte_contraria_estado"
+                    class="form-label"
+                >
+                    Estado
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control text-uppercase"
+                    id="parte_contraria_estado"
+                    name="parte_contraria_estado"
+                    maxlength="2"
+                    value="{{ ficha.parte_contraria_estado or '' }}"
+                    placeholder="UF"
+                >
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         COMUNICAÇÃO ENTRE AS PARTES
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-chat-left-text"></i>
+            </span>
+
+            <div>
+                <h3>Comunicação entre as partes</h3>
+                <p>Descreva como ocorre atualmente o contato entre cliente e parte contrária.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="comunicacao_entre_partes"
+                    class="form-label"
+                >
+                    Situação da comunicação
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="comunicacao_entre_partes"
+                    name="comunicacao_entre_partes"
+                    rows="5"
+                    maxlength="5000"
+                    placeholder="Informe se há diálogo, bloqueios, conflitos, ameaças, comunicação por terceiros ou apenas por mensagens."
+                >{{ ficha.comunicacao_entre_partes or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         OBSERVAÇÕES
+         ===================================================== -->
+
+    <section class="civel-section">
+
+        <div class="civel-section-title">
+
+            <span class="civel-section-title-icon">
+                <i class="bi bi-journal-text"></i>
+            </span>
+
+            <div>
+                <h3>Observações sobre a parte contrária</h3>
+                <p>Registre informações complementares úteis para a análise e localização.</p>
+            </div>
+
+        </div>
+
+
+        <div class="row g-3">
+
+            <div class="col-12">
+
+                <label
+                    for="observacoes_parte_contraria"
+                    class="form-label"
+                >
+                    Observações
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="observacoes_parte_contraria"
+                    name="observacoes_parte_contraria"
+                    rows="6"
+                    maxlength="5000"
+                    placeholder="Registre outras informações relevantes, possíveis endereços, redes sociais, familiares ou locais em que possa ser encontrada."
+                >{{ ficha.observacoes_parte_contraria or '' }}</textarea>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const cpf = document.getElementById("parte_contraria_cpf");
+            const telefone = document.getElementById(
+                "parte_contraria_telefone"
+            );
+            const estado = document.getElementById(
+                "parte_contraria_estado"
+            );
+            const renda = document.getElementById(
+                "parte_contraria_renda_mensal"
+            );
+
+            function somenteNumeros(valor) {
+                return valor.replace(/\D/g, "");
+            }
+
+            function formatarCpf(valor) {
+                const numeros = somenteNumeros(valor).slice(0, 11);
+
+                return numeros
+                    .replace(/^(\d{3})(\d)/, "$1.$2")
+                    .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+                    .replace(/\.(\d{3})(\d)/, ".$1-$2");
+            }
+
+            function formatarTelefone(valor) {
+                const numeros = somenteNumeros(valor).slice(0, 11);
+
+                if (numeros.length <= 10) {
+                    return numeros
+                        .replace(/^(\d{2})(\d)/, "($1) $2")
+                        .replace(/(\d{4})(\d)/, "$1-$2");
+                }
+
+                return numeros
+                    .replace(/^(\d{2})(\d)/, "($1) $2")
+                    .replace(/(\d{5})(\d)/, "$1-$2");
+            }
+
+            function formatarRenda(valor) {
+                let limpo = valor.replace(/[^\d,]/g, "");
+
+                const partes = limpo.split(",");
+
+                if (partes.length > 2) {
+                    limpo = partes.shift() + "," + partes.join("");
+                }
+
+                return limpo;
+            }
+
+            cpf.addEventListener("input", function () {
+                cpf.value = formatarCpf(cpf.value);
+            });
+
+            telefone.addEventListener("input", function () {
+                telefone.value = formatarTelefone(telefone.value);
+            });
+
+            estado.addEventListener("input", function () {
+                estado.value = estado.value
+                    .replace(/[^a-zA-Z]/g, "")
+                    .toUpperCase()
+                    .slice(0, 2);
+            });
+
+            renda.addEventListener("input", function () {
+                renda.value = formatarRenda(renda.value);
+            });
+        });
+    </script>
+
+{% endblock %}

@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Dados do Escritório
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "🏢 Dados do Escritório",
+    "Configure as informações utilizadas em todo o sistema."
+) }}
+
+<div class="row">
+
+    <!-- FORMULÁRIO -->
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-dark text-white">
+                Informações do Escritório
+            </div>
+
+            <div class="card-body">
+
+                <form method="POST"
+                      enctype="multipart/form-data">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Nome do Escritório
+                            </label>
+
+                            <input
+                                type="text"
+                                name="nome_escritorio"
+                                class="form-control"
+                                value="{{ configuracao.nome_escritorio or '' }}">
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Nome Fantasia
+                            </label>
+
+                            <input
+                                type="text"
+                                name="nome_fantasia"
+                                class="form-control"
+                                value="{{ configuracao.nome_fantasia or '' }}">
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                CNPJ
+                            </label>
+
+                            <input
+                                type="text"
+                                name="cnpj"
+                                class="form-control"
+                                value="{{ configuracao.cnpj or '' }}"
+                                maxlength="18"
+                                inputmode="numeric"
+                                data-mask="cnpj">
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                OAB
+                            </label>
+
+                            <input
+                                type="text"
+                                name="oab"
+                                class="form-control"
+                                value="{{ configuracao.oab or '' }}">
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                Telefone
+                            </label>
+
+                            <input
+                                type="text"
+                                name="telefone"
+                                class="form-control"
+                                value="{{ configuracao.telefone or '' }}"
+                                maxlength="15"
+                                inputmode="numeric"
+                                data-mask="telefone">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                WhatsApp
+                            </label>
+
+                            <input
+                                type="text"
+                                name="whatsapp"
+                                class="form-control"
+                                value="{{ configuracao.whatsapp or '' }}"
+                                maxlength="15"
+                                inputmode="numeric"
+                                data-mask="whatsapp">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                class="form-control"
+                                value="{{ configuracao.email or '' }}">
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Site
+                        </label>
+
+                        <input
+                            type="text"
+                            name="site"
+                            class="form-control"
+                            value="{{ configuracao.site or '' }}">
+
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">
+                        📍 Endereço
+                    </h5>
+
+                    <div class="row">
+
+                        <div class="col-md-3 mb-3">
+
+                            <label class="form-label">
+                                CEP
+                            </label>
+
+                            <input
+                                type="text"
+                                name="cep"
+                                class="form-control"
+                                value="{{ configuracao.cep or '' }}"
+                                maxlength="9"
+                                inputmode="numeric"
+                                data-mask="cep">
+
+                        </div>
+
+                        <div class="col-md-7 mb-3">
+
+                            <label class="form-label">
+                                Rua
+                            </label>
+
+                            <input
+                                type="text"
+                                name="rua"
+                                class="form-control"
+                                value="{{ configuracao.rua or '' }}">
+
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+
+                            <label class="form-label">
+                                Nº
+                            </label>
+
+                            <input
+                                type="text"
+                                name="numero"
+                                class="form-control"
+                                value="{{ configuracao.numero or '' }}">
+
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                Bairro
+                            </label>
+
+                            <input
+                                type="text"
+                                name="bairro"
+                                class="form-control"
+                                value="{{ configuracao.bairro or '' }}">
+
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+
+                            <label class="form-label">
+                                Cidade
+                            </label>
+
+                            <input
+                                type="text"
+                                name="cidade"
+                                class="form-control"
+                                value="{{ configuracao.cidade or '' }}">
+
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+
+                            <label class="form-label">
+                                Estado
+                            </label>
+
+                            <input
+                                type="text"
+                                maxlength="2"
+                                name="estado"
+                                class="form-control text-uppercase"
+                                value="{{ configuracao.estado or '' }}">
+
+                        </div>
+
+                        <div class="col-md-2 mb-3">
+
+                            <label class="form-label">
+                                Complemento
+                            </label>
+
+                            <input
+                                type="text"
+                                name="complemento"
+                                class="form-control"
+                                value="{{ configuracao.complemento or '' }}">
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <h5 class="mb-3">
+                        🎨 Identidade Visual
+                    </h5>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Logo
+                        </label>
+
+                        <input
+                            type="file"
+                            class="form-control"
+                            name="logo">
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Cor Principal
+                            </label>
+
+                            <input
+                                type="color"
+                                name="cor_principal"
+                                class="form-control form-control-color"
+                                value="{{ configuracao.cor_principal }}">
+
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+
+                            <label class="form-label">
+                                Cor Secundária
+                            </label>
+
+                            <input
+                                type="color"
+                                name="cor_secundaria"
+                                class="form-control form-control-color"
+                                value="{{ configuracao.cor_secundaria }}">
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Texto do Rodapé
+                        </label>
+
+                        <textarea
+                            class="form-control"
+                            rows="4"
+                            name="texto_rodape">{{ configuracao.texto_rodape or '' }}</textarea>
+
+                    </div>
+
+                    <div class="text-end">
+
+                        <button
+                            class="btn btn-success btn-lg">
+
+                            💾 Salvar Alterações
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- PRÉVIA -->
+
+    <div class="col-lg-4">
+
+        <div class="card shadow-sm sticky-top"
+             style="top:20px;">
+
+            <div class="card-header bg-primary text-white">
+
+                Pré-visualização
+
+            </div>
+
+            <div class="card-body text-center">
+
+                {% if configuracao.logo %}
+
+                    <img
+                        src="{{ url_for('static', filename=configuracao.logo) }}"
+                        class="img-fluid mb-4"
+                        style="max-height:120px;">
+
+                {% else %}
+
+                    <div class="border rounded p-5 mb-4">
+
+                        🖼️ Logo
+
+                    </div>
+
+                {% endif %}
+
+                <h4>
+
+                    {{ configuracao.nome_escritorio }}
+
+                </h4>
+
+                <p class="text-muted">
+
+                    {{ configuracao.nome_fantasia }}
+
+                </p>
+
+                <hr>
+
+                <p class="mb-1">
+
+                    ☎ {{ configuracao.telefone or "-" }}
+
+                </p>
+
+                <p class="mb-1">
+
+                    📱 {{ configuracao.whatsapp or "-" }}
+
+                </p>
+
+                <p class="mb-1">
+
+                    ✉ {{ configuracao.email or "-" }}
+
+                </p>
+
+                <p class="mb-1">
+
+                    🌐 {{ configuracao.site or "-" }}
+
+                </p>
+
+                <hr>
+
+                <small class="text-muted">
+
+                    {{ configuracao.rua or "" }}
+                    {{ configuracao.numero or "" }}
+
+                    <br>
+
+                    {{ configuracao.bairro or "" }}
+
+                    <br>
+
+                    {{ configuracao.cidade or "" }}
+                    {{ configuracao.estado or "" }}
+
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,427 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+{% block title %}Cliente - Ficha Trabalhista{% endblock %}
+
+{% block form_action %}
+{{ url_for("atendimentos.etapa_cliente", atendimento_id=atendimento.id) }}
+{% endblock %}
+
+{% block etapa_titulo %}Dados do cliente{% endblock %}
+
+{% block etapa_descricao %}
+Confira os dados cadastrais e preencha as informações complementares.
+{% endblock %}
+
+{% block etapa_identificacao %}Etapa 2 de 10{% endblock %}
+
+{% block etapa_alertas %}
+<div class="trabalhista-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        Os campos em cinza vêm do cadastro principal do cliente.
+        Os demais pertencem somente a esta ficha trabalhista.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-person-vcard"></i>
+        </span>
+        <div>
+            <h3>Dados cadastrais</h3>
+            <p>Informações recuperadas do cadastro do cliente.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <label class="form-label">Nome completo</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.nome or '' }}" readonly>
+        </div>
+
+        <div class="col-lg-4">
+            <label class="form-label">Data de nascimento</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.data_nascimento.strftime('%d/%m/%Y') if cliente.data_nascimento else '' }}"
+                   readonly>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">CPF</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.cpf or '' }}" readonly>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">RG</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.rg or '' }}" readonly>
+        </div>
+
+        <div class="col-md-4">
+            <label for="orgao_expedidor" class="form-label">Órgão expedidor</label>
+            <input type="text" class="form-control"
+                   id="orgao_expedidor" name="orgao_expedidor"
+                   maxlength="30"
+                   value="{{ ficha.orgao_expedidor or '' }}"
+                   placeholder="Ex.: SSP/PB">
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Estado civil</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.estado_civil or '' }}" readonly>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Profissão</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.profissao or '' }}" readonly>
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-mortarboard"></i>
+        </span>
+        <div>
+            <h3>Escolaridade e contato</h3>
+            <p>Formação e contatos adicionais.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label for="escolaridade" class="form-label">Escolaridade</label>
+            <select class="form-select" id="escolaridade" name="escolaridade">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in escolaridades.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.escolaridade == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label for="escolaridade_outro" class="form-label">
+                Outra escolaridade
+            </label>
+            <input type="text" class="form-control"
+                   id="escolaridade_outro" name="escolaridade_outro"
+                   maxlength="100"
+                   value="{{ ficha.escolaridade_outro or '' }}">
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Telefone</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.telefone or '' }}" readonly>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">WhatsApp</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.whatsapp or '' }}" readonly>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">E-mail</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.email or '' }}" readonly>
+        </div>
+
+        <div class="col-md-5">
+            <label for="contato_parente_amigo" class="form-label">
+                Parente ou amigo para contato
+            </label>
+            <input type="text" class="form-control"
+                   id="contato_parente_amigo"
+                   name="contato_parente_amigo"
+                   maxlength="150"
+                   value="{{ ficha.contato_parente_amigo or '' }}">
+        </div>
+
+        <div class="col-md-4">
+            <label for="contato_parente_amigo_telefone" class="form-label">
+                Telefone do contato
+            </label>
+            <input type="text" class="form-control"
+                   id="contato_parente_amigo_telefone"
+                   name="contato_parente_amigo_telefone"
+                   maxlength="20"
+                   value="{{ ficha.contato_parente_amigo_telefone or '' }}">
+        </div>
+
+        <div class="col-md-3">
+            <label for="contato_parente_amigo_relacao" class="form-label">
+                Relação
+            </label>
+            <input type="text" class="form-control"
+                   id="contato_parente_amigo_relacao"
+                   name="contato_parente_amigo_relacao"
+                   maxlength="80"
+                   value="{{ ficha.contato_parente_amigo_relacao or '' }}"
+                   placeholder="Ex.: mãe">
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-at"></i>
+        </span>
+        <div>
+            <h3>Redes sociais</h3>
+            <p>Perfis informados pelo cliente.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-3">
+            <label for="instagram" class="form-label">Instagram</label>
+            <input type="text" class="form-control"
+                   id="instagram" name="instagram"
+                   maxlength="150"
+                   value="{{ ficha.instagram or '' }}">
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <label for="facebook" class="form-label">Facebook</label>
+            <input type="text" class="form-control"
+                   id="facebook" name="facebook"
+                   maxlength="150"
+                   value="{{ ficha.facebook or '' }}">
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <label for="tiktok" class="form-label">TikTok</label>
+            <input type="text" class="form-control"
+                   id="tiktok" name="tiktok"
+                   maxlength="150"
+                   value="{{ ficha.tiktok or '' }}">
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <label for="outra_rede_social" class="form-label">
+                Outra rede social
+            </label>
+            <input type="text" class="form-control"
+                   id="outra_rede_social" name="outra_rede_social"
+                   maxlength="150"
+                   value="{{ ficha.outra_rede_social or '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-house-door"></i>
+        </span>
+        <div>
+            <h3>Endereço e filiação</h3>
+            <p>Endereço cadastrado e nomes dos pais.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <label class="form-label">Endereço</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.rua or '' }}{% if cliente.numero %}, {{ cliente.numero }}{% endif %}{% if cliente.bairro %} - {{ cliente.bairro }}{% endif %}"
+                   readonly>
+        </div>
+
+        <div class="col-lg-4">
+            <label class="form-label">CEP</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.cep or '' }}" readonly>
+        </div>
+
+        <div class="col-md-8">
+            <label class="form-label">Cidade</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.cidade or '' }}" readonly>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Estado</label>
+            <input class="form-control trabalhista-readonly-field"
+                   value="{{ cliente.estado or '' }}" readonly>
+        </div>
+
+        <div class="col-md-6">
+            <label for="nome_pai" class="form-label">Nome do pai</label>
+            <input type="text" class="form-control"
+                   id="nome_pai" name="nome_pai"
+                   maxlength="150"
+                   value="{{ ficha.nome_pai or '' }}">
+        </div>
+
+        <div class="col-md-6">
+            <label for="nome_mae" class="form-label">Nome da mãe</label>
+            <input type="text" class="form-control"
+                   id="nome_mae" name="nome_mae"
+                   maxlength="150"
+                   value="{{ ficha.nome_mae or '' }}">
+        </div>
+    </div>
+</section>
+
+<section class="trabalhista-section">
+    <div class="trabalhista-section-title">
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-clipboard2-heart"></i>
+        </span>
+        <div>
+            <h3>Informações complementares</h3>
+            <p>Filhos menores, deficiência e benefício do INSS.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="possui_filhos_menores" class="form-label">
+                Possui filhos menores?
+            </label>
+            <select class="form-select"
+                    id="possui_filhos_menores"
+                    name="possui_filhos_menores">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.possui_filhos_menores == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label for="quantidade_filhos_menores" class="form-label">
+                Quantos?
+            </label>
+            <input type="number" class="form-control"
+                   id="quantidade_filhos_menores"
+                   name="quantidade_filhos_menores"
+                   min="0" max="30"
+                   value="{{ ficha.quantidade_filhos_menores if ficha.quantidade_filhos_menores is not none else '' }}">
+        </div>
+
+        <div class="col-md-6">
+            <label for="possui_deficiencia" class="form-label">
+                Possui alguma deficiência?
+            </label>
+            <select class="form-select"
+                    id="possui_deficiencia"
+                    name="possui_deficiencia">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.possui_deficiencia == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12">
+            <label for="descricao_deficiencia" class="form-label">
+                Qual deficiência?
+            </label>
+            <input type="text" class="form-control"
+                   id="descricao_deficiencia"
+                   name="descricao_deficiencia"
+                   maxlength="255"
+                   value="{{ ficha.descricao_deficiencia or '' }}">
+        </div>
+
+        <div class="col-md-5">
+            <label for="recebeu_beneficio_inss" class="form-label">
+                Recebe ou já recebeu benefício do INSS?
+            </label>
+            <select class="form-select"
+                    id="recebeu_beneficio_inss"
+                    name="recebeu_beneficio_inss">
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option value="{{ valor }}"
+                        {% if ficha.recebeu_beneficio_inss == valor %}selected{% endif %}>
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-7">
+            <label for="beneficio_inss_descricao" class="form-label">
+                Qual benefício?
+            </label>
+            <input type="text" class="form-control"
+                   id="beneficio_inss_descricao"
+                   name="beneficio_inss_descricao"
+                   maxlength="255"
+                   value="{{ ficha.beneficio_inss_descricao or '' }}">
+        </div>
+
+        <div class="col-12">
+            <label for="observacoes_dados_cliente" class="form-label">
+                Observações
+            </label>
+            <textarea class="form-control"
+                      id="observacoes_dados_cliente"
+                      name="observacoes_dados_cliente"
+                      rows="4">{{ ficha.observacoes_dados_cliente or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const configuracoes = [
+        ["possui_filhos_menores", "quantidade_filhos_menores"],
+        ["possui_deficiencia", "descricao_deficiencia"],
+        ["recebeu_beneficio_inss", "beneficio_inss_descricao"]
+    ];
+
+    function atualizar() {
+        configuracoes.forEach(function (item) {
+            const seletor = document.getElementById(item[0]);
+            const campo = document.getElementById(item[1]);
+
+            if (!seletor || !campo) {
+                return;
+            }
+
+            const habilitado = seletor.value === "SIM";
+            campo.disabled = !habilitado;
+
+            if (!habilitado) {
+                campo.value = "";
+            }
+        });
+    }
+
+    configuracoes.forEach(function (item) {
+        const seletor = document.getElementById(item[0]);
+
+        if (seletor) {
+            seletor.addEventListener("change", atualizar);
+        }
+    });
+
+    atualizar();
+});
+</script>
+
+{% endblock %}

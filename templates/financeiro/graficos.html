@@ -1,0 +1,677 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Dashboard Financeiro
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+
+    {{ page_header(
+        "📊 Dashboard Financeiro",
+        "Análise mensal e comparação entre os anos."
+    ) }}
+
+    <a href="{{ url_for(
+        'financeiro.listar_financeiro',
+        ano=ano_b
+    ) }}"
+       class="btn btn-secondary">
+        ← Voltar ao Financeiro
+    </a>
+
+</div>
+
+<!-- Filtros de comparação -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <form method="GET"
+              action="{{ url_for('financeiro.graficos_financeiros') }}">
+
+            <div class="row align-items-end">
+
+                <div class="col-md-4 mb-3 mb-md-0">
+
+                    <label class="form-label">
+                        Primeiro ano
+                    </label>
+
+                    <select name="ano_a"
+                            class="form-select">
+
+                        {% for ano in anos_disponiveis %}
+
+                            <option value="{{ ano }}"
+                                    {% if ano == ano_a %}selected{% endif %}>
+                                {{ ano }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-4 mb-3 mb-md-0">
+
+                    <label class="form-label">
+                        Segundo ano
+                    </label>
+
+                    <select name="ano_b"
+                            class="form-select">
+
+                        {% for ano in anos_disponiveis %}
+
+                            <option value="{{ ano }}"
+                                    {% if ano == ano_b %}selected{% endif %}>
+                                {{ ano }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <button type="submit"
+                            class="btn btn-dark w-100">
+                        📊 Comparar anos
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Indicadores -->
+<div class="row mb-4">
+
+    <div class="col-lg-3 col-md-6 mb-3">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h6 class="text-primary">
+                    📅 Total de {{ ano_a }}
+                </h6>
+
+                <h3 class="mb-1">
+                    R$ {{ "{:,.2f}".format(dados_a.total_anual).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                </h3>
+
+                <small class="text-muted">
+                    Total de despesas no ano
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h6 class="text-success">
+                    📅 Total de {{ ano_b }}
+                </h6>
+
+                <h3 class="mb-1">
+                    R$ {{ "{:,.2f}".format(dados_b.total_anual).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                </h3>
+
+                <small class="text-muted">
+                    Total de despesas no ano
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h6 class="{% if diferenca > 0 %}text-danger{% elif diferenca < 0 %}text-success{% else %}text-muted{% endif %}">
+                    ↕ Diferença
+                </h6>
+
+                <h3 class="mb-1">
+                    {% if diferenca > 0 %}
+                        +
+                    {% endif %}
+
+                    R$ {{ "{:,.2f}".format(diferenca).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                </h3>
+
+                <small class="text-muted">
+                    {{ ano_b }} em relação a {{ ano_a }}
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h6 class="text-warning">
+                    📈 Variação
+                </h6>
+
+                <h3 class="mb-1">
+
+                    {% if variacao_percentual is not none %}
+
+                        {% if variacao_percentual > 0 %}
+                            +
+                        {% endif %}
+
+                        {{ "%.2f"|format(variacao_percentual) }}%
+
+                    {% else %}
+
+                        -
+
+                    {% endif %}
+
+                </h3>
+
+                <small class="text-muted">
+                    Percentual entre os anos
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Comparação mensal -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-dark text-white">
+        📊 Comparação mensal — {{ ano_a }} × {{ ano_b }}
+    </div>
+
+    <div class="card-body">
+
+        <div class="financeiro-grafico-grande">
+
+            <canvas id="graficoComparacaoMensal"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+
+    <!-- Despesas do segundo ano -->
+    <div class="col-lg-8 mb-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header bg-primary text-white">
+                📈 Despesas mensais de {{ ano_b }}
+            </div>
+
+            <div class="card-body">
+
+                <div class="financeiro-grafico-medio">
+
+                    <canvas id="graficoDespesasAno"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Indicadores do segundo ano -->
+    <div class="col-lg-4 mb-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header bg-success text-white">
+                📌 Resumo de {{ ano_b }}
+            </div>
+
+            <div class="card-body">
+
+                <div class="mb-4">
+
+                    <small class="text-muted d-block">
+                        Média mensal
+                    </small>
+
+                    <h4 class="mb-0">
+                        R$ {{ "{:,.2f}".format(dados_b.media_mensal).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                    </h4>
+
+                </div>
+
+                <hr>
+
+                <div class="mb-4">
+
+                    <small class="text-muted d-block">
+                        Mês com maior despesa
+                    </small>
+
+                    <h5 class="mb-1">
+                        {{ dados_b.maior_mes_nome }}
+                    </h5>
+
+                    <strong class="text-danger">
+                        R$ {{ "{:,.2f}".format(dados_b.maior_mes_valor).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                    </strong>
+
+                </div>
+
+                <hr>
+
+                <div>
+
+                    <small class="text-muted d-block">
+                        Ano comparado
+                    </small>
+
+                    <h5 class="mb-0">
+                        {{ ano_a }} × {{ ano_b }}
+                    </h5>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+
+    <!-- Categorias -->
+    <div class="col-lg-6 mb-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header bg-warning">
+                🥧 Despesas por categoria — {{ ano_b }}
+            </div>
+
+            <div class="card-body">
+
+                {% if categorias_rotulos %}
+
+                    <div class="financeiro-grafico-medio">
+
+                        <canvas id="graficoCategorias"></canvas>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="text-center py-5">
+
+                        <h5 class="text-muted">
+                            Nenhuma categoria encontrada
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Cadastre despesas para visualizar o gráfico.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Ranking de categorias -->
+    <div class="col-lg-6 mb-4">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-header bg-secondary text-white">
+                📋 Ranking de categorias — {{ ano_b }}
+            </div>
+
+            <div class="card-body">
+
+                {% if categorias_ordenadas %}
+
+                    <div class="table-responsive">
+
+                        <table class="table table-hover align-middle">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Categoria</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {% for categoria, valor in categorias_ordenadas %}
+
+                                    <tr>
+
+                                        <td>
+                                            <strong>
+                                                {{ categoria }}
+                                            </strong>
+                                        </td>
+
+                                        <td class="text-end">
+                                            R$ {{ "{:,.2f}".format(valor).replace(",", "X").replace(".", ",").replace("X", ".") }}
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="text-center py-5">
+
+                        <h5 class="text-muted">
+                            Nenhuma despesa encontrada
+                        </h5>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const rotulosMeses = {{ rotulos_meses | tojson }};
+    const valoresAnoA = {{ valores_ano_a | tojson }};
+    const valoresAnoB = {{ valores_ano_b | tojson }};
+    const categoriasRotulos = {{ categorias_rotulos | tojson }};
+    const categoriasValores = {{ categorias_valores | tojson }};
+
+    const formatadorMoeda = new Intl.NumberFormat(
+        "pt-BR",
+        {
+            style: "currency",
+            currency: "BRL"
+        }
+    );
+
+
+    const elementoComparacao = document.getElementById(
+        "graficoComparacaoMensal"
+    );
+
+    if (elementoComparacao) {
+
+        new Chart(
+            elementoComparacao,
+            {
+                type: "bar",
+
+                data: {
+                    labels: rotulosMeses,
+
+                    datasets: [
+                        {
+                            label: "{{ ano_a }}",
+                            data: valoresAnoA,
+                            backgroundColor: "rgba(108, 117, 125, 0.70)",
+                            borderColor: "rgb(108, 117, 125)",
+                            borderWidth: 1
+                        },
+                        {
+                            label: "{{ ano_b }}",
+                            data: valoresAnoB,
+                            backgroundColor: "rgba(13, 110, 253, 0.70)",
+                            borderColor: "rgb(13, 110, 253)",
+                            borderWidth: 1
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: "index",
+                        intersect: false
+                    },
+
+                    plugins: {
+                        legend: {
+                            position: "top"
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: function (contexto) {
+                                    return (
+                                        contexto.dataset.label
+                                        + ": "
+                                        + formatadorMoeda.format(
+                                            contexto.raw
+                                        )
+                                    );
+                                }
+                            }
+                        }
+                    },
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                callback: function (valor) {
+                                    return formatadorMoeda.format(
+                                        valor
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+    }
+
+
+    const elementoAno = document.getElementById(
+        "graficoDespesasAno"
+    );
+
+    if (elementoAno) {
+
+        new Chart(
+            elementoAno,
+            {
+                type: "line",
+
+                data: {
+                    labels: rotulosMeses,
+
+                    datasets: [
+                        {
+                            label: "Despesas de {{ ano_b }}",
+                            data: valoresAnoB,
+                            borderColor: "rgb(25, 135, 84)",
+                            backgroundColor: "rgba(25, 135, 84, 0.15)",
+                            fill: true,
+                            tension: 0.3,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function (contexto) {
+                                    return formatadorMoeda.format(
+                                        contexto.raw
+                                    );
+                                }
+                            }
+                        }
+                    },
+
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                callback: function (valor) {
+                                    return formatadorMoeda.format(
+                                        valor
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+    }
+
+
+    const elementoCategorias = document.getElementById(
+        "graficoCategorias"
+    );
+
+    if (
+        elementoCategorias
+        && categoriasRotulos.length > 0
+    ) {
+
+        new Chart(
+            elementoCategorias,
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: categoriasRotulos,
+
+                    datasets: [
+                        {
+                            data: categoriasValores,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        },
+
+                        tooltip: {
+                            callbacks: {
+                                label: function (contexto) {
+                                    const rotulo =
+                                        contexto.label || "";
+
+                                    return (
+                                        rotulo
+                                        + ": "
+                                        + formatadorMoeda.format(
+                                            contexto.raw
+                                        )
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+    }
+
+});
+</script>
+
+<style>
+.financeiro-grafico-grande {
+    position: relative;
+    min-height: 420px;
+}
+
+.financeiro-grafico-medio {
+    position: relative;
+    min-height: 340px;
+}
+</style>
+
+{% endblock %}

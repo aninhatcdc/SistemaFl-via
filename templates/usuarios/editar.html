@@ -1,0 +1,706 @@
+{% extends "base.html" %}
+
+{% from "components/page_header.html" import page_header %}
+
+{% block titulo %}
+Editar Usuário
+{% endblock %}
+
+{% block conteudo %}
+
+{{ page_header(
+    "✏️ Editar Usuário",
+    "Atualize os dados do usuário e redefina sua senha quando necessário."
+) }}
+
+<div class="row g-4">
+
+    <!-- =====================================
+         DADOS DO USUÁRIO
+    ====================================== -->
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-white py-3">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div
+                        class="rounded-circle bg-dark text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                        style="width: 48px; height: 48px; font-weight: 600;">
+
+                        {{ usuario.iniciais }}
+
+                    </div>
+
+                    <div>
+
+                        <h5 class="mb-0">
+                            Dados do usuário
+                        </h5>
+
+                        <small class="text-muted">
+                            {{ usuario.nome }}
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'usuarios.editar_usuario',
+                        id=usuario.id
+                    ) }}">
+
+                    <!-- DADOS PESSOAIS -->
+                    <div class="mb-4">
+
+                        <h6 class="fw-bold border-bottom pb-2 mb-3">
+                            👤 Dados pessoais
+                        </h6>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nome"
+                                    class="form-label fw-semibold">
+
+                                    Nome completo
+                                    <span class="text-danger">*</span>
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="nome"
+                                    name="nome"
+                                    class="form-control"
+                                    maxlength="120"
+                                    value="{{ dados.get('nome', usuario.nome) }}"
+                                    required>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label
+                                    for="cargo"
+                                    class="form-label fw-semibold">
+
+                                    Cargo
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="cargo"
+                                    name="cargo"
+                                    class="form-control"
+                                    maxlength="100"
+                                    placeholder="Ex.: Advogado, Assistente, Financeiro"
+                                    value="{{ dados.get(
+                                        'cargo',
+                                        usuario.cargo or ''
+                                    ) }}">
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label
+                                    for="email"
+                                    class="form-label fw-semibold">
+
+                                    E-mail
+                                    <span class="text-danger">*</span>
+
+                                </label>
+
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    class="form-control"
+                                    maxlength="120"
+                                    value="{{ dados.get(
+                                        'email',
+                                        usuario.email
+                                    ) }}"
+                                    required>
+
+                                <div class="form-text">
+                                    Este e-mail é utilizado para entrar no sistema.
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label
+                                    for="telefone"
+                                    class="form-label fw-semibold">
+
+                                    Telefone
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="telefone"
+                                    name="telefone"
+                                    class="form-control"
+                                    maxlength="20"
+                                    inputmode="numeric"
+                                    placeholder="(00) 00000-0000"
+                                    value="{{ dados.get(
+                                        'telefone',
+                                        usuario.telefone or ''
+                                    ) }}">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- PERFIL -->
+                    <div class="mb-4">
+
+                        <h6 class="fw-bold border-bottom pb-2 mb-3">
+                            🔐 Perfil de acesso
+                        </h6>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label
+                                    for="perfil"
+                                    class="form-label fw-semibold">
+
+                                    Perfil
+                                    <span class="text-danger">*</span>
+
+                                </label>
+
+                                {% set perfil_selecionado = dados.get(
+                                    'perfil',
+                                    usuario.perfil
+                                ) %}
+
+                                <select
+                                    id="perfil"
+                                    name="perfil"
+                                    class="form-select"
+                                    required>
+
+                                    {% for codigo, descricao in perfis.items() %}
+
+                                        <option
+                                            value="{{ codigo }}"
+                                            {% if perfil_selecionado == codigo %}
+                                                selected
+                                            {% endif %}>
+
+                                            {{ descricao }}
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="alert alert-light border mb-0 h-100">
+
+                                    <strong id="titulo-perfil">
+                                        {{ usuario.perfil_nome }}
+                                    </strong>
+
+                                    <div
+                                        id="descricao-perfil"
+                                        class="small text-muted mt-1">
+
+                                        Permissões correspondentes ao perfil
+                                        selecionado.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- INFORMAÇÕES DA CONTA -->
+                    <div class="mb-4">
+
+                        <h6 class="fw-bold border-bottom pb-2 mb-3">
+                            📋 Informações da conta
+                        </h6>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+
+                                <small class="text-muted d-block">
+                                    Status
+                                </small>
+
+                                {% if usuario.ativo %}
+
+                                    <span class="badge bg-success mt-1">
+                                        ● Ativo
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary mt-1">
+                                        ● Inativo
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <small class="text-muted d-block">
+                                    Cadastrado em
+                                </small>
+
+                                <strong class="d-block mt-1">
+
+                                    {% if usuario.criado_em %}
+
+                                        {{ usuario.criado_em.strftime(
+                                            "%d/%m/%Y às %H:%M"
+                                        ) }}
+
+                                    {% else %}
+
+                                        Não informado
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <small class="text-muted d-block">
+                                    Último acesso
+                                </small>
+
+                                <strong class="d-block mt-1">
+
+                                    {% if usuario.ultimo_acesso %}
+
+                                        {{ usuario.ultimo_acesso.strftime(
+                                            "%d/%m/%Y às %H:%M"
+                                        ) }}
+
+                                    {% else %}
+
+                                        Ainda não acessou
+
+                                    {% endif %}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- BOTÕES -->
+                    <div class="d-flex justify-content-between align-items-center border-top pt-3">
+
+                        <a
+                            href="{{ url_for(
+                                'usuarios.listar_usuarios'
+                            ) }}"
+                            class="btn btn-outline-secondary">
+
+                            ← Voltar
+
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-success">
+
+                            💾 Salvar alterações
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- =====================================
+         REDEFINIR SENHA
+    ====================================== -->
+    <div class="col-lg-4">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-warning py-3">
+
+                <h5 class="mb-0">
+                    🔑 Redefinir senha
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <p class="text-muted small">
+
+                    Defina uma nova senha para o usuário. A senha deve
+                    possuir pelo menos 6 caracteres.
+
+                </p>
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'usuarios.redefinir_senha',
+                        id=usuario.id
+                    ) }}"
+                    autocomplete="off"
+                    onsubmit="return confirmarRedefinicaoSenha();">
+
+                    <div class="mb-3">
+
+                        <label
+                            for="nova_senha"
+                            class="form-label fw-semibold">
+
+                            Nova senha
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <input
+                                type="password"
+                                id="nova_senha"
+                                name="nova_senha"
+                                class="form-control"
+                                minlength="6"
+                                placeholder="Mínimo de 6 caracteres"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="alternarSenha(
+                                    'nova_senha',
+                                    this
+                                )"
+                                title="Mostrar ou ocultar senha">
+
+                                👁️
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label
+                            for="confirmar_senha"
+                            class="form-label fw-semibold">
+
+                            Confirmar nova senha
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <input
+                                type="password"
+                                id="confirmar_senha"
+                                name="confirmar_senha"
+                                class="form-control"
+                                minlength="6"
+                                placeholder="Digite a senha novamente"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                onclick="alternarSenha(
+                                    'confirmar_senha',
+                                    this
+                                )"
+                                title="Mostrar ou ocultar senha">
+
+                                👁️
+
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="mensagem-senhas"
+                            class="form-text">
+
+                            As duas senhas devem ser iguais.
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="btn btn-warning w-100">
+
+                        🔐 Redefinir senha
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="alert alert-light border mt-4">
+
+            <strong class="d-block mb-2">
+                ℹ️ Atenção
+            </strong>
+
+            <small class="text-muted">
+
+                Após a redefinição, informe a nova senha ao usuário
+                por um meio seguro.
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ super() }}
+
+<script>
+    function alternarSenha(campoId, botao) {
+        const campo = document.getElementById(campoId);
+
+        if (campo.type === "password") {
+            campo.type = "text";
+            botao.textContent = "🙈";
+            botao.title = "Ocultar senha";
+        } else {
+            campo.type = "password";
+            botao.textContent = "👁️";
+            botao.title = "Mostrar senha";
+        }
+    }
+
+
+    function atualizarDescricaoPerfil() {
+        const campoPerfil = document.getElementById("perfil");
+        const titulo = document.getElementById("titulo-perfil");
+        const descricao = document.getElementById("descricao-perfil");
+
+        if (!campoPerfil || !titulo || !descricao) {
+            return;
+        }
+
+        const perfilSelecionado = campoPerfil.value;
+
+        if (perfilSelecionado === "ADMIN") {
+            titulo.textContent = "Administrador";
+            descricao.textContent =
+                "Acesso total ao sistema, incluindo Financeiro, " +
+                "configurações e gerenciamento de usuários.";
+        } else if (perfilSelecionado === "FIN") {
+            titulo.textContent = "Financeiro";
+            descricao.textContent =
+                "Acesso ao sistema e ao módulo Financeiro, " +
+                "sem permissão para gerenciar usuários.";
+        } else {
+            titulo.textContent = "Funcionário";
+            descricao.textContent =
+                "Acesso ao sistema, exceto ao módulo Financeiro " +
+                "e ao gerenciamento de usuários.";
+        }
+    }
+
+
+    function validarConfirmacaoSenha() {
+        const novaSenha =
+            document.getElementById("nova_senha");
+
+        const confirmarSenha =
+            document.getElementById("confirmar_senha");
+
+        const mensagem =
+            document.getElementById("mensagem-senhas");
+
+        if (!confirmarSenha.value) {
+            confirmarSenha.classList.remove(
+                "is-valid",
+                "is-invalid"
+            );
+
+            mensagem.className = "form-text";
+            mensagem.textContent =
+                "As duas senhas devem ser iguais.";
+
+            return;
+        }
+
+        if (novaSenha.value === confirmarSenha.value) {
+            confirmarSenha.classList.remove("is-invalid");
+            confirmarSenha.classList.add("is-valid");
+
+            mensagem.className = "form-text text-success";
+            mensagem.textContent = "As senhas coincidem.";
+        } else {
+            confirmarSenha.classList.remove("is-valid");
+            confirmarSenha.classList.add("is-invalid");
+
+            mensagem.className = "form-text text-danger";
+            mensagem.textContent = "As senhas não coincidem.";
+        }
+    }
+
+
+    function confirmarRedefinicaoSenha() {
+        const novaSenha =
+            document.getElementById("nova_senha").value;
+
+        const confirmarSenha =
+            document.getElementById("confirmar_senha").value;
+
+        if (novaSenha !== confirmarSenha) {
+            window.alert(
+                "As senhas não coincidem."
+            );
+
+            return false;
+        }
+
+        return window.confirm(
+            "Deseja realmente redefinir a senha deste usuário?"
+        );
+    }
+
+
+    function aplicarMascaraTelefone(evento) {
+        let valor = evento.target.value.replace(/\D/g, "");
+
+        valor = valor.substring(0, 11);
+
+        if (valor.length <= 10) {
+            valor = valor.replace(
+                /^(\d{2})(\d)/,
+                "($1) $2"
+            );
+
+            valor = valor.replace(
+                /(\d{4})(\d)/,
+                "$1-$2"
+            );
+        } else {
+            valor = valor.replace(
+                /^(\d{2})(\d)/,
+                "($1) $2"
+            );
+
+            valor = valor.replace(
+                /(\d{5})(\d)/,
+                "$1-$2"
+            );
+        }
+
+        evento.target.value = valor;
+    }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const campoPerfil =
+            document.getElementById("perfil");
+
+        const campoNovaSenha =
+            document.getElementById("nova_senha");
+
+        const campoConfirmarSenha =
+            document.getElementById("confirmar_senha");
+
+        const campoTelefone =
+            document.getElementById("telefone");
+
+        atualizarDescricaoPerfil();
+
+        if (campoPerfil) {
+            campoPerfil.addEventListener(
+                "change",
+                atualizarDescricaoPerfil
+            );
+        }
+
+        if (campoNovaSenha) {
+            campoNovaSenha.addEventListener(
+                "input",
+                validarConfirmacaoSenha
+            );
+        }
+
+        if (campoConfirmarSenha) {
+            campoConfirmarSenha.addEventListener(
+                "input",
+                validarConfirmacaoSenha
+            );
+        }
+
+        if (campoTelefone) {
+            campoTelefone.addEventListener(
+                "input",
+                aplicarMascaraTelefone
+            );
+        }
+    });
+</script>
+
+{% endblock %}

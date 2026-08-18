@@ -1,0 +1,412 @@
+{% extends "atendimentos/trabalhista/layout.html" %}
+
+{% block titulo %}
+13º Salário | Ficha Trabalhista
+{% endblock %}
+
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_decimo_terceiro",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+
+{% block etapa_titulo %}
+13º Salário
+{% endblock %}
+
+
+{% block etapa_descricao %}
+Registre o recebimento, a forma de pagamento, as datas aproximadas
+e os documentos referentes ao décimo terceiro salário.
+{% endblock %}
+
+
+{% block etapa_identificacao %}
+Etapa 9 de 10
+{% endblock %}
+
+
+{% block etapa_alertas %}
+
+<div class="trabalhista-info-box">
+
+    <i class="bi bi-info-circle"></i>
+
+    <div>
+        Informe o que o cliente se recorda sobre o pagamento do 13º salário.
+        Quando as datas não forem exatas, registre o mês ou o período aproximado.
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+
+<!-- ============================================================
+     RECEBIMENTO DO 13º SALÁRIO
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-wallet2"></i>
+        </span>
+
+        <div>
+            <h3>Recebimento do 13º salário</h3>
+
+            <p>
+                Informe se o benefício era pago e se o valor
+                correspondia corretamente à remuneração.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-lg-6">
+
+            <label
+                for="recebia_decimo_terceiro"
+                class="form-label"
+            >
+                Recebia 13º salário?
+            </label>
+
+            <select
+                name="recebia_decimo_terceiro"
+                id="recebia_decimo_terceiro"
+                class="form-select"
+                data-controla="grupo-decimo-terceiro"
+                data-exibir-quando="SIM"
+            >
+
+                <option value="">
+                    Selecione
+                </option>
+
+                {% for valor, rotulo in respostas.items() %}
+
+                    <option
+                        value="{{ valor }}"
+                        {% if ficha.recebia_decimo_terceiro == valor %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ rotulo }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="grupo-decimo-terceiro"
+            class="col-12 campo-condicional"
+        >
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="recebia_decimo_terceiro_corretamente"
+                        class="form-label"
+                    >
+                        O valor era pago corretamente?
+                    </label>
+
+                    <select
+                        name="recebia_decimo_terceiro_corretamente"
+                        id="recebia_decimo_terceiro_corretamente"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.recebia_decimo_terceiro_corretamente == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="recebia_decimo_terceiro_duas_parcelas"
+                        class="form-label"
+                    >
+                        Era pago em duas parcelas?
+                    </label>
+
+                    <select
+                        name="recebia_decimo_terceiro_duas_parcelas"
+                        id="recebia_decimo_terceiro_duas_parcelas"
+                        class="form-select"
+                        data-controla="grupo-parcelas-decimo"
+                        data-exibir-quando="SIM"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.recebia_decimo_terceiro_duas_parcelas == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="grupo-parcelas-decimo"
+                    class="col-12 campo-condicional"
+                >
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label
+                                for="data_aproximada_primeira_parcela"
+                                class="form-label"
+                            >
+                                Data aproximada da primeira parcela
+                            </label>
+
+                            <input
+                                type="text"
+                                name="data_aproximada_primeira_parcela"
+                                id="data_aproximada_primeira_parcela"
+                                class="form-control"
+                                value="{{ ficha.data_aproximada_primeira_parcela or '' }}"
+                                placeholder="Ex.: novembro, dia 20/11 ou junto das férias."
+                            >
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label
+                                for="data_aproximada_segunda_parcela"
+                                class="form-label"
+                            >
+                                Data aproximada da segunda parcela
+                            </label>
+
+                            <input
+                                type="text"
+                                name="data_aproximada_segunda_parcela"
+                                id="data_aproximada_segunda_parcela"
+                                class="form-control"
+                                value="{{ ficha.data_aproximada_segunda_parcela or '' }}"
+                                placeholder="Ex.: dezembro ou próximo ao dia 20/12."
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="possui_contracheque_decimo_terceiro"
+                        class="form-label"
+                    >
+                        Possui contracheque ou comprovante do 13º?
+                    </label>
+
+                    <select
+                        name="possui_contracheque_decimo_terceiro"
+                        id="possui_contracheque_decimo_terceiro"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for valor, rotulo in respostas.items() %}
+
+                            <option
+                                value="{{ valor }}"
+                                {% if ficha.possui_contracheque_decimo_terceiro == valor %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ rotulo }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     OBSERVAÇÕES
+     ============================================================ -->
+<section class="trabalhista-section">
+
+    <div class="trabalhista-section-title">
+
+        <span class="trabalhista-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+
+        <div>
+            <h3>Observações sobre o 13º salário</h3>
+
+            <p>
+                Registre pagamentos em atraso, valores incompletos,
+                diferenças ou documentos disponíveis.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-12">
+
+            <label
+                for="observacoes_decimo_terceiro"
+                class="form-label"
+            >
+                Observações
+            </label>
+
+            <textarea
+                name="observacoes_decimo_terceiro"
+                id="observacoes_decimo_terceiro"
+                class="form-control"
+                rows="7"
+                placeholder="Ex.: recebeu somente uma parcela, pagamento após dezembro, valor calculado sobre salário menor ou ausência de comprovante."
+            >{{ ficha.observacoes_decimo_terceiro or "" }}</textarea>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        function atualizarCampoCondicional(controle) {
+            const destinoId = controle.dataset.controla;
+            const valorEsperado = controle.dataset.exibirQuando;
+            const destino = document.getElementById(destinoId);
+
+            if (!destino) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorEsperado;
+
+            destino.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            const campos = destino.querySelectorAll(
+                "input, select, textarea"
+            );
+
+            campos.forEach(function (campo) {
+                campo.disabled = !deveExibir;
+            });
+        }
+
+
+        function atualizarTodosCamposCondicionais() {
+            const controles = document.querySelectorAll(
+                "[data-controla][data-exibir-quando]"
+            );
+
+            controles.forEach(function (controle) {
+                atualizarCampoCondicional(controle);
+            });
+        }
+
+
+        const controles = document.querySelectorAll(
+            "[data-controla][data-exibir-quando]"
+        );
+
+        controles.forEach(function (controle) {
+
+            controle.addEventListener("change", function () {
+                atualizarTodosCamposCondicionais();
+            });
+
+        });
+
+        atualizarTodosCamposCondicionais();
+
+    });
+</script>
+
+{% endblock %}

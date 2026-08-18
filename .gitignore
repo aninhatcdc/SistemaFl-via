@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.db
+instance/
+logs/
+backups_automaticos/
+uploads/
+venv/
+.env
+.venv/
+.idea/
+.vscode/

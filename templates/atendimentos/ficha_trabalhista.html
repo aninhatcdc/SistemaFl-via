@@ -1,0 +1,834 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Ficha Trabalhista
+{% endblock %}
+
+{% block conteudo %}
+
+<div
+    class="
+        d-flex
+        flex-column
+        flex-lg-row
+        justify-content-between
+        align-items-lg-center
+        gap-3
+        mb-4
+    "
+>
+
+    <div>
+
+        <div class="d-flex align-items-center gap-2 mb-1">
+
+            <h2 class="mb-0">
+                👷 Ficha Trabalhista
+            </h2>
+
+            <span class="badge bg-warning text-dark">
+
+                {{ atendimento.status_nome }}
+
+            </span>
+
+        </div>
+
+        <p class="text-muted mb-0">
+
+            Cliente:
+
+            <strong>
+                {{ atendimento.cliente.nome }}
+            </strong>
+
+            · Atendimento nº {{ atendimento.id }}
+
+        </p>
+
+    </div>
+
+    <a
+        href="{{ url_for(
+            'clientes.detalhes_cliente',
+            id=atendimento.cliente_id
+        ) }}"
+        class="btn btn-secondary"
+    >
+        ← Voltar ao cliente
+    </a>
+
+</div>
+
+
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-body">
+
+        <div class="row g-3">
+
+            <div class="col-md-4">
+
+                <small class="text-muted d-block">
+                    CPF
+                </small>
+
+                <strong>
+                    {{ atendimento.cliente.cpf or "-" }}
+                </strong>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <small class="text-muted d-block">
+                    WhatsApp
+                </small>
+
+                <strong>
+                    {{ atendimento.cliente.whatsapp or "-" }}
+                </strong>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <small class="text-muted d-block">
+                    Responsável
+                </small>
+
+                <strong>
+                    {{ atendimento.responsavel_nome }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<form method="POST">
+
+    <!-- =====================================
+         INFORMAÇÕES DO ATENDIMENTO
+    ====================================== -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-success text-white">
+
+            ⭐ Informações do Atendimento
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-8">
+
+                    <label
+                        for="titulo"
+                        class="form-label"
+                    >
+                        Título do atendimento
+                    </label>
+
+                    <input
+                        type="text"
+                        id="titulo"
+                        name="titulo"
+                        class="form-control"
+                        maxlength="150"
+                        value="{{ atendimento.titulo or '' }}"
+                        placeholder="Ex.: Rescisão sem pagamento das verbas"
+                    >
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label
+                        for="horario_atendimento"
+                        class="form-label"
+                    >
+                        Horário
+                    </label>
+
+                    <input
+                        type="time"
+                        id="horario_atendimento"
+                        name="horario_atendimento"
+                        class="form-control"
+                        value="{% if atendimento.horario_atendimento %}{{ atendimento.horario_atendimento.strftime('%H:%M') }}{% endif %}"
+                    >
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label
+                        for="status"
+                        class="form-label"
+                    >
+                        Status
+                    </label>
+
+                    <select
+                        id="status"
+                        name="status"
+                        class="form-select"
+                    >
+
+                        {% for codigo, nome in status_atendimento.items() %}
+
+                            <option
+                                value="{{ codigo }}"
+                                {% if atendimento.status == codigo %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ nome }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-8">
+
+                    <label
+                        for="resumo_caso"
+                        class="form-label"
+                    >
+                        Resumo inicial do caso
+                    </label>
+
+                    <textarea
+                        id="resumo_caso"
+                        name="resumo_caso"
+                        class="form-control"
+                        rows="3"
+                        placeholder="Descreva resumidamente o motivo do atendimento."
+                    >{{ atendimento.resumo_caso or '' }}</textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         DADOS COMPLEMENTARES
+    ====================================== -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-primary text-white">
+
+            👤 Dados Complementares do Cliente
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label
+                        for="orgao_expedidor"
+                        class="form-label"
+                    >
+                        Órgão expedidor do RG
+                    </label>
+
+                    <input
+                        type="text"
+                        id="orgao_expedidor"
+                        name="orgao_expedidor"
+                        class="form-control"
+                        maxlength="30"
+                        value="{{ ficha.orgao_expedidor or '' }}"
+                        placeholder="Ex.: SSP/GO"
+                    >
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label
+                        for="escolaridade"
+                        class="form-label"
+                    >
+                        Escolaridade
+                    </label>
+
+                    <select
+                        id="escolaridade"
+                        name="escolaridade"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for codigo, nome in escolaridades.items() %}
+
+                            <option
+                                value="{{ codigo }}"
+                                {% if ficha.escolaridade == codigo %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ nome }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label
+                        for="escolaridade_outro"
+                        class="form-label"
+                    >
+                        Outra escolaridade
+                    </label>
+
+                    <input
+                        type="text"
+                        id="escolaridade_outro"
+                        name="escolaridade_outro"
+                        class="form-control"
+                        maxlength="100"
+                        value="{{ ficha.escolaridade_outro or '' }}"
+                    >
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label
+                        for="nome_pai"
+                        class="form-label"
+                    >
+                        Nome do pai
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nome_pai"
+                        name="nome_pai"
+                        class="form-control"
+                        maxlength="150"
+                        value="{{ ficha.nome_pai or '' }}"
+                    >
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label
+                        for="nome_mae"
+                        class="form-label"
+                    >
+                        Nome da mãe
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nome_mae"
+                        name="nome_mae"
+                        class="form-control"
+                        maxlength="150"
+                        value="{{ ficha.nome_mae or '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         CONTATO DE EMERGÊNCIA
+    ====================================== -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-dark text-white">
+
+            📞 Contato de Parente ou Amigo
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+
+                    <label
+                        for="contato_parente_amigo"
+                        class="form-label"
+                    >
+                        Nome
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contato_parente_amigo"
+                        name="contato_parente_amigo"
+                        class="form-control"
+                        maxlength="120"
+                        value="{{ ficha.contato_parente_amigo or '' }}"
+                    >
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label
+                        for="contato_parente_amigo_telefone"
+                        class="form-label"
+                    >
+                        Telefone
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contato_parente_amigo_telefone"
+                        name="contato_parente_amigo_telefone"
+                        class="form-control"
+                        maxlength="20"
+                        value="{{ ficha.contato_parente_amigo_telefone or '' }}"
+                    >
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label
+                        for="contato_parente_amigo_relacao"
+                        class="form-label"
+                    >
+                        Relação com o cliente
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contato_parente_amigo_relacao"
+                        name="contato_parente_amigo_relacao"
+                        class="form-control"
+                        maxlength="100"
+                        value="{{ ficha.contato_parente_amigo_relacao or '' }}"
+                        placeholder="Ex.: Irmã, amigo, mãe"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         REDES SOCIAIS
+    ====================================== -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-info text-white">
+
+            🌐 Redes Sociais
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+
+                    <label
+                        for="instagram"
+                        class="form-label"
+                    >
+                        Instagram
+                    </label>
+
+                    <input
+                        type="text"
+                        id="instagram"
+                        name="instagram"
+                        class="form-control"
+                        maxlength="150"
+                        value="{{ ficha.instagram or '' }}"
+                    >
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label
+                        for="facebook"
+                        class="form-label"
+                    >
+                        Facebook
+                    </label>
+
+                    <input
+                        type="text"
+                        id="facebook"
+                        name="facebook"
+                        class="form-control"
+                        maxlength="150"
+                        value="{{ ficha.facebook or '' }}"
+                    >
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label
+                        for="tiktok"
+                        class="form-label"
+                    >
+                        TikTok
+                    </label>
+
+                    <input
+                        type="text"
+                        id="tiktok"
+                        name="tiktok"
+                        class="form-control"
+                        maxlength="150"
+                        value="{{ ficha.tiktok or '' }}"
+                    >
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label
+                        for="outra_rede_social"
+                        class="form-label"
+                    >
+                        Outra rede
+                    </label>
+
+                    <input
+                        type="text"
+                        id="outra_rede_social"
+                        name="outra_rede_social"
+                        class="form-control"
+                        maxlength="150"
+                        value="{{ ficha.outra_rede_social or '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         FILHOS, DEFICIÊNCIA E INSS
+    ====================================== -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-warning">
+
+            📋 Informações Adicionais
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <div class="col-lg-4">
+
+                    <label
+                        for="possui_filhos_menores"
+                        class="form-label"
+                    >
+                        Possui filhos menores?
+                    </label>
+
+                    <select
+                        id="possui_filhos_menores"
+                        name="possui_filhos_menores"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for codigo, nome in respostas.items() %}
+
+                            <option
+                                value="{{ codigo }}"
+                                {% if ficha.possui_filhos_menores == codigo %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ nome }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <label
+                        for="quantidade_filhos_menores"
+                        class="form-label mt-3"
+                    >
+                        Quantidade
+                    </label>
+
+                    <input
+                        type="number"
+                        id="quantidade_filhos_menores"
+                        name="quantidade_filhos_menores"
+                        class="form-control"
+                        min="0"
+                        value="{% if ficha.quantidade_filhos_menores is not none %}{{ ficha.quantidade_filhos_menores }}{% endif %}"
+                    >
+
+                </div>
+
+                <div class="col-lg-4">
+
+                    <label
+                        for="possui_deficiencia"
+                        class="form-label"
+                    >
+                        Possui alguma deficiência?
+                    </label>
+
+                    <select
+                        id="possui_deficiencia"
+                        name="possui_deficiencia"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for codigo, nome in respostas.items() %}
+
+                            <option
+                                value="{{ codigo }}"
+                                {% if ficha.possui_deficiencia == codigo %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ nome }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <label
+                        for="descricao_deficiencia"
+                        class="form-label mt-3"
+                    >
+                        Descrição
+                    </label>
+
+                    <input
+                        type="text"
+                        id="descricao_deficiencia"
+                        name="descricao_deficiencia"
+                        class="form-control"
+                        maxlength="255"
+                        value="{{ ficha.descricao_deficiencia or '' }}"
+                    >
+
+                </div>
+
+                <div class="col-lg-4">
+
+                    <label
+                        for="recebeu_beneficio_inss"
+                        class="form-label"
+                    >
+                        Recebeu benefício do INSS?
+                    </label>
+
+                    <select
+                        id="recebeu_beneficio_inss"
+                        name="recebeu_beneficio_inss"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            Selecione
+                        </option>
+
+                        {% for codigo, nome in respostas.items() %}
+
+                            <option
+                                value="{{ codigo }}"
+                                {% if ficha.recebeu_beneficio_inss == codigo %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ nome }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <label
+                        for="beneficio_inss_descricao"
+                        class="form-label mt-3"
+                    >
+                        Qual benefício?
+                    </label>
+
+                    <input
+                        type="text"
+                        id="beneficio_inss_descricao"
+                        name="beneficio_inss_descricao"
+                        class="form-control"
+                        maxlength="255"
+                        value="{{ ficha.beneficio_inss_descricao or '' }}"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         OBSERVAÇÕES
+    ====================================== -->
+    <div class="card shadow-sm mb-4">
+
+        <div class="card-header bg-secondary text-white">
+
+            📝 Observações
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="observacoes_dados_cliente"
+                        class="form-label"
+                    >
+                        Observações sobre os dados do cliente
+                    </label>
+
+                    <textarea
+                        id="observacoes_dados_cliente"
+                        name="observacoes_dados_cliente"
+                        class="form-control"
+                        rows="5"
+                    >{{ ficha.observacoes_dados_cliente or '' }}</textarea>
+
+                </div>
+
+                <div class="col-lg-6">
+
+                    <label
+                        for="observacoes_internas"
+                        class="form-label"
+                    >
+                        Observações internas do atendimento
+                    </label>
+
+                    <textarea
+                        id="observacoes_internas"
+                        name="observacoes_internas"
+                        class="form-control"
+                        rows="5"
+                    >{{ atendimento.observacoes_internas or '' }}</textarea>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         BOTÕES
+    ====================================== -->
+    <div
+        class="
+            d-flex
+            flex-column
+            flex-sm-row
+            justify-content-end
+            gap-2
+            mb-5
+        "
+    >
+
+        <a
+            href="{{ url_for(
+                'clientes.detalhes_cliente',
+                id=atendimento.cliente_id
+            ) }}"
+            class="btn btn-outline-secondary"
+        >
+            Cancelar
+        </a>
+
+        <button
+            type="submit"
+            name="acao"
+            value="salvar"
+            class="btn btn-outline-success"
+        >
+            💾 Salvar e continuar
+        </button>
+
+        <button
+            type="submit"
+            name="acao"
+            value="salvar_voltar"
+            class="btn btn-success"
+        >
+            ✅ Salvar e voltar ao cliente
+        </button>
+
+    </div>
+
+</form>
+
+{% endblock %}

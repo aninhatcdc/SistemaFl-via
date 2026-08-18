@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Documento {{ documento.nome_arquivo }}
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-1">📂 Documento</h2>
+        <p class="text-muted mb-0">{{ documento.nome_arquivo }}</p>
+    </div>
+
+    <div>
+        <a href="{{ url_for('documentos.visualizar_documento', id=documento.id) }}"
+           class="btn btn-primary"
+           target="_blank">
+            👁 Visualizar
+        </a>
+
+        <a href="{{ url_for('documentos.download_documento', id=documento.id) }}"
+           class="btn btn-success">
+            ⬇ Baixar
+        </a>
+
+        <a href="{{ url_for('documentos.listar_documentos') }}"
+           class="btn btn-secondary">
+            ← Voltar
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-dark text-white">
+        👤 Cliente
+    </div>
+
+    <div class="card-body">
+        <p>
+            <strong>Nome:</strong>
+            <a href="{{ url_for('clientes.detalhes_cliente', id=documento.cliente.id) }}"
+               class="fw-bold text-decoration-none">
+                {{ documento.cliente.nome }}
+            </a>
+        </p>
+
+        <p class="mb-0">
+            <strong>WhatsApp:</strong> {{ documento.cliente.whatsapp }}
+        </p>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        📄 Informações do Documento
+    </div>
+
+    <div class="card-body">
+        <p><strong>Arquivo:</strong> {{ documento.nome_arquivo }}</p>
+        <p><strong>Tipo:</strong> {{ documento.tipo or "-" }}</p>
+        <p><strong>Data de envio:</strong> {{ documento.criado_em.strftime("%d/%m/%Y") }}</p>
+
+        <p><strong>Descrição:</strong></p>
+
+        <div class="border rounded p-3 bg-light">
+            {{ documento.descricao or "Nenhuma descrição cadastrada." }}
+        </div>
+    </div>
+</div>
+
+<form action="{{ url_for('documentos.excluir_documento', id=documento.id) }}"
+      method="POST">
+
+    <button type="submit"
+            class="btn btn-danger"
+            onclick="return confirm('Tem certeza que deseja excluir este documento?')">
+        🗑 Excluir Documento
+    </button>
+
+</form>
+
+{% endblock %}

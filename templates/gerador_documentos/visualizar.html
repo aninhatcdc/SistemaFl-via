@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Documento Gerado
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="mb-1">
+            Documento Gerado
+        </h2>
+
+        <p class="text-muted mb-0">
+            O arquivo foi gerado e registrado com sucesso.
+        </p>
+
+    </div>
+
+    <a href="{{ url_for('gerador_documentos.historico') }}"
+       class="btn btn-secondary">
+        ← Histórico
+    </a>
+
+</div>
+
+<div class="alert alert-success d-flex align-items-center"
+     role="alert">
+
+    <div class="fs-4 me-3">
+        ✅
+    </div>
+
+    <div>
+        <strong>
+            Documento gerado com sucesso.
+        </strong>
+
+        <div>
+            O arquivo está disponível para download.
+        </div>
+    </div>
+
+</div>
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-light">
+                <strong>
+                    Informações do documento
+                </strong>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-md-8">
+
+                        <div class="text-muted small">
+                            Documento
+                        </div>
+
+                        <div class="fw-bold">
+                            {{ documento.nome_documento }}
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="text-muted small">
+                            Data da geração
+                        </div>
+
+                        <div>
+                            {{ documento.gerado_em.strftime('%d/%m/%Y às %H:%M') }}
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="text-muted small">
+                            Cliente
+                        </div>
+
+                        <div class="fw-bold">
+                            {{ documento.nome_cliente }}
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="text-muted small">
+                            Gerado por
+                        </div>
+
+                        <div>
+                            {{ documento.nome_usuario }}
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="text-muted small">
+                            Modelo utilizado
+                        </div>
+
+                        <div>
+                            {{ documento.nome_modelo }}
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="text-muted small">
+                            Processo
+                        </div>
+
+                        <div>
+
+                            {% if documento.processo %}
+
+                                {{ documento.processo.numero }}
+
+                            {% else %}
+
+                                Nenhum processo vinculado
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <div class="text-muted small">
+                            Nome do arquivo
+                        </div>
+
+                        <div class="font-monospace">
+                            {{ documento.nome_arquivo }}
+                        </div>
+
+                    </div>
+
+                    {% if documento.observacoes %}
+
+                        <div class="col-12">
+
+                            <div class="text-muted small">
+                                Observações
+                            </div>
+
+                            <div class="border rounded p-3 bg-light">
+                                {{ documento.observacoes }}
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="card shadow-sm">
+
+            <div class="card-header bg-light">
+                <strong>
+                    Ações
+                </strong>
+            </div>
+
+            <div class="card-body">
+
+                <a href="{{ url_for(
+                    'gerador_documentos.baixar_documento',
+                    documento_id=documento.id
+                ) }}"
+                   class="btn btn-success w-100 mb-2">
+
+                    ⬇ Baixar Documento
+
+                </a>
+
+                <a href="{{ url_for(
+                    'gerador_documentos.selecionar_cliente',
+                    modelo_id=documento.modelo_id
+                ) }}"
+                   class="btn btn-outline-primary w-100 mb-2">
+
+                    📄 Gerar Outro
+
+                </a>
+
+                <a href="{{ url_for('gerador_documentos.listar') }}"
+                   class="btn btn-outline-secondary w-100">
+
+                    Ver Modelos
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

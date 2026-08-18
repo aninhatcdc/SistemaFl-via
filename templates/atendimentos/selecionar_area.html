@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block titulo %}
+Novo Atendimento
+{% endblock %}
+
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="mb-1">
+            ⭐ Novo Atendimento
+        </h2>
+
+        <p class="text-muted mb-0">
+
+            Cliente:
+            <strong>
+                {{ cliente.nome }}
+            </strong>
+
+        </p>
+
+    </div>
+
+    <a
+        href="{{ url_for(
+            'clientes.detalhes_cliente',
+            id=cliente.id
+        ) }}"
+        class="btn btn-secondary"
+    >
+        ← Voltar
+    </a>
+
+</div>
+
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-header bg-success text-white">
+
+        <strong>
+            Escolha a área jurídica
+        </strong>
+
+    </div>
+
+    <div class="card-body p-4">
+
+        <div class="alert alert-light border">
+
+            Selecione a área relacionada ao atendimento.
+
+            A ficha específica será aberta automaticamente
+            depois da confirmação.
+
+        </div>
+
+        <form method="POST">
+
+            <div class="row g-3">
+
+                {% for codigo, nome in areas.items() %}
+
+                    {% set disponivel = codigo in ["TRABALHISTA", "PREVIDENCIARIA", "CIVEL", "FAMILIA"] %}
+
+                    <div class="col-md-6 col-xl-4">
+
+                        <label
+                            class="
+                                card
+                                h-100
+                                shadow-sm
+                                border
+                                area-atendimento
+                                {% if not disponivel %}
+                                    opacity-75
+                                {% endif %}
+                            "
+                            style="
+                                cursor:
+                                {% if disponivel %}
+                                    pointer
+                                {% else %}
+                                    not-allowed
+                                {% endif %};
+                            "
+                        >
+
+                            <div class="card-body">
+
+                                <div
+                                    class="
+                                        d-flex
+                                        justify-content-between
+                                        align-items-start
+                                        gap-3
+                                    "
+                                >
+
+                                    <div>
+
+                                        <div class="fs-2 mb-2">
+
+                                            {% if codigo == "TRABALHISTA" %}
+
+                                                👷
+
+                                            {% elif codigo == "PREVIDENCIARIA" %}
+
+                                                🧓
+
+                                            {% elif codigo == "CIVEL" %}
+
+                                                ⚖
+
+                                            {% elif codigo == "FAMILIA" %}
+
+                                                👨‍👩‍👧
+
+                                            {% elif codigo == "CONSUMIDOR" %}
+
+                                                🛒
+
+                                            {% else %}
+
+                                                📋
+
+                                            {% endif %}
+
+                                        </div>
+
+                                        <h5 class="mb-1">
+                                            {{ nome }}
+                                        </h5>
+
+                                        {% if disponivel %}
+
+                                            <small class="text-success">
+                                                Disponível
+                                            </small>
+
+                                        {% else %}
+
+                                            <small class="text-muted">
+                                                Em breve
+                                            </small>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <input
+                                        type="radio"
+                                        name="area"
+                                        value="{{ codigo }}"
+                                        class="form-check-input"
+                                        {% if not disponivel %}
+                                            disabled
+                                        {% endif %}
+                                        {% if disponivel %}
+                                            required
+                                        {% endif %}
+                                    >
+
+                                </div>
+
+                            </div>
+
+                        </label>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div
+                class="
+                    d-flex
+                    justify-content-end
+                    gap-2
+                    mt-4
+                    pt-3
+                    border-top
+                "
+            >
+
+                <a
+                    href="{{ url_for(
+                        'clientes.detalhes_cliente',
+                        id=cliente.id
+                    ) }}"
+                    class="btn btn-outline-secondary"
+                >
+                    Cancelar
+                </a>
+
+                <button
+                    type="submit"
+                    class="btn btn-success"
+                >
+                    Continuar →
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<style>
+    .area-atendimento {
+        transition:
+            transform 0.15s ease,
+            box-shadow 0.15s ease,
+            border-color 0.15s ease;
+    }
+
+    .area-atendimento:hover {
+        transform: translateY(-2px);
+        border-color: var(--bs-success) !important;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.10) !important;
+    }
+
+    .area-atendimento:has(
+        input[type="radio"]:checked
+    ) {
+        border: 2px solid var(--bs-success) !important;
+        background-color: rgba(25, 135, 84, 0.05);
+    }
+</style>
+
+{% endblock %}

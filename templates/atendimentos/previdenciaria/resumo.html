@@ -1,0 +1,393 @@
+{% extends "atendimentos/previdenciaria/layout.html" %}
+
+{% block title %}
+Resumo e Análise Jurídica - Ficha Previdenciária
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_resumo_previdenciario",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Resumo e análise jurídica
+{% endblock %}
+
+{% block etapa_descricao %}
+Consolide as informações do atendimento e registre a estratégia jurídica recomendada.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 8 de 8
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="previdenciaria-info-box">
+    <i class="bi bi-check-circle-fill"></i>
+    <div>
+        Esta é a última etapa da ficha previdenciária. Revise as informações
+        antes de finalizar.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .resumo-dado {
+        height: 100%;
+        border: 1px solid #e9ecef;
+        border-radius: 14px;
+        padding: 16px;
+        background: #ffffff;
+    }
+
+    .resumo-dado-titulo {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #6c757d;
+        margin-bottom: 6px;
+    }
+
+    .resumo-dado-valor {
+        display: block;
+        color: #212529;
+        font-weight: 600;
+        line-height: 1.4;
+        word-break: break-word;
+    }
+
+    .resumo-dado-vazio {
+        color: #adb5bd;
+        font-weight: 500;
+    }
+
+    .analise-campo textarea {
+        min-height: 140px;
+    }
+
+    .analise-campo-destaque textarea {
+        min-height: 180px;
+    }
+
+    .conclusao-card {
+        border: 1px solid #d3f9d8;
+        background: #f4fff6;
+        border-radius: 14px;
+        padding: 18px;
+    }
+</style>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-person-lines-fill"></i>
+        </span>
+        <div>
+            <h3>Visão geral do atendimento</h3>
+            <p>Principais informações registradas nas etapas anteriores.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">Cliente</span>
+                <span class="resumo-dado-valor">
+                    {{ atendimento.cliente.nome if atendimento.cliente else 'Não informado' }}
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">Benefício principal</span>
+                <span class="resumo-dado-valor">
+                    {% if ficha.beneficio_principal_nome %}
+                        {{ ficha.beneficio_principal_nome }}
+                    {% else %}
+                        <span class="resumo-dado-vazio">Não informado</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">Tempo estimado</span>
+                <span class="resumo-dado-valor">
+                    {% if ficha.tempo_contribuicao_estimado %}
+                        {{ ficha.tempo_contribuicao_estimado }}
+                    {% else %}
+                        <span class="resumo-dado-vazio">Não informado</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">Carência estimada</span>
+                <span class="resumo-dado-valor">
+                    {% if ficha.carencia_estimada is not none %}
+                        {{ ficha.carencia_estimada }} contribuições
+                    {% else %}
+                        <span class="resumo-dado-vazio">Não informada</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">Situação do INSS</span>
+                <span class="resumo-dado-valor">
+                    {% if ficha.situacao_requerimento %}
+                        {{ ficha.situacao_requerimento|replace('_', ' ')|title }}
+                    {% else %}
+                        <span class="resumo-dado-vazio">Não informada</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">Número do benefício</span>
+                <span class="resumo-dado-valor">
+                    {% if ficha.numero_beneficio %}
+                        {{ ficha.numero_beneficio }}
+                    {% else %}
+                        <span class="resumo-dado-vazio">Não informado</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">Incapacidade</span>
+                <span class="resumo-dado-valor">
+                    {% if ficha.tipo_incapacidade_nome %}
+                        {{ ficha.tipo_incapacidade_nome }}
+                    {% else %}
+                        <span class="resumo-dado-vazio">Não informada</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">CID principal</span>
+                <span class="resumo-dado-valor">
+                    {% if ficha.cid_principal %}
+                        {{ ficha.cid_principal }}
+                    {% else %}
+                        <span class="resumo-dado-vazio">Não informado</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+            <div class="resumo-dado">
+                <span class="resumo-dado-titulo">Progresso da ficha</span>
+                <span class="resumo-dado-valor">
+                    {{ atendimento.progresso_percentual }}%
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-file-text"></i>
+        </span>
+        <div>
+            <h3>Resumo previdenciário</h3>
+            <p>Apresente os fatos relevantes de forma clara e objetiva.</p>
+        </div>
+    </div>
+
+    <div class="analise-campo analise-campo-destaque">
+        <label for="resumo_previdenciario" class="form-label">
+            Resumo do caso
+        </label>
+        <textarea
+            class="form-control"
+            id="resumo_previdenciario"
+            name="resumo_previdenciario"
+            rows="7"
+            placeholder="Resuma histórico contributivo, benefício pretendido, quadro de saúde, documentos e situação administrativa."
+        >{{ ficha.resumo_previdenciario or '' }}</textarea>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-bank"></i>
+        </span>
+        <div>
+            <h3>Análise jurídica</h3>
+            <p>Registre o enquadramento jurídico e a viabilidade preliminar.</p>
+        </div>
+    </div>
+
+    <div class="analise-campo analise-campo-destaque">
+        <label for="analise_juridica" class="form-label">
+            Análise jurídica do caso
+        </label>
+        <textarea
+            class="form-control"
+            id="analise_juridica"
+            name="analise_juridica"
+            rows="7"
+            placeholder="Informe requisitos legais, regras aplicáveis, qualidade de segurado, carência, direito adquirido e demais fundamentos."
+        >{{ ficha.analise_juridica or '' }}</textarea>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-signpost-split"></i>
+        </span>
+        <div>
+            <h3>Estratégia e riscos</h3>
+            <p>Indique o caminho recomendado e os riscos identificados.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6 analise-campo">
+            <label for="estrategia_sugerida" class="form-label">
+                Estratégia sugerida
+            </label>
+            <textarea
+                class="form-control"
+                id="estrategia_sugerida"
+                name="estrategia_sugerida"
+                rows="6"
+                placeholder="Ex.: novo requerimento, cumprimento de exigência, recurso administrativo ou ação judicial."
+            >{{ ficha.estrategia_sugerida or '' }}</textarea>
+        </div>
+
+        <div class="col-lg-6 analise-campo">
+            <label for="riscos_identificados" class="form-label">
+                Riscos identificados
+            </label>
+            <textarea
+                class="form-control"
+                id="riscos_identificados"
+                name="riscos_identificados"
+                rows="6"
+                placeholder="Registre fragilidades documentais, divergências, prazos, prescrição e riscos probatórios."
+            >{{ ficha.riscos_identificados or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-list-check"></i>
+        </span>
+        <div>
+            <h3>Providências e pendências</h3>
+            <p>Defina os próximos passos necessários para o caso.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6 analise-campo">
+            <label
+                for="providencias_recomendadas"
+                class="form-label"
+            >
+                Providências recomendadas
+            </label>
+            <textarea
+                class="form-control"
+                id="providencias_recomendadas"
+                name="providencias_recomendadas"
+                rows="6"
+                placeholder="Liste documentos, cálculos, requerimentos, perícias e demais medidas recomendadas."
+            >{{ ficha.providencias_recomendadas or '' }}</textarea>
+        </div>
+
+        <div class="col-lg-6 analise-campo">
+            <label for="pendencias_gerais" class="form-label">
+                Pendências gerais
+            </label>
+            <textarea
+                class="form-control"
+                id="pendencias_gerais"
+                name="pendencias_gerais"
+                rows="6"
+                placeholder="Registre tudo o que ainda depende do cliente, do escritório ou de terceiros."
+            >{{ ficha.pendencias_gerais or '' }}</textarea>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+        <div>
+            <h3>Observações finais</h3>
+            <p>Espaço para informações complementares da análise.</p>
+        </div>
+    </div>
+
+    <div class="analise-campo">
+        <label for="observacoes_gerais" class="form-label">
+            Observações gerais
+        </label>
+        <textarea
+            class="form-control"
+            id="observacoes_gerais"
+            name="observacoes_gerais"
+            rows="5"
+            placeholder="Registre informações adicionais relevantes para o acompanhamento."
+        >{{ ficha.observacoes_gerais or '' }}</textarea>
+    </div>
+
+    <div class="conclusao-card mt-4">
+        <div class="d-flex gap-3 align-items-start">
+            <i class="bi bi-check-circle-fill fs-4"></i>
+            <div>
+                <strong>Finalização da ficha</strong>
+                <div class="mt-1 text-muted">
+                    Ao usar o botão “Salvar e finalizar”, esta etapa será
+                    marcada como concluída e você retornará aos detalhes do cliente.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const botaoFinalizar = document.querySelector(
+            'button[name="acao"][value="salvar_proxima"]'
+        );
+
+        if (botaoFinalizar) {
+            botaoFinalizar.innerHTML =
+                '<i class="bi bi-check-circle"></i> Salvar e finalizar';
+        }
+    });
+</script>
+
+{% endblock %}

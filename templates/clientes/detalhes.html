@@ -1,0 +1,1705 @@
+{% extends "base.html" %}
+
+{% from "components/file_icon.html" import file_icon %}
+
+{% block titulo %}
+{{ cliente.nome }}
+{% endblock %}
+
+{% block conteudo %}
+
+<!-- =====================================
+     CÁLCULO DO PRÓXIMO PRAZO
+===================================== -->
+{% set prazo = namespace(data=None) %}
+
+{% for processo in cliente.processos %}
+
+    {% if processo.proximo_prazo %}
+
+        {% if prazo.data is none
+              or processo.proximo_prazo < prazo.data %}
+
+            {% set prazo.data = processo.proximo_prazo %}
+
+        {% endif %}
+
+    {% endif %}
+
+{% endfor %}
+
+
+<!-- =====================================
+     CABEÇALHO DO CLIENTE
+===================================== -->
+<div class="card shadow-sm border-0 mb-4">
+
+    <div class="card-body p-4">
+
+        <div
+            class="
+                d-flex
+                flex-column
+                flex-lg-row
+                justify-content-between
+                align-items-lg-center
+                gap-3
+            "
+        >
+
+            <div>
+
+                <div class="d-flex align-items-center gap-3 mb-2">
+
+                    <div
+                        class="
+                            rounded-circle
+                            bg-primary
+                            text-white
+                            d-flex
+                            align-items-center
+                            justify-content-center
+                            flex-shrink-0
+                        "
+                        style="
+                            width: 58px;
+                            height: 58px;
+                            font-size: 1.7rem;
+                        "
+                    >
+                        👤
+                    </div>
+
+                    <div>
+
+                        <h2 class="mb-1">
+                            {{ cliente.nome }}
+                        </h2>
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            {% if cliente.ativo %}
+
+                                <span class="badge bg-success">
+
+                                    🟢 Cliente ativo
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-secondary">
+
+                                    ⚫ Cliente inativo
+
+                                </span>
+
+                            {% endif %}
+
+                            <span class="badge bg-light text-dark border">
+
+                                CPF:
+                                {{ cliente.cpf or "Não informado" }}
+
+                            </span>
+
+                            {% if cliente.criado_em %}
+
+                                <span class="badge bg-light text-dark border">
+
+                                    Cliente desde
+                                    {{ cliente.criado_em.strftime(
+                                        "%d/%m/%Y"
+                                    ) }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+
+                <a
+                    href="{{ url_for(
+                        'clientes.editar_cliente',
+                        id=cliente.id
+                    ) }}"
+                    class="btn btn-warning"
+                >
+
+                    ✏ Editar cliente
+
+                </a>
+
+                <a
+                    href="{{ url_for(
+                        'clientes.listar_clientes'
+                    ) }}"
+                    class="btn btn-secondary"
+                >
+
+                    ← Voltar
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     CARDS DE RESUMO
+===================================== -->
+<div class="row g-3 mb-4">
+
+    <!-- PROCESSOS -->
+    <div class="col-sm-6 col-xl-3">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-start
+                    "
+                >
+
+                    <div>
+
+                        <small
+                            class="
+                                text-muted
+                                text-uppercase
+                                fw-semibold
+                            "
+                        >
+                            Processos
+                        </small>
+
+                        <h2 class="mb-0 mt-2">
+
+                            {{ cliente.processos|length }}
+
+                        </h2>
+
+                    </div>
+
+                    <div
+                        class="
+                            rounded
+                            bg-primary
+                            bg-opacity-10
+                            p-3
+                            fs-4
+                        "
+                    >
+                        ⚖
+                    </div>
+
+                </div>
+
+                <div class="mt-3">
+
+                    {% if cliente.processos %}
+
+                        <span class="text-muted small">
+
+                            Processos vinculados ao cliente.
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-muted small">
+
+                            Nenhum processo cadastrado.
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ATENDIMENTOS -->
+    <div class="col-sm-6 col-xl-3">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-start
+                    "
+                >
+
+                    <div>
+
+                        <small
+                            class="
+                                text-muted
+                                text-uppercase
+                                fw-semibold
+                            "
+                        >
+                            Atendimentos
+                        </small>
+
+                        <h2 class="mb-0 mt-2">
+
+                            {{ cliente.atendimentos|length }}
+
+                        </h2>
+
+                    </div>
+
+                    <div
+                        class="
+                            rounded
+                            bg-success
+                            bg-opacity-10
+                            p-3
+                            fs-4
+                        "
+                    >
+                        ⭐
+                    </div>
+
+                </div>
+
+                <div class="mt-3">
+
+                    {% if cliente.atendimentos %}
+
+                        <span class="text-muted small">
+
+                            Fichas e atendimentos registrados.
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-muted small">
+
+                            Nenhum atendimento iniciado.
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ARQUIVOS -->
+    <div class="col-sm-6 col-xl-3">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-start
+                    "
+                >
+
+                    <div>
+
+                        <small
+                            class="
+                                text-muted
+                                text-uppercase
+                                fw-semibold
+                            "
+                        >
+                            Arquivos
+                        </small>
+
+                        <h2 class="mb-0 mt-2">
+
+                            {{ cliente.documentos|length }}
+
+                        </h2>
+
+                    </div>
+
+                    <div
+                        class="
+                            rounded
+                            bg-info
+                            bg-opacity-10
+                            p-3
+                            fs-4
+                        "
+                    >
+                        📂
+                    </div>
+
+                </div>
+
+                <div class="mt-3">
+
+                    {% if cliente.documentos %}
+
+                        <span class="text-muted small">
+
+                            Documentos armazenados.
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-muted small">
+
+                            Nenhum arquivo enviado.
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PRÓXIMO PRAZO -->
+    <div class="col-sm-6 col-xl-3">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div
+                    class="
+                        d-flex
+                        justify-content-between
+                        align-items-start
+                    "
+                >
+
+                    <div>
+
+                        <small
+                            class="
+                                text-muted
+                                text-uppercase
+                                fw-semibold
+                            "
+                        >
+                            Próximo prazo
+                        </small>
+
+                        <h5 class="mb-0 mt-2">
+
+                            {% if prazo.data %}
+
+                                {{ prazo.data.strftime(
+                                    "%d/%m/%Y"
+                                ) }}
+
+                            {% else %}
+
+                                Sem prazo
+
+                            {% endif %}
+
+                        </h5>
+
+                    </div>
+
+                    <div
+                        class="
+                            rounded
+                            bg-warning
+                            bg-opacity-10
+                            p-3
+                            fs-4
+                        "
+                    >
+                        📅
+                    </div>
+
+                </div>
+
+                <div class="mt-3">
+
+                    {% if prazo.data %}
+
+                        <span class="text-muted small">
+
+                            Prazo mais próximo nos processos.
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="text-muted small">
+
+                            Nenhum prazo registrado.
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     DADOS PESSOAIS E CONTATO
+===================================== -->
+<div class="row">
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm mb-4 h-100">
+
+            <div class="card-header bg-primary text-white">
+
+                👤 Dados pessoais
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-sm-6">
+
+                        <small class="text-muted d-block">
+                            CPF
+                        </small>
+
+                        <strong>
+                            {{ cliente.cpf or "-" }}
+                        </strong>
+
+                    </div>
+
+                    <div class="col-sm-6">
+
+                        <small class="text-muted d-block">
+                            RG
+                        </small>
+
+                        <strong>
+                            {{ cliente.rg or "-" }}
+                        </strong>
+
+                    </div>
+
+                    <div class="col-sm-6">
+
+                        <small class="text-muted d-block">
+                            Nascimento
+                        </small>
+
+                        <strong>
+
+                            {% if cliente.data_nascimento %}
+
+                                {{ cliente.data_nascimento.strftime(
+                                    "%d/%m/%Y"
+                                ) }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                    <div class="col-sm-6">
+
+                        <small class="text-muted d-block">
+                            Estado civil
+                        </small>
+
+                        <strong>
+                            {{ cliente.estado_civil or "-" }}
+                        </strong>
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <small class="text-muted d-block">
+                            Profissão
+                        </small>
+
+                        <strong>
+                            {{ cliente.profissao or "-" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <div class="card shadow-sm mb-4 h-100">
+
+            <div class="card-header bg-success text-white">
+
+                📞 Contato
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-3">
+
+                    <div class="col-sm-6">
+
+                        <small class="text-muted d-block">
+                            Telefone
+                        </small>
+
+                        <strong>
+                            {{ cliente.telefone or "-" }}
+                        </strong>
+
+                    </div>
+
+                    <div class="col-sm-6">
+
+                        <small class="text-muted d-block">
+                            WhatsApp
+                        </small>
+
+                        <strong>
+                            {{ cliente.whatsapp or "-" }}
+                        </strong>
+
+                    </div>
+
+                    <div class="col-12">
+
+                        <small class="text-muted d-block">
+                            E-mail
+                        </small>
+
+                        <strong>
+                            {{ cliente.email or "-" }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     ENDEREÇO
+===================================== -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-info text-white">
+
+        🏠 Endereço
+
+    </div>
+
+    <div class="card-body">
+
+        {% if cliente.rua
+              or cliente.numero
+              or cliente.bairro
+              or cliente.cidade
+              or cliente.estado
+              or cliente.cep %}
+
+            <div class="row g-3">
+
+                <div class="col-md-8">
+
+                    <small class="text-muted d-block">
+                        Logradouro
+                    </small>
+
+                    <strong>
+
+                        {{ cliente.rua or "Não informado" }}
+
+                        {% if cliente.numero %}
+
+                            , {{ cliente.numero }}
+
+                        {% endif %}
+
+                        {% if cliente.complemento %}
+
+                            - {{ cliente.complemento }}
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        CEP
+                    </small>
+
+                    <strong>
+                        {{ cliente.cep or "-" }}
+                    </strong>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Bairro
+                    </small>
+
+                    <strong>
+                        {{ cliente.bairro or "-" }}
+                    </strong>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Cidade
+                    </small>
+
+                    <strong>
+                        {{ cliente.cidade or "-" }}
+                    </strong>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <small class="text-muted d-block">
+                        Estado
+                    </small>
+
+                    <strong>
+                        {{ cliente.estado or "-" }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <p class="text-muted mb-0">
+
+                Nenhum endereço cadastrado.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     DADOS JURÍDICOS
+===================================== -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-dark text-white">
+
+        ⚖ Dados jurídicos
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-md-4">
+
+                <small class="text-muted d-block">
+                    Área
+                </small>
+
+                <strong>
+                    {{ cliente.area_juridica or "-" }}
+                </strong>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <small class="text-muted d-block">
+                    Origem
+                </small>
+
+                <strong>
+                    {{ cliente.origem_cliente or "-" }}
+                </strong>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <small class="text-muted d-block">
+                    Responsável
+                </small>
+
+                <strong>
+                    {{ cliente.responsavel or "-" }}
+                </strong>
+
+            </div>
+
+        </div>
+
+        <small class="text-muted d-block mb-1">
+            Observações
+        </small>
+
+        <div class="border rounded p-3 bg-light">
+
+            {{ cliente.observacoes
+               or "Nenhuma observação cadastrada." }}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     PROCESSOS
+===================================== -->
+<div class="card shadow-sm mb-4">
+
+    <div
+        class="
+            card-header
+            bg-dark
+            text-white
+            d-flex
+            flex-column
+            flex-sm-row
+            justify-content-between
+            align-items-sm-center
+            gap-2
+        "
+    >
+
+        <span>
+
+            ⚖ Processos
+
+            <span class="badge bg-light text-dark">
+
+                {{ cliente.processos|length }}
+
+            </span>
+
+        </span>
+
+        <a
+            href="{{ url_for(
+                'processos.novo_processo',
+                cliente_id=cliente.id
+            ) }}"
+            class="btn btn-light btn-sm"
+        >
+
+            + Novo processo
+
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if cliente.processos %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Número</th>
+                            <th>Área</th>
+                            <th>Situação</th>
+                            <th>Próximo prazo</th>
+                            <th>Advogado</th>
+
+                            <th class="text-center">
+                                Ações
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for processo in cliente.processos %}
+
+                            <tr>
+
+                                <td>
+                                    {{ processo.numero }}
+                                </td>
+
+                                <td>
+                                    {{ processo.area or "-" }}
+                                </td>
+
+                                <td>
+
+                                    {% if processo.situacao
+                                          == "Em andamento" %}
+
+                                        <span class="badge bg-success">
+
+                                            {{ processo.situacao }}
+
+                                        </span>
+
+                                    {% elif processo.situacao
+                                            == "Aguardando documentos" %}
+
+                                        <span
+                                            class="
+                                                badge
+                                                bg-warning
+                                                text-dark
+                                            "
+                                        >
+
+                                            {{ processo.situacao }}
+
+                                        </span>
+
+                                    {% elif processo.situacao
+                                            == "Aguardando audiência" %}
+
+                                        <span class="badge bg-info">
+
+                                            {{ processo.situacao }}
+
+                                        </span>
+
+                                    {% elif processo.situacao
+                                            == "Arquivado" %}
+
+                                        <span class="badge bg-secondary">
+
+                                            {{ processo.situacao }}
+
+                                        </span>
+
+                                    {% elif processo.situacao
+                                            == "Suspenso" %}
+
+                                        <span class="badge bg-danger">
+
+                                            {{ processo.situacao }}
+
+                                        </span>
+
+                                    {% else %}
+
+                                        {{ processo.situacao or "-" }}
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    {% if processo.proximo_prazo %}
+
+                                        {{ processo.proximo_prazo.strftime(
+                                            "%d/%m/%Y"
+                                        ) }}
+
+                                    {% else %}
+
+                                        -
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ processo.advogado or "-" }}
+                                </td>
+
+                                <td class="text-center text-nowrap">
+
+                                    <a
+                                        href="{{ url_for(
+                                            'processos.editar_processo',
+                                            id=processo.id
+                                        ) }}"
+                                        class="btn btn-warning btn-sm"
+                                    >
+
+                                        ✏ Editar
+
+                                    </a>
+
+                                    <form
+                                        action="{{ url_for(
+                                            'processos.excluir_processo',
+                                            id=processo.id
+                                        ) }}"
+                                        method="POST"
+                                        class="d-inline"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm(
+                                                'Tem certeza que deseja excluir este processo?'
+                                            )"
+                                        >
+
+                                            🗑 Excluir
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-4">
+
+                <div class="fs-1 mb-2">
+                    ⚖
+                </div>
+
+                <h5>
+                    Nenhum processo cadastrado
+                </h5>
+
+                <p class="text-muted">
+
+                    Adicione o primeiro processo
+                    relacionado a este cliente.
+
+                </p>
+
+                <a
+                    href="{{ url_for(
+                        'processos.novo_processo',
+                        cliente_id=cliente.id
+                    ) }}"
+                    class="btn btn-dark"
+                >
+
+                    + Novo processo
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     ATENDIMENTOS
+===================================== -->
+<div class="card shadow-sm mb-4">
+
+    <div
+        class="
+            card-header
+            bg-success
+            text-white
+            d-flex
+            flex-column
+            flex-sm-row
+            justify-content-between
+            align-items-sm-center
+            gap-2
+        "
+    >
+
+        <span>
+
+            ⭐ Atendimentos
+
+            <span class="badge bg-light text-dark">
+
+                {{ cliente.atendimentos|length }}
+
+            </span>
+
+        </span>
+
+        <a
+            href="{{ url_for(
+                'atendimentos.selecionar_area',
+                cliente_id=cliente.id
+            ) }}"
+            class="btn btn-light btn-sm"
+        >
+
+            + Novo atendimento
+
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if cliente.atendimentos %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Data</th>
+                            <th>Área</th>
+                            <th>Status</th>
+                            <th>Responsável</th>
+                            <th>Resumo</th>
+                            <th class="text-end">Ações</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for atendimento in cliente.atendimentos %}
+
+                            <tr>
+
+                                <td>
+
+                                    {% if atendimento.data_atendimento %}
+
+                                        {{ atendimento.data_atendimento.strftime(
+                                            "%d/%m/%Y"
+                                        ) }}
+
+                                        {% if atendimento.horario_atendimento %}
+
+                                            <small
+                                                class="
+                                                    text-muted
+                                                    d-block
+                                                "
+                                            >
+
+                                                {{ atendimento.horario_atendimento.strftime(
+                                                    "%H:%M"
+                                                ) }}
+
+                                            </small>
+
+                                        {% endif %}
+
+                                    {% else %}
+
+                                        -
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    <span
+                                        class="
+                                            badge
+                                            bg-primary
+                                            bg-opacity-10
+                                            text-primary
+                                            border
+                                            border-primary
+                                        "
+                                    >
+
+                                        {{ atendimento.area_nome }}
+
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    {% if atendimento.status
+                                          == atendimento.STATUS_RASCUNHO %}
+
+                                        <span
+                                            class="
+                                                badge
+                                                bg-warning
+                                                text-dark
+                                            "
+                                        >
+
+                                            {{ atendimento.status_nome }}
+
+                                        </span>
+
+                                    {% elif atendimento.status
+                                            == atendimento.STATUS_FINALIZADO %}
+
+                                        <span class="badge bg-success">
+
+                                            {{ atendimento.status_nome }}
+
+                                        </span>
+
+                                    {% elif atendimento.status
+                                            == atendimento.STATUS_ARQUIVADO %}
+
+                                        <span class="badge bg-secondary">
+
+                                            {{ atendimento.status_nome }}
+
+                                        </span>
+
+                                    {% elif atendimento.status
+                                            == atendimento.STATUS_AGUARDANDO_DOCUMENTOS %}
+
+                                        <span class="badge bg-info">
+
+                                            {{ atendimento.status_nome }}
+
+                                        </span>
+
+                                    {% elif atendimento.status
+                                            == atendimento.STATUS_CONVERTIDO_PROCESSO %}
+
+                                        <span class="badge bg-primary">
+
+                                            {{ atendimento.status_nome }}
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-dark">
+
+                                            {{ atendimento.status_nome }}
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    {{ atendimento.responsavel_nome }}
+
+                                </td>
+
+                                <td>
+
+                                    {{ atendimento.resumo_caso
+                                       or atendimento.titulo
+                                       or "Sem resumo cadastrado." }}
+
+                                </td>
+
+                                <td class="text-end">
+
+                                    {% if atendimento.area
+                                          == atendimento.AREA_TRABALHISTA %}
+
+                                        <a
+                                            href="{{ url_for(
+                                                'atendimentos.ficha_trabalhista',
+                                                atendimento_id=atendimento.id
+                                            ) }}"
+                                            class="btn btn-outline-success btn-sm"
+                                        >
+
+                                            Abrir ficha
+
+                                        </a>
+
+                                    {% else %}
+
+                                        <span class="text-muted small">
+
+                                            Ficha indisponível
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <div class="fs-1 mb-2">
+                    ⭐
+                </div>
+
+                <h5>
+                    Nenhum atendimento iniciado
+                </h5>
+
+                <p class="text-muted mb-3">
+
+                    Os atendimentos e fichas jurídicas
+                    deste cliente aparecerão aqui.
+
+                </p>
+
+                <a
+                    href="{{ url_for(
+                        'atendimentos.selecionar_area',
+                        cliente_id=cliente.id
+                    ) }}"
+                    class="btn btn-success"
+                >
+
+                    + Iniciar primeiro atendimento
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     ARQUIVOS
+===================================== -->
+<div class="card shadow-sm mb-4">
+
+    <div
+        class="
+            card-header
+            bg-primary
+            text-white
+            d-flex
+            flex-column
+            flex-sm-row
+            justify-content-between
+            align-items-sm-center
+            gap-2
+        "
+    >
+
+        <span>
+
+            📂 Arquivos
+
+            <span class="badge bg-light text-dark">
+
+                {{ cliente.documentos|length }}
+
+            </span>
+
+        </span>
+
+        <a
+            href="{{ url_for(
+                'documentos.novo_documento',
+                cliente_id=cliente.id
+            ) }}"
+            class="btn btn-light btn-sm"
+        >
+
+            + Enviar arquivo
+
+        </a>
+
+    </div>
+
+    <div class="card-body">
+
+        {% if cliente.documentos %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Arquivo</th>
+                            <th>Descrição</th>
+                            <th>Data de envio</th>
+
+                            <th class="text-center">
+                                Ações
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for documento in cliente.documentos %}
+
+                            <tr>
+
+                                <td class="fw-bold">
+
+                                    {{ file_icon(
+                                        documento.nome_arquivo
+                                    ) }}
+
+                                    {{ documento.nome_arquivo }}
+
+                                </td>
+
+                                <td>
+
+                                    {{ documento.descricao or "-" }}
+
+                                </td>
+
+                                <td>
+
+                                    {% if documento.criado_em %}
+
+                                        {{ documento.criado_em.strftime(
+                                            "%d/%m/%Y às %H:%M"
+                                        ) }}
+
+                                    {% else %}
+
+                                        -
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td class="text-center text-nowrap">
+
+                                    <a
+                                        href="{{ url_for(
+                                            'documentos.visualizar_documento',
+                                            id=documento.id
+                                        ) }}"
+                                        class="btn btn-info btn-sm"
+                                        target="_blank"
+                                    >
+
+                                        👁 Ver
+
+                                    </a>
+
+                                    <a
+                                        href="{{ url_for(
+                                            'documentos.download_documento',
+                                            id=documento.id
+                                        ) }}"
+                                        class="btn btn-success btn-sm"
+                                    >
+
+                                        ⬇ Baixar
+
+                                    </a>
+
+                                    <form
+                                        action="{{ url_for(
+                                            'documentos.excluir_documento',
+                                            id=documento.id
+                                        ) }}"
+                                        method="POST"
+                                        class="d-inline"
+                                    >
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger btn-sm"
+                                            onclick="return confirm(
+                                                'Tem certeza que deseja excluir este arquivo?'
+                                            )"
+                                        >
+
+                                            🗑 Excluir
+
+                                        </button>
+
+                                    </form>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-5">
+
+                <div class="fs-1 mb-2">
+                    📂
+                </div>
+
+                <h5 class="text-muted">
+
+                    Nenhum arquivo enviado
+
+                </h5>
+
+                <p class="text-muted">
+
+                    Envie documentos, imagens, vídeos,
+                    áudios ou outros arquivos relacionados
+                    a este cliente.
+
+                </p>
+
+                <a
+                    href="{{ url_for(
+                        'documentos.novo_documento',
+                        cliente_id=cliente.id
+                    ) }}"
+                    class="btn btn-primary"
+                >
+
+                    + Enviar arquivo
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =====================================
+     AUDITORIA
+===================================== -->
+<div class="card shadow-sm mb-4">
+
+    <div class="card-header bg-secondary text-white">
+
+        📋 Auditoria
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="row g-4">
+
+            <div class="col-md-6">
+
+                <div class="border rounded p-3 h-100 bg-light">
+
+                    <small class="text-muted d-block mb-1">
+
+                        Criado por
+
+                    </small>
+
+                    <strong class="d-block mb-3">
+
+                        {{ cliente.criado_por_nome }}
+
+                    </strong>
+
+                    <small class="text-muted d-block mb-1">
+
+                        Data de criação
+
+                    </small>
+
+                    <strong>
+
+                        {% if cliente.criado_em %}
+
+                            {{ cliente.criado_em.strftime(
+                                "%d/%m/%Y às %H:%M"
+                            ) }}
+
+                        {% else %}
+
+                            Não registrado
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <div class="border rounded p-3 h-100 bg-light">
+
+                    <small class="text-muted d-block mb-1">
+
+                        Última alteração por
+
+                    </small>
+
+                    <strong class="d-block mb-3">
+
+                        {{ cliente.atualizado_por_nome }}
+
+                    </strong>
+
+                    <small class="text-muted d-block mb-1">
+
+                        Data da última alteração
+
+                    </small>
+
+                    <strong>
+
+                        {% if cliente.atualizado_em %}
+
+                            {{ cliente.atualizado_em.strftime(
+                                "%d/%m/%Y às %H:%M"
+                            ) }}
+
+                        {% else %}
+
+                            Não registrado
+
+                        {% endif %}
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% if not cliente.criado_por
+              or not cliente.atualizado_por %}
+
+            <div class="alert alert-light border mt-4 mb-0">
+
+                <small class="text-muted">
+
+                    ℹ️ Alguns dados de auditoria podem não estar
+                    disponíveis para clientes cadastrados antes da
+                    implantação deste recurso.
+
+                </small>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

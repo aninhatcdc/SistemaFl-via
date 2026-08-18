@@ -1,0 +1,537 @@
+{% extends "atendimentos/previdenciaria/layout.html" %}
+
+{% block title %}
+Segurado - Ficha Previdenciária
+{% endblock %}
+
+{% block form_action %}
+{{ url_for(
+    "atendimentos.etapa_segurado_previdenciario",
+    atendimento_id=atendimento.id
+) }}
+{% endblock %}
+
+{% block etapa_titulo %}
+Dados do segurado
+{% endblock %}
+
+{% block etapa_descricao %}
+Confira os dados cadastrais e registre as informações previdenciárias do segurado.
+{% endblock %}
+
+{% block etapa_identificacao %}
+Etapa 2 de 8
+{% endblock %}
+
+{% block etapa_alertas %}
+<div class="previdenciaria-info-box">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        Os campos em cinza são recuperados do cadastro principal do cliente.
+        Os demais pertencem exclusivamente à ficha previdenciária.
+    </div>
+</div>
+{% endblock %}
+
+{% block etapa_conteudo %}
+
+<style>
+    .campo-condicional {
+        display: none;
+    }
+
+    .campo-condicional.campo-condicional-visivel {
+        display: block;
+    }
+</style>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-person-vcard"></i>
+        </span>
+        <div>
+            <h3>Identificação do segurado</h3>
+            <p>Dados pessoais e números de identificação previdenciária.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <label class="form-label">Nome completo</label>
+            <input
+                type="text"
+                class="form-control previdenciaria-readonly-field"
+                value="{{ cliente.nome or '' }}"
+                readonly
+            >
+        </div>
+
+        <div class="col-lg-4">
+            <label class="form-label">Data de nascimento</label>
+            <input
+                type="text"
+                class="form-control previdenciaria-readonly-field"
+                value="{{ cliente.data_nascimento.strftime('%d/%m/%Y') if cliente.data_nascimento else '' }}"
+                readonly
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">CPF</label>
+            <input
+                type="text"
+                class="form-control previdenciaria-readonly-field"
+                value="{{ cliente.cpf or '' }}"
+                readonly
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label for="rg" class="form-label">RG</label>
+            <input
+                type="text"
+                class="form-control"
+                id="rg"
+                name="rg"
+                maxlength="30"
+                value="{{ ficha.rg or cliente.rg or '' }}"
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label for="orgao_expedidor" class="form-label">
+                Órgão expedidor
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="orgao_expedidor"
+                name="orgao_expedidor"
+                maxlength="30"
+                value="{{ ficha.orgao_expedidor or '' }}"
+                placeholder="Ex.: SSP/PB"
+            >
+        </div>
+
+        <div class="col-md-6">
+            <label for="nit_pis_pasep" class="form-label">
+                NIT, PIS ou PASEP
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="nit_pis_pasep"
+                name="nit_pis_pasep"
+                maxlength="30"
+                value="{{ ficha.nit_pis_pasep or '' }}"
+                placeholder="Informe o número de identificação"
+            >
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Estado civil</label>
+            <input
+                type="text"
+                class="form-control previdenciaria-readonly-field"
+                value="{{ cliente.estado_civil or '' }}"
+                readonly
+            >
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-mortarboard"></i>
+        </span>
+        <div>
+            <h3>Escolaridade e profissão</h3>
+            <p>Formação e atividade profissional informadas pelo segurado.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="escolaridade" class="form-label">
+                Escolaridade
+            </label>
+            <select
+                class="form-select"
+                id="escolaridade"
+                name="escolaridade"
+                data-controla="grupo-escolaridade-outro"
+                data-exibir-quando="OUTRA"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in escolaridades.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.escolaridade == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-escolaridade-outro"
+            class="col-lg-6 campo-condicional"
+        >
+            <label for="escolaridade_outro" class="form-label">
+                Outra escolaridade
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="escolaridade_outro"
+                name="escolaridade_outro"
+                maxlength="120"
+                value="{{ ficha.escolaridade_outro or '' }}"
+            >
+        </div>
+
+        <div class="col-lg-6">
+            <label for="profissao" class="form-label">Profissão</label>
+            <input
+                type="text"
+                class="form-control"
+                id="profissao"
+                name="profissao"
+                maxlength="150"
+                value="{{ ficha.profissao or cliente.profissao or '' }}"
+            >
+        </div>
+
+        <div class="col-lg-6">
+            <label for="ocupacao_atual" class="form-label">
+                Ocupação atual
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="ocupacao_atual"
+                name="ocupacao_atual"
+                maxlength="150"
+                value="{{ ficha.ocupacao_atual or '' }}"
+                placeholder="Ex.: comerciante, agricultor ou sem atividade"
+            >
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-briefcase"></i>
+        </span>
+        <div>
+            <h3>Filiação e situação profissional</h3>
+            <p>Categoria previdenciária e situação atual do segurado.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="categoria_segurado" class="form-label">
+                Categoria do segurado
+            </label>
+            <select
+                class="form-select"
+                id="categoria_segurado"
+                name="categoria_segurado"
+                data-controla="grupo-categoria-outro"
+                data-exibir-quando="OUTRA"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in categorias_segurado.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.categoria_segurado == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-categoria-outro"
+            class="col-lg-6 campo-condicional"
+        >
+            <label for="categoria_segurado_outro" class="form-label">
+                Outra categoria
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="categoria_segurado_outro"
+                name="categoria_segurado_outro"
+                maxlength="150"
+                value="{{ ficha.categoria_segurado_outro or '' }}"
+            >
+        </div>
+
+        <div class="col-lg-6">
+            <label for="situacao_profissional" class="form-label">
+                Situação profissional
+            </label>
+            <select
+                class="form-select"
+                id="situacao_profissional"
+                name="situacao_profissional"
+                data-controla="grupo-situacao-outro"
+                data-exibir-quando="OUTRA"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in situacoes_profissionais.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.situacao_profissional == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-situacao-outro"
+            class="col-lg-6 campo-condicional"
+        >
+            <label for="situacao_profissional_outro" class="form-label">
+                Outra situação profissional
+            </label>
+            <input
+                type="text"
+                class="form-control"
+                id="situacao_profissional_outro"
+                name="situacao_profissional_outro"
+                maxlength="150"
+                value="{{ ficha.situacao_profissional_outro or '' }}"
+            >
+        </div>
+
+        <div class="col-lg-6">
+            <label for="data_ultimo_trabalho" class="form-label">
+                Data do último trabalho
+            </label>
+            <input
+                type="date"
+                class="form-control"
+                id="data_ultimo_trabalho"
+                name="data_ultimo_trabalho"
+                value="{{ ficha.data_ultimo_trabalho.strftime('%Y-%m-%d') if ficha.data_ultimo_trabalho else '' }}"
+            >
+            <div class="form-text">
+                Informe quando encerrou a última atividade, quando aplicável.
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-people"></i>
+        </span>
+        <div>
+            <h3>Dependentes</h3>
+            <p>Dependentes econômicos ou previdenciários do segurado.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="possui_dependentes" class="form-label">
+                Possui dependentes?
+            </label>
+            <select
+                class="form-select"
+                id="possui_dependentes"
+                name="possui_dependentes"
+                data-controla="grupo-dependentes"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_dependentes == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-dependentes"
+            class="col-12 campo-condicional"
+        >
+            <div class="row g-3">
+                <div class="col-lg-4">
+                    <label for="quantidade_dependentes" class="form-label">
+                        Quantidade de dependentes
+                    </label>
+                    <input
+                        type="number"
+                        class="form-control"
+                        id="quantidade_dependentes"
+                        name="quantidade_dependentes"
+                        min="0"
+                        value="{{ ficha.quantidade_dependentes if ficha.quantidade_dependentes is not none else '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-8">
+                    <label for="dependentes_descricao" class="form-label">
+                        Identificação dos dependentes
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="dependentes_descricao"
+                        name="dependentes_descricao"
+                        rows="3"
+                        placeholder="Informe nomes, vínculos, idades e outras informações relevantes."
+                    >{{ ficha.dependentes_descricao or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-universal-access"></i>
+        </span>
+        <div>
+            <h3>Pessoa com deficiência</h3>
+            <p>Informações relevantes para benefícios e aposentadoria da pessoa com deficiência.</p>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <label for="possui_deficiencia" class="form-label">
+                Possui deficiência?
+            </label>
+            <select
+                class="form-select"
+                id="possui_deficiencia"
+                name="possui_deficiencia"
+                data-controla="grupo-deficiencia"
+                data-exibir-quando="SIM"
+            >
+                <option value="">Selecione</option>
+                {% for valor, rotulo in respostas.items() %}
+                <option
+                    value="{{ valor }}"
+                    {% if ficha.possui_deficiencia == valor %}selected{% endif %}
+                >
+                    {{ rotulo }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div
+            id="grupo-deficiencia"
+            class="col-12 campo-condicional"
+        >
+            <div class="row g-3">
+                <div class="col-lg-8">
+                    <label for="tipo_deficiencia" class="form-label">
+                        Tipo ou descrição da deficiência
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="tipo_deficiencia"
+                        name="tipo_deficiencia"
+                        maxlength="150"
+                        value="{{ ficha.tipo_deficiencia or '' }}"
+                    >
+                </div>
+
+                <div class="col-lg-4">
+                    <label for="data_inicio_deficiencia" class="form-label">
+                        Data de início
+                    </label>
+                    <input
+                        type="date"
+                        class="form-control"
+                        id="data_inicio_deficiencia"
+                        name="data_inicio_deficiencia"
+                        value="{{ ficha.data_inicio_deficiencia.strftime('%Y-%m-%d') if ficha.data_inicio_deficiencia else '' }}"
+                    >
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="previdenciaria-section">
+    <div class="previdenciaria-section-title">
+        <span class="previdenciaria-section-title-icon">
+            <i class="bi bi-journal-text"></i>
+        </span>
+        <div>
+            <h3>Observações</h3>
+            <p>Registre detalhes complementares sobre o segurado.</p>
+        </div>
+    </div>
+
+    <label for="observacoes_segurado" class="form-label">
+        Observações sobre o segurado
+    </label>
+    <textarea
+        class="form-control"
+        id="observacoes_segurado"
+        name="observacoes_segurado"
+        rows="5"
+        placeholder="Registre informações relevantes que não foram contempladas nos campos anteriores."
+    >{{ ficha.observacoes_segurado or '' }}</textarea>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function atualizarCampoCondicional(controle) {
+            const alvoId = controle.dataset.controla;
+            const valorExibicao = controle.dataset.exibirQuando;
+            const alvo = document.getElementById(alvoId);
+
+            if (!alvo) {
+                return;
+            }
+
+            const deveExibir = controle.value === valorExibicao;
+
+            alvo.classList.toggle(
+                "campo-condicional-visivel",
+                deveExibir
+            );
+
+            alvo.querySelectorAll("input, select, textarea").forEach(
+                function (campo) {
+                    campo.disabled = !deveExibir;
+                }
+            );
+        }
+
+        document.querySelectorAll("[data-controla]").forEach(
+            function (controle) {
+                atualizarCampoCondicional(controle);
+
+                controle.addEventListener("change", function () {
+                    atualizarCampoCondicional(controle);
+                });
+            }
+        );
+    });
+</script>
+
+{% endblock %}
